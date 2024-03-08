@@ -37,6 +37,7 @@ RESERVED_ATTRS: Tuple[str, ...] = (
     "processName",
     "relativeCreated",
     "stack_info",
+    "taskName",
     "thread",
     "threadName",
 )
