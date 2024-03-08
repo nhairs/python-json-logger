@@ -2,27 +2,16 @@
 [![License](https://img.shields.io/pypi/l/python-json-logger.svg)](https://pypi.python.org/pypi/python-json-logger/)
 [![Version](https://img.shields.io/pypi/v/python-json-logger.svg)](https://pypi.python.org/pypi/python-json-logger/)
 
+**Important:** This repository is a maintained fork of [madzak/python-json-logger](https://github.com/madzak/python-json-logger) pending [a PEP 541 request](https://github.com/pypi/support/issues/3607) for the PyPI package.  The future direction of the project is being discussed [here](https://github.com/nhairs/python-json-logger/issues/1).
+
 Overview
 =======
 This library is provided to allow standard python logging to output log data as json objects. With JSON we can make our logs more readable by machines and we can stop writing custom parsers for syslog type records.
 
-News
-=======
-Hi, I see this package is quiet alive and I am sorry for ignoring it so long. I will be stepping up my maintenance of this package so please allow me a week to get things back in order (and most likely a new minor version) and I'll post and update here once I am caught up.
-
 Installing
 ==========
-Pip:
 
-    pip install python-json-logger
-
-Pypi:
-
-   https://pypi.python.org/pypi/python-json-logger
-
-Manual:
-
-    python setup.py install
+Until the PEP 541 request is complete you will need to find your own means of installing the package (e.g. building and storing in a private package repository).
 
 Usage
 =====
@@ -166,9 +155,11 @@ Sample JSON with a full formatter (basically the log message from the unit test)
 }
 ```
 
-External Examples
-=================
+Author and Maintainers
+======================
 
-- [Wesley Tanaka - Structured log files in Python using python-json-logger](http://web.archive.org/web/20201130054012/https://wtanaka.com/node/8201)
+This project was originally authored by [Zakaria Zajac](https://github.com/madzak).
 
-- [Archive](https://web.archive.org/web/20201130054012/https://wtanaka.com/node/8201)
+It is currently maintained by:
+
+- [Nicholas Hairs](https://github.com/nhairs) - [nicholashairs.com](https://www.nicholashairs.com)
