@@ -125,7 +125,7 @@ class JsonFormatter(logging.Formatter):
         reserved_attrs: Union[Tuple[str, ...], List[str]] = RESERVED_ATTRS,
         timestamp: Union[bool, str] = False,
         **kwargs: Any,
-    ):
+    ) -> None:
         """
         :param json_default: a function for encoding non-standard objects
             as outlined in https://docs.python.org/3/library/json.html
