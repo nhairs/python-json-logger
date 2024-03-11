@@ -2,12 +2,14 @@
 This library is provided to allow standard python logging
 to output log data as JSON formatted strings
 """
+
 import logging
 import json
 import re
 import traceback
 import importlib
 from datetime import date, datetime, time, timezone
+import sys
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 from inspect import istraceback
@@ -16,7 +18,8 @@ from collections import OrderedDict
 
 # skip natural LogRecord attributes
 # http://docs.python.org/library/logging.html#logrecord-attributes
-RESERVED_ATTRS: Tuple[str, ...] = (
+# Changed in 3.0.0, is now list[str] instead of tuple[str, ...]
+RESERVED_ATTRS: List[str] = [
     "args",
     "asctime",
     "created",
@@ -39,7 +42,11 @@ RESERVED_ATTRS: Tuple[str, ...] = (
     "stack_info",
     "thread",
     "threadName",
-)
+]
+
+if sys.version_info >= (3, 12):
+    # taskName added in python 3.12
+    RESERVED_ATTRS.append("taskName")
 
 OptionalCallableOrStr = Optional[Union[Callable, str]]
 
@@ -63,9 +70,7 @@ def merge_record_extra(
         rename_fields = {}
     for key, value in record.__dict__.items():
         # this allows to have numeric keys
-        if key not in reserved and not (
-            hasattr(key, "startswith") and key.startswith("_")
-        ):
+        if key not in reserved and not (hasattr(key, "startswith") and key.startswith("_")):
             target[rename_fields.get(key, key)] = value
     return target
 
@@ -79,10 +84,10 @@ class JsonEncoder(json.JSONEncoder):
         if isinstance(obj, (date, datetime, time)):
             return self.format_datetime_obj(obj)
 
-        elif istraceback(obj):
+        if istraceback(obj):
             return "".join(traceback.format_tb(obj)).strip()
 
-        elif type(obj) == Exception or isinstance(obj, Exception) or type(obj) == type:
+        if type(obj) == Exception or isinstance(obj, Exception) or type(obj) == type:
             return str(obj)
 
         try:
@@ -117,9 +122,9 @@ class JsonFormatter(logging.Formatter):
         prefix: str = "",
         rename_fields: Optional[dict] = None,
         static_fields: Optional[dict] = None,
-        reserved_attrs: Tuple[str, ...] = RESERVED_ATTRS,
+        reserved_attrs: Union[Tuple[str, ...], List[str]] = RESERVED_ATTRS,
         timestamp: Union[bool, str] = False,
-        **kwargs: Any
+        **kwargs: Any,
     ):
         """
         :param json_default: a function for encoding non-standard objects
@@ -197,8 +202,7 @@ class JsonFormatter(logging.Formatter):
 
         if self._fmt:
             return formatter_style_pattern.findall(self._fmt)
-        else:
-            return []
+        return []
 
     def add_fields(
         self,
