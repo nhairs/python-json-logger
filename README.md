@@ -13,24 +13,35 @@ This repository is a maintained fork of [madzak/python-json-logger](https://gith
 
 ## Installation
 
-### Install via pip / PyPI
+Note: All versions of this fork use version `>=3.0.0` - to use pre-fork versions use `python-json-logger<3.0.0`.
 
-Until the PEP 541 request is complete you will need to use one of the alternative methods below.
+### Install via pip
 
-### Install from GitHub
+Until the PEP 541 request is complete you will need to install directly from github.
+
+#### Install from GitHub
+
+To install from releases:
+
+```shell
+# 3.0.0 wheel
+pip install 'python-json-logger@https://github.com/nhairs/python-json-logger/releases/download/v3.0.0/python_json_logger-3.0.0-py3-none-any.whl'
+```
+
+To install from head:
 
 ```shell
 pip install 'python-json-logger@git+https://github.com/nhairs/python-json-logger.git'
 ```
 
-To install a specific version:
+To install a specific version from a tag:
 
 ```shell
+# Last released version before forking
 pip install 'python-json-logger@git+https://github.com/nhairs/python-json-logger.git@v2.0.7'
 ```
 
-
-### Install from Source
+#### Install from Source
 
 ```shell
 git clone https://github.com/nhairs/python-json-logger.git
@@ -43,8 +54,6 @@ pip install -e .
 ### Integrating with Python's logging framework
 
 Json outputs are provided by the JsonFormatter logging formatter. You can add the custom formatter like below:
-
-**Please note: version 0.1.0 has changed the import structure, please update to the following example for proper importing**
 
 ```python
     import logging
