@@ -41,13 +41,14 @@ classifiers = [
 GitHub = "https://github.com/nhairs/python-json-logger"
 
 [project.optional-dependencies]
-dev = [
-    ## Formatting / Linting
+lint = [
     "validate-pyproject[all]",
     "black",
     "pylint",
     "mypy",
-    ## Testing
+]
+
+test = [
     "pytest",
 ]
 
