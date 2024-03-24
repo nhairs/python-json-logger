@@ -10,8 +10,27 @@ on:
       - main
 
 jobs:
+  lint:
+    name: "Python Lint"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install tox
+
+      - name: Lint with tox
+        run: tox -e lint
+
   test:
-    name: "Python ${{matrix.python-version}} ${{ matrix.os }}"
+    name: "Python Test ${{matrix.python-version}} ${{ matrix.os }}"
+    needs: [lint]
     runs-on: "${{ matrix.os }}"
     strategy:
       matrix:
@@ -45,7 +64,3 @@ jobs:
 
       - name: Test with tox
         run: tox
-
-      - name: Lint with tox
-        run: tox -e lint
-        if: "${{ matrix.python-version == '3.12' && matrix.os == 'ubuntu-latest' }}"
