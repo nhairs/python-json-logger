@@ -1,22 +1,46 @@
-![Build Status](https://github.com/madzak/python-json-logger/actions/workflows/build.yml/badge.svg)
+![Build Status](https://github.com/nhairs/python-json-logger/actions/workflows/test-suite.yml/badge.svg)
 [![License](https://img.shields.io/pypi/l/python-json-logger.svg)](https://pypi.python.org/pypi/python-json-logger/)
 [![Version](https://img.shields.io/pypi/v/python-json-logger.svg)](https://pypi.python.org/pypi/python-json-logger/)
 
-**Important:** This repository is a maintained fork of [madzak/python-json-logger](https://github.com/madzak/python-json-logger) pending [a PEP 541 request](https://github.com/pypi/support/issues/3607) for the PyPI package.  The future direction of the project is being discussed [here](https://github.com/nhairs/python-json-logger/issues/1).
+# Python JSON Logger
 
-Overview
-=======
 This library is provided to allow standard python logging to output log data as json objects. With JSON we can make our logs more readable by machines and we can stop writing custom parsers for syslog type records.
 
-Installing
-==========
 
-Until the PEP 541 request is complete you will need to find your own means of installing the package (e.g. building and storing in a private package repository).
+### 🚨 Important 🚨
 
-Usage
-=====
+This repository is a maintained fork of [madzak/python-json-logger](https://github.com/madzak/python-json-logger) pending [a PEP 541 request](https://github.com/pypi/support/issues/3607) for the PyPI package.  The future direction of the project is being discussed [here](https://github.com/nhairs/python-json-logger/issues/1).
 
-## Integrating with Python's logging framework
+## Installation
+
+### Install via pip / PyPI
+
+Until the PEP 541 request is complete you will need to use one of the alternative methods below.
+
+### Install from GitHub
+
+```shell
+pip install 'python-json-logger@git+https://github.com/nhairs/python-json-logger.git'
+```
+
+To install a specific version:
+
+```shell
+pip install 'python-json-logger@git+https://github.com/nhairs/python-json-logger.git@v2.0.7'
+```
+
+
+### Install from Source
+
+```shell
+git clone https://github.com/nhairs/python-json-logger.git
+cd python-json-logger
+pip install -e .
+```
+
+## Usage
+
+### Integrating with Python's logging framework
 
 Json outputs are provided by the JsonFormatter logging formatter. You can add the custom formatter like below:
 
@@ -34,7 +58,7 @@ Json outputs are provided by the JsonFormatter logging formatter. You can add th
     logger.addHandler(logHandler)
 ```
 
-## Customizing fields
+### Customizing fields
 
 The fmt parser can also be overidden if you want to have required fields that differ from the default of just `message`.
 
@@ -76,7 +100,7 @@ formatter = CustomJsonFormatter('%(timestamp)s %(level)s %(name)s %(message)s')
 
 Items added to the log record will be included in *every* log message, no matter what the format requires.
 
-## Adding custom object serialization
+### Adding custom object serialization
 
 For custom handling of object serialization you can specify default json object translator or provide a custom encoder
 
@@ -93,7 +117,7 @@ logger.info({"special": "value", "run": 12})
 logger.info("classic message", extra={"special": "value", "run": 12})
 ```
 
-## Using a Config File
+### Using a Config File
 
 To use the module with a config file using the [`fileConfig` function](https://docs.python.org/3/library/logging.config.html#logging.config.fileConfig), use the class `pythonjsonlogger.jsonlogger.JsonFormatter`. Here is a sample config file.
 
@@ -126,8 +150,7 @@ format = %(message)s
 class = pythonjsonlogger.jsonlogger.JsonFormatter
 ```
 
-Example Output
-==============
+## Example Output
 
 Sample JSON with a full formatter (basically the log message from the unit test). Every log message will appear on 1 line like a typical logger.
 
@@ -155,10 +178,13 @@ Sample JSON with a full formatter (basically the log message from the unit test)
 }
 ```
 
-Author and Maintainers
-======================
+## License
 
-This project was originally authored by [Zakaria Zajac](https://github.com/madzak).
+This project is licensed under the BSD 2 Clause License - see [`LICENSE`](https://github.com/nhairs/python-json-logger/blob/main/LICENSE)
+
+## Authors and Maintainers
+
+This project was originally authored by [Zakaria Zajac](https://github.com/madzak) and our wonderful [contributors](https://github.com/nhairs/python-json-logger/graphs/contributors)
 
 It is currently maintained by:
 
