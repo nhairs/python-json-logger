@@ -45,3 +45,7 @@ jobs:
 
       - name: Test with tox
         run: tox
+
+      - name: Lint with tox
+        run: tox -e lint
+        if: "${{ matrix.python-version == '3.12' && matrix.os == 'ubuntu-latest' }}"
