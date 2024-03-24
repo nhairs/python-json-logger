@@ -1,0 +1,74 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "python-json-logger"
+version = "3.0.0.dev1"
+description = "JSON Log Formatter for the Python Logging Package"
+authors = [
+    {name = "Zakaria Zajac", email = "zak@madzak.com"},
+]
+maintainers  = [
+    {name = "Nicholas Hairs", email = "info+python-json-logger@nicholashairs.com"},
+]
+
+# Dependency Information
+requires-python = ">=3.7"
+# dependencies = []
+
+# Extra information
+readme = "README.md"
+license = {text = "BSD-2-Clause License"}
+classifiers = [
+    "Development Status :: 6 - Mature",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: System :: Logging",
+    "Typing :: Typed",
+]
+
+[project.urls]
+# homepage = "https://nhairs.github.io/python-json-logger/latest/"
+GitHub = "https://github.com/nhairs/python-json-logger"
+
+[project.optional-dependencies]
+dev = [
+    ## Formatting / Linting
+    "validate-pyproject[all]",
+    "black",
+    "pylint",
+    "mypy",
+    ## Testing
+    "pytest",
+]
+
+#docs = [
+#    "black",
+#    "mkdocs",
+#    "mkdocs-material>=8.5",
+#    "mkdocs-awesome-pages-plugin",
+#    "mdx_truly_sane_lists",
+#    "mkdocstrings[python]",
+#    "mkdocs-gen-files",
+#    "mkdocs-literate-nav",
+#    "mike",
+#]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["pythonjsonlogger*"]
+
+[tool.setuptools.package-data]
+pythonjsonlogger = ["py.typed"]
+
+[tool.black]
+line-length = 100

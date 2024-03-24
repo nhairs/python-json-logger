@@ -80,28 +80,34 @@ class JsonEncoder(json.JSONEncoder):
     A custom encoder extending the default JSONEncoder
     """
 
-    def default(self, obj):
-        if isinstance(obj, (date, datetime, time)):
-            return self.format_datetime_obj(obj)
+    def default(self, o: Any) -> Any:
+        if isinstance(o, (date, datetime, time)):
+            return self.format_datetime_obj(o)
 
-        if istraceback(obj):
-            return "".join(traceback.format_tb(obj)).strip()
+        if istraceback(o):
+            return "".join(traceback.format_tb(o)).strip()
 
-        if type(obj) == Exception or isinstance(obj, Exception) or type(obj) == type:
-            return str(obj)
+        # pylint: disable=unidiomatic-typecheck
+        if type(o) == Exception or isinstance(o, Exception) or type(o) == type:
+            return str(o)
 
         try:
-            return super(JsonEncoder, self).default(obj)
+            return super().default(o)
 
         except TypeError:
             try:
-                return str(obj)
+                return str(o)
 
-            except Exception:
+            except Exception:  # pylint: disable=broad-exception-caught
                 return None
 
-    def format_datetime_obj(self, obj):
-        return obj.isoformat()
+    def format_datetime_obj(self, o):
+        """Format datetime objects found in self.default
+
+        This allows subclasses to change the datetime format without understanding the
+        internals of the default method.
+        """
+        return o.isoformat()
 
 
 class JsonFormatter(logging.Formatter):
@@ -111,6 +117,7 @@ class JsonFormatter(logging.Formatter):
     json default encoder
     """
 
+    # pylint: disable=too-many-arguments
     def __init__(
         self,
         *args: Any,
@@ -122,7 +129,7 @@ class JsonFormatter(logging.Formatter):
         prefix: str = "",
         rename_fields: Optional[dict] = None,
         static_fields: Optional[dict] = None,
-        reserved_attrs: Union[Tuple[str, ...], List[str]] = RESERVED_ATTRS,
+        reserved_attrs: Union[Tuple[str, ...], List[str], None] = None,
         timestamp: Union[bool, str] = False,
         **kwargs: Any,
     ) -> None:
@@ -155,6 +162,8 @@ class JsonFormatter(logging.Formatter):
         self.prefix = prefix
         self.rename_fields = rename_fields or {}
         self.static_fields = static_fields or {}
+        if reserved_attrs is None:
+            reserved_attrs = RESERVED_ATTRS
         self.reserved_attrs = dict(zip(reserved_attrs, reserved_attrs))
         self.timestamp = timestamp
 
@@ -166,6 +175,7 @@ class JsonFormatter(logging.Formatter):
         self._required_fields = self.parse()
         self._skip_fields = dict(zip(self._required_fields, self._required_fields))
         self._skip_fields.update(self.reserved_attrs)
+        return
 
     def _str_to_fn(self, fn_as_str):
         """
@@ -198,7 +208,7 @@ class JsonFormatter(logging.Formatter):
         elif isinstance(self._style, logging.PercentStyle):
             formatter_style_pattern = re.compile(r"%\((.+?)\)", re.IGNORECASE)
         else:
-            raise ValueError("Invalid format: %s" % self._fmt)
+            raise ValueError(f"Invalid format: {self._fmt!r}")
 
         if self._fmt:
             return formatter_style_pattern.findall(self._fmt)
@@ -226,24 +236,28 @@ class JsonFormatter(logging.Formatter):
         )
 
         if self.timestamp:
+            # TODO: Can this use isinstance instead?
+            # pylint: disable=unidiomatic-typecheck
             key = self.timestamp if type(self.timestamp) == str else "timestamp"
             log_record[key] = datetime.fromtimestamp(record.created, tz=timezone.utc)
 
         self._perform_rename_log_fields(log_record)
+        return
 
-    def _perform_rename_log_fields(self, log_record):
+    def _perform_rename_log_fields(self, log_record: Dict[str, Any]) -> None:
         for old_field_name, new_field_name in self.rename_fields.items():
             log_record[new_field_name] = log_record[old_field_name]
             del log_record[old_field_name]
+        return
 
-    def process_log_record(self, log_record):
+    def process_log_record(self, log_record: Dict[str, Any]) -> Dict[str, Any]:
         """
         Override this method to implement custom logic
         on the possibly ordered dictionary.
         """
         return log_record
 
-    def jsonify_log_record(self, log_record):
+    def jsonify_log_record(self, log_record: Dict[str, Any]) -> str:
         """Returns a json string of the log record."""
         return self.json_serializer(
             log_record,
@@ -255,12 +269,12 @@ class JsonFormatter(logging.Formatter):
 
     def serialize_log_record(self, log_record: Dict[str, Any]) -> str:
         """Returns the final representation of the log record."""
-        return "%s%s" % (self.prefix, self.jsonify_log_record(log_record))
+        return self.prefix + self.jsonify_log_record(log_record)
 
     def format(self, record: logging.LogRecord) -> str:
         """Formats a log record and serializes to json"""
         message_dict: Dict[str, Any] = {}
-        # FIXME: logging.LogRecord.msg and logging.LogRecord.message in typeshed
+        # TODO: logging.LogRecord.msg and logging.LogRecord.message in typeshed
         #        are always type of str. We shouldn't need to override that.
         if isinstance(record.msg, dict):
             message_dict = record.msg
