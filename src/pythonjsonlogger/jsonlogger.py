@@ -47,6 +47,7 @@ RESERVED_ATTRS: List[str] = [
 if sys.version_info >= (3, 12):
     # taskName added in python 3.12
     RESERVED_ATTRS.append("taskName")
+    RESERVED_ATTRS.sort()
 
 OptionalCallableOrStr = Optional[Union[Callable, str]]
 
