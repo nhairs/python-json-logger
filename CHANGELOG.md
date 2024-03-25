@@ -89,13 +89,13 @@ Note: using new major version to seperate changes from this fork and the origina
 ### Changed
 - 'stack_info' flag in logging calls is now respected in JsonFormatter by [@ghShu](https://github.com/ghShu)
 
-
-[2.0.7]: https://github.com/madzak/python-json-logger/compare/v2.0.6...v2.0.7
-[2.0.6]: https://github.com/madzak/python-json-logger/compare/v2.0.5...v2.0.6
-[2.0.5]: https://github.com/madzak/python-json-logger/compare/v2.0.4...v2.0.5
-[2.0.4]: https://github.com/madzak/python-json-logger/compare/v2.0.3...v2.0.4
-[2.0.3]: https://github.com/madzak/python-json-logger/compare/v2.0.2...v2.0.3
-[2.0.2]: https://github.com/madzak/python-json-logger/compare/v2.0.1...v2.0.2
-[2.0.1]: https://github.com/madzak/python-json-logger/compare/v2.0.0...v2.0.1
-[2.0.0]: https://github.com/madzak/python-json-logger/compare/v0.1.11...v2.0.0
-[0.1.11]: https://github.com/madzak/python-json-logger/compare/v0.1.10...v0.1.11
+[3.0.0]: https://github.com/nhairs/python-json-logger/compare/v2.0.7...v3.0.0
+[2.0.7]: https://github.com/nhairs/python-json-logger/compare/v2.0.6...v2.0.7
+[2.0.6]: https://github.com/nhairs/python-json-logger/compare/v2.0.5...v2.0.6
+[2.0.5]: https://github.com/nhairs/python-json-logger/compare/v2.0.4...v2.0.5
+[2.0.4]: https://github.com/nhairs/python-json-logger/compare/v2.0.3...v2.0.4
+[2.0.3]: https://github.com/nhairs/python-json-logger/compare/v2.0.2...v2.0.3
+[2.0.2]: https://github.com/nhairs/python-json-logger/compare/v2.0.1...v2.0.2
+[2.0.1]: https://github.com/nhairs/python-json-logger/compare/v2.0.0...v2.0.1
+[2.0.0]: https://github.com/nhairs/python-json-logger/compare/v0.1.11...v2.0.0
+[0.1.11]: https://github.com/nhairs/python-json-logger/compare/v0.1.10...v0.1.11
