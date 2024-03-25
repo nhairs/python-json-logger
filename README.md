@@ -11,6 +11,8 @@ This library is provided to allow standard python logging to output log data as 
 
 This repository is a maintained fork of [madzak/python-json-logger](https://github.com/madzak/python-json-logger) pending [a PEP 541 request](https://github.com/pypi/support/issues/3607) for the PyPI package.  The future direction of the project is being discussed [here](https://github.com/nhairs/python-json-logger/issues/1).
 
+[**Changelog**](https://github.com/nhairs/python-json-logger/blob/main/CHANGELOG.md)
+
 ## Installation
 
 Note: All versions of this fork use version `>=3.0.0` - to use pre-fork versions use `python-json-logger<3.0.0`.

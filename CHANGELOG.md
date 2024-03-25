@@ -4,6 +4,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.0.0] - 2024-03-25
+
+Note: using new major version to seperate changes from this fork and the original (upstream). See #1 for details.
+
+### Changes
+- Update supported Python versions - @nhairs
+  - Drop 3.6
+  - The following versions are supported and tested:
+    - CPython 3.7-3.12 (ubuntu, windows, mac)
+    - PyPy 3.7-3.10 (ubuntu, wundows, mac)
+  - `RESERVED_ATTRS` is now a list and version dependent
+- Fix `JsonFormatter.__init__` return type (`None`) - @nhairs
+- Moved to `pyproject.toml` - @nhairs
+- Update linting and testing - @nhairs
+  - Split lint and test steps in GHA
+  - Use validate-pyproject, black, pylint, mypy
+
 ## [2.0.7] - 2023-02-21
 ### Changed
 - Fix inclusion of py.typed in pip packages - @sth
@@ -30,7 +47,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [2.0.4] - 2022-07-11
 ### Changed
 - Fix too strict regex for percentage style logging - @aberres
-- 
 
 ## [2.0.3] - 2022-07-08
 ### Added
