@@ -124,7 +124,7 @@ class JsonFormatter(logging.Formatter):
         *args: Any,
         json_default: OptionalCallableOrStr = None,
         json_encoder: OptionalCallableOrStr = None,
-        json_serialiser: Union[Callable, str] = json.dumps,
+        json_serializer: Union[Callable, str] = json.dumps,
         json_indent: Optional[Union[int, str]] = None,
         json_ensure_ascii: bool = True,
         prefix: str = "",
@@ -157,7 +157,7 @@ class JsonFormatter(logging.Formatter):
         """
         self.json_default = self._str_to_fn(json_default)
         self.json_encoder = self._str_to_fn(json_encoder)
-        self.json_serializer = self._str_to_fn(json_serialiser)
+        self.json_serializer = self._str_to_fn(json_serializer)
         self.json_indent = json_indent
         self.json_ensure_ascii = json_ensure_ascii
         self.prefix = prefix
