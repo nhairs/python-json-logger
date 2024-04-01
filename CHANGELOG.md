@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixes
 
-- Fix spelling of parameter `json_serialiser` -> `json_serializer` (#170) - @juliangilbey
+- Fix spelling of parameter `json_serialiser` -> `json_serializer` (#8) - @juliangilbey
 
 ## [3.0.0](https://github.com/nhairs/python-json-logger/compare/v2.0.7...v3.0.0) - 2024-03-25
 
