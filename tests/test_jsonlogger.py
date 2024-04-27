@@ -8,8 +8,8 @@ import traceback
 import unittest
 import unittest.mock
 
-sys.path.append("src/python-json-logger")
-from pythonjsonlogger import jsonlogger
+from pythonjsonlogger.core import RESERVED_ATTRS, merge_record_extra
+from pythonjsonlogger.json import JsonFormatter
 
 
 class TestJsonLogger(unittest.TestCase):
@@ -22,7 +22,7 @@ class TestJsonLogger(unittest.TestCase):
         self.log.addHandler(self.log_handler)
 
     def test_default_format(self):
-        fr = jsonlogger.JsonFormatter()
+        fr = JsonFormatter()
         self.log_handler.setFormatter(fr)
 
         msg = "testing logging format"
@@ -32,7 +32,7 @@ class TestJsonLogger(unittest.TestCase):
         self.assertEqual(log_json["message"], msg)
 
     def test_percentage_format(self):
-        fr = jsonlogger.JsonFormatter(
+        fr = JsonFormatter(
             # All kind of different styles to check the regex
             "[%(levelname)8s] %(message)s %(filename)s:%(lineno)d %(asctime)"
         )
@@ -46,7 +46,7 @@ class TestJsonLogger(unittest.TestCase):
         self.assertEqual(log_json.keys(), {"levelname", "message", "filename", "lineno", "asctime"})
 
     def test_rename_base_field(self):
-        fr = jsonlogger.JsonFormatter(rename_fields={"message": "@message"})
+        fr = JsonFormatter(rename_fields={"message": "@message"})
         self.log_handler.setFormatter(fr)
 
         msg = "testing logging format"
@@ -56,7 +56,7 @@ class TestJsonLogger(unittest.TestCase):
         self.assertEqual(log_json["@message"], msg)
 
     def test_rename_nonexistent_field(self):
-        fr = jsonlogger.JsonFormatter(rename_fields={"nonexistent_key": "new_name"})
+        fr = JsonFormatter(rename_fields={"nonexistent_key": "new_name"})
         self.log_handler.setFormatter(fr)
 
         stderr_watcher = StringIO()
@@ -66,7 +66,7 @@ class TestJsonLogger(unittest.TestCase):
         self.assertTrue("KeyError: 'nonexistent_key'" in stderr_watcher.getvalue())
 
     def test_add_static_fields(self):
-        fr = jsonlogger.JsonFormatter(static_fields={"log_stream": "kafka"})
+        fr = JsonFormatter(static_fields={"log_stream": "kafka"})
 
         self.log_handler.setFormatter(fr)
 
@@ -101,7 +101,7 @@ class TestJsonLogger(unittest.TestCase):
         log_format = lambda x: [f"%({i:s})s" for i in x]
         custom_format = " ".join(log_format(supported_keys))
 
-        fr = jsonlogger.JsonFormatter(custom_format)
+        fr = JsonFormatter(custom_format)
         self.log_handler.setFormatter(fr)
 
         msg = "testing logging format"
@@ -114,7 +114,7 @@ class TestJsonLogger(unittest.TestCase):
                 self.assertTrue(True)
 
     def test_unknown_format_key(self):
-        fr = jsonlogger.JsonFormatter("%(unknown_key)s %(message)s")
+        fr = JsonFormatter("%(unknown_key)s %(message)s")
 
         self.log_handler.setFormatter(fr)
         msg = "testing unknown logging format"
@@ -124,7 +124,7 @@ class TestJsonLogger(unittest.TestCase):
             self.assertTrue(False, "Should succeed")
 
     def test_log_adict(self):
-        fr = jsonlogger.JsonFormatter()
+        fr = JsonFormatter()
         self.log_handler.setFormatter(fr)
 
         msg = {"text": "testing logging", "num": 1, 5: "9", "nested": {"more": "data"}}
@@ -138,7 +138,7 @@ class TestJsonLogger(unittest.TestCase):
         self.assertEqual(log_json["message"], "")
 
     def test_log_extra(self):
-        fr = jsonlogger.JsonFormatter()
+        fr = JsonFormatter()
         self.log_handler.setFormatter(fr)
 
         extra = {"text": "testing logging", "num": 1, 5: "9", "nested": {"more": "data"}}
@@ -151,7 +151,7 @@ class TestJsonLogger(unittest.TestCase):
         self.assertEqual(log_json["message"], "hello")
 
     def test_json_default_encoder(self):
-        fr = jsonlogger.JsonFormatter()
+        fr = JsonFormatter()
         self.log_handler.setFormatter(fr)
 
         msg = {
@@ -169,7 +169,7 @@ class TestJsonLogger(unittest.TestCase):
 
     @unittest.mock.patch("time.time", return_value=1500000000.0)
     def test_json_default_encoder_with_timestamp(self, time_mock):
-        fr = jsonlogger.JsonFormatter(timestamp=True)
+        fr = JsonFormatter(timestamp=True)
         self.log_handler.setFormatter(fr)
 
         self.log.info("Hello")
@@ -182,7 +182,7 @@ class TestJsonLogger(unittest.TestCase):
         def custom(o):
             return "very custom"
 
-        fr = jsonlogger.JsonFormatter(json_default=custom)
+        fr = JsonFormatter(json_default=custom)
         self.log_handler.setFormatter(fr)
 
         msg = {"adate": datetime.datetime(1999, 12, 31, 23, 59), "normal": "value"}
@@ -192,13 +192,13 @@ class TestJsonLogger(unittest.TestCase):
         self.assertEqual(log_json.get("normal"), "value")
 
     def test_json_custom_logic_adds_field(self):
-        class CustomJsonFormatter(jsonlogger.JsonFormatter):
+        class CustomJsonFormatter(JsonFormatter):
 
             def process_log_record(self, log_record):
                 log_record["custom"] = "value"
                 # Old Style "super" since Python 2.6's logging.Formatter is old
                 # style
-                return jsonlogger.JsonFormatter.process_log_record(self, log_record)
+                return JsonFormatter.process_log_record(self, log_record)
 
         self.log_handler.setFormatter(CustomJsonFormatter())
         self.log.info("message")
@@ -218,7 +218,7 @@ class TestJsonLogger(unittest.TestCase):
         return str_traceback
 
     def test_exc_info(self):
-        fr = jsonlogger.JsonFormatter()
+        fr = JsonFormatter()
         self.log_handler.setFormatter(fr)
         expected_value = self.get_traceback_from_exception_followed_by_log_call()
 
@@ -226,7 +226,7 @@ class TestJsonLogger(unittest.TestCase):
         self.assertEqual(log_json.get("exc_info"), expected_value)
 
     def test_exc_info_renamed(self):
-        fr = jsonlogger.JsonFormatter("%(exc_info)s", rename_fields={"exc_info": "stack_trace"})
+        fr = JsonFormatter("%(exc_info)s", rename_fields={"exc_info": "stack_trace"})
         self.log_handler.setFormatter(fr)
         expected_value = self.get_traceback_from_exception_followed_by_log_call()
 
@@ -235,14 +235,14 @@ class TestJsonLogger(unittest.TestCase):
         self.assertEqual(log_json.get("exc_info"), None)
 
     def test_ensure_ascii_true(self):
-        fr = jsonlogger.JsonFormatter()
+        fr = JsonFormatter()
         self.log_handler.setFormatter(fr)
         self.log.info("Привет")
         msg = self.buffer.getvalue().split('"message": "', 1)[1].split('"', 1)[0]
         self.assertEqual(msg, r"\u041f\u0440\u0438\u0432\u0435\u0442")
 
     def test_ensure_ascii_false(self):
-        fr = jsonlogger.JsonFormatter(json_ensure_ascii=False)
+        fr = JsonFormatter(json_ensure_ascii=False)
         self.log_handler.setFormatter(fr)
         self.log.info("Привет")
         msg = self.buffer.getvalue().split('"message": "', 1)[1].split('"', 1)[0]
@@ -256,7 +256,7 @@ class TestJsonLogger(unittest.TestCase):
                 type_name = z.__class__.__name__
                 raise TypeError(f"Object of type '{type_name}' is no JSON serializable")
 
-        formatter = jsonlogger.JsonFormatter(
+        formatter = JsonFormatter(
             json_default=encode_complex, json_encoder=json.JSONEncoder
         )
         self.log_handler.setFormatter(formatter)
@@ -284,9 +284,9 @@ class TestJsonLogger(unittest.TestCase):
 
         custom_format = " ".join(log_format(reserved_attrs_map.keys()))
         reserved_attrs = [
-            _ for _ in jsonlogger.RESERVED_ATTRS if _ not in list(reserved_attrs_map.keys())
+            attr for attr in RESERVED_ATTRS if attr not in list(reserved_attrs_map.keys())
         ]
-        formatter = jsonlogger.JsonFormatter(
+        formatter = JsonFormatter(
             custom_format, reserved_attrs=reserved_attrs, rename_fields=reserved_attrs_map
         )
         self.log_handler.setFormatter(formatter)
@@ -302,7 +302,7 @@ class TestJsonLogger(unittest.TestCase):
         record = logging.LogRecord(
             "name", level=1, pathname="", lineno=1, msg="Some message", args=None, exc_info=None
         )
-        output = jsonlogger.merge_record_extra(record, target=dict(foo="bar"), reserved=[])
+        output = merge_record_extra(record, target=dict(foo="bar"), reserved=[])
         self.assertIn("foo", output)
         self.assertIn("msg", output)
         self.assertEqual(output["foo"], "bar")
