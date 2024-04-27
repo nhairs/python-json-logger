@@ -133,7 +133,6 @@ class BaseJsonFormatter(logging.Formatter):
         style: str = "%",
         validate: bool = True,
         *,
-        defaults: None = None,
         prefix: str = "",
         rename_fields: Optional[Dict[str, str]] = None,
         static_fields: Optional[Dict[str, Any]] = None,
@@ -168,7 +167,9 @@ class BaseJsonFormatter(logging.Formatter):
         ## logging.Formatter compatibility
         ## ---------------------------------------------------------------------
         if style in logging._STYLES:
-            _style = logging._STYLES[style][0](fmt, defaults=defaults)  # type: ignore[operator]
+            # Note style defaults kwarg is only supported from py310+, since we
+            # don't use it anyway just ignore it
+            _style = logging._STYLES[style][0](fmt)  # type: ignore[operator]
             if validate:
                 _style.validate()
             self._style = _style
