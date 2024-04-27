@@ -32,8 +32,8 @@ jobs:
     name: "Python Test ${{matrix.python-version}} ${{ matrix.os }}"
     needs: [lint]
     runs-on: "${{ matrix.os }}"
-    fail-fast: false  # allow tests to run on all platforms
     strategy:
+      fail-fast: false  # allow tests to run on all platforms
       matrix:
         python-version:
           - "pypy-3.7"
