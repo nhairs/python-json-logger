@@ -256,9 +256,7 @@ class TestJsonLogger(unittest.TestCase):
                 type_name = z.__class__.__name__
                 raise TypeError(f"Object of type '{type_name}' is no JSON serializable")
 
-        formatter = JsonFormatter(
-            json_default=encode_complex, json_encoder=json.JSONEncoder
-        )
+        formatter = JsonFormatter(json_default=encode_complex, json_encoder=json.JSONEncoder)
         self.log_handler.setFormatter(formatter)
 
         value = {
