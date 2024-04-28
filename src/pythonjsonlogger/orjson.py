@@ -40,8 +40,8 @@ class OrjsonFormatter(core.BaseJsonFormatter):
 
     def jsonify_log_record(self, log_record: core.LogRecord) -> str:
         """Returns a json string of the log record."""
-        opt = 0
+        opt = orjson.OPT_NON_STR_KEYS
         if self.json_indent:
             opt |= orjson.OPT_INDENT_2
 
-        return orjson.dumps(log_record, default=self.json_default, option=opt).decode("ascii")
+        return orjson.dumps(log_record, default=self.json_default, option=opt).decode("utf8")

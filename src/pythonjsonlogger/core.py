@@ -138,6 +138,7 @@ class BaseJsonFormatter(logging.Formatter):
         static_fields: Optional[Dict[str, Any]] = None,
         reserved_attrs: Optional[Sequence[str]] = None,
         timestamp: Union[bool, str] = False,
+        defaults: Optional[Dict[str, Any]] = None,
     ) -> None:
         """
         Args:
@@ -146,7 +147,7 @@ class BaseJsonFormatter(logging.Formatter):
             style: how to extract log fields from `fmt`
             validate: validate fmt against style, if implementing a custom style you
                 must set this to `False`.
-            defaults: ignored - kept for compatibility
+            defaults: ignored - kept for compatibility with python 3.10+
             prefix: an optional string prefix added at the beginning of
                 the formatted string
             rename_fields: an optional dict, used to rename field names in the output.
@@ -166,9 +167,9 @@ class BaseJsonFormatter(logging.Formatter):
         """
         ## logging.Formatter compatibility
         ## ---------------------------------------------------------------------
+        # Note: validate added in 3.8
+        # Note: defaults added in 3.10
         if style in logging._STYLES:
-            # Note style defaults kwarg is only supported from py310+, since we
-            # don't use it anyway just ignore it
             _style = logging._STYLES[style][0](fmt)  # type: ignore[operator]
             if validate:
                 _style.validate()
