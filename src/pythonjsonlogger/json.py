@@ -1,5 +1,8 @@
-"""JSON Formatter using the standard library `json` module"""
+"""JSON formatter using the standard library's `json` for encoding.
 
+Module contains the `JsonFormatter` and a custom `JsonEncoder` which supports a greater
+variety of types.
+"""
 ### IMPORTS
 ### ============================================================================
 ## Future
@@ -19,9 +22,7 @@ from . import core
 ### CLASSES
 ### ============================================================================
 class JsonEncoder(json.JSONEncoder):
-    """
-    A custom encoder extending the default JSONEncoder
-    """
+    """A custom encoder extending the default JSONEncoder"""
 
     def default(self, o: Any) -> Any:
         if isinstance(o, (date, datetime, time)):
@@ -54,13 +55,8 @@ class JsonEncoder(json.JSONEncoder):
 
 
 class JsonFormatter(core.BaseJsonFormatter):
-    """
-    A custom formatter to format logging records as json strings.
-    Extra values will be formatted as str() if not supported by
-    json default encoder
-    """
+    """JSON formatter using the standard library's `json` for encoding"""
 
-    # pylint: disable=too-many-arguments
     def __init__(
         self,
         *args,
@@ -72,13 +68,14 @@ class JsonFormatter(core.BaseJsonFormatter):
         **kwargs,
     ) -> None:
         """
-        :param json_default: a function for encoding non-standard objects
-            as outlined in https://docs.python.org/3/library/json.html
-        :param json_encoder: optional custom encoder
-        :param json_serializer: a :meth:`json.dumps`-compatible callable
-            that will be used to serialize the log record.
-        :param json_indent: indent parameter for json.dumps
-        :param json_ensure_ascii: ensure_ascii parameter for json.dumps
+        Args:
+            json_default: a function for encoding non-standard objects
+                as outlined in https://docs.python.org/3/library/json.html
+            json_encoder: optional custom encoder
+            json_serializer: a :meth:`json.dumps`-compatible callable
+                that will be used to serialize the log record.
+            json_indent: indent parameter for json.dumps
+            json_ensure_ascii: ensure_ascii parameter for json.dumps
         """
         super().__init__(*args, **kwargs)
 
@@ -92,7 +89,6 @@ class JsonFormatter(core.BaseJsonFormatter):
         return
 
     def jsonify_log_record(self, log_record: core.LogRecord) -> str:
-        """Returns a json string of the log record."""
         return self.json_serializer(
             log_record,
             default=self.json_default,

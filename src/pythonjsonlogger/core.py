@@ -96,11 +96,12 @@ def merge_record_extra(
     """
     Merges extra attributes from LogRecord object into target dictionary
 
-    :param record: logging.LogRecord
-    :param target: dict to update
-    :param reserved: dict or list with reserved keys to skip
-    :param rename_fields: an optional dict, used to rename field names in the output.
-            Rename levelname to log.level: {'levelname': 'log.level'}
+    Args:
+        record: logging.LogRecord
+        target: dict to update
+        reserved: dict or list with reserved keys to skip
+        rename_fields: an optional dict, used to rename field names in the output.
+            e.g. Rename `levelname` to `log.level`: `{'levelname': 'log.level'}`
 
     *Changed in 4.0*: `reserved` is now `Container[str]`.
     """
@@ -199,7 +200,11 @@ class BaseJsonFormatter(logging.Formatter):
         return
 
     def format(self, record: logging.LogRecord) -> str:
-        """Formats a log record and serializes to json"""
+        """Formats a log record and serializes to json
+
+        Args:
+            record: the record to format
+        """
         message_dict: Dict[str, Any] = {}
         # TODO: logging.LogRecord.msg and logging.LogRecord.message in typeshed
         #        are always type of str. We shouldn't need to override that.
@@ -238,6 +243,9 @@ class BaseJsonFormatter(logging.Formatter):
         to include in all log messages.
 
         You can support custom styles by overriding this method.
+
+        Returns:
+            list of fields to be extracted and serialized
         """
         if isinstance(self._style, logging.StringTemplateStyle):
             formatter_style_pattern = STYLE_STRING_TEMPLATE_REGEX
@@ -272,8 +280,14 @@ class BaseJsonFormatter(logging.Formatter):
         record: logging.LogRecord,
         message_dict: Dict[str, Any],
     ) -> None:
-        """
-        Override this method to implement custom logic for adding fields.
+        """Extract fields from a LogRecord for logging
+
+        This method can be overridden to implement custom logic for adding fields.
+
+        Args:
+            log_record: data that will be logged
+            record: the record to extract data from
+            message_dict: ???
         """
         for field in self._required_fields:
             log_record[field] = record.__dict__.get(field)
@@ -308,6 +322,9 @@ class BaseJsonFormatter(logging.Formatter):
         """Convert this log record into a JSON string.
 
         Child classes MUST override this method.
+
+        Args:
+            log_record: the data to serialize
         """
         raise NotImplementedError()
 
@@ -316,5 +333,8 @@ class BaseJsonFormatter(logging.Formatter):
 
         Child classes can override this method to alter the log record before it
         is serialized.
+
+        Args:
+            log_record: incoming data
         """
         return log_record
