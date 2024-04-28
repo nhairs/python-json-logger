@@ -3,6 +3,7 @@
 Module contains the `JsonFormatter` and a custom `JsonEncoder` which supports a greater
 variety of types.
 """
+
 ### IMPORTS
 ### ============================================================================
 ## Future

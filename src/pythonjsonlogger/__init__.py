@@ -18,6 +18,7 @@ if sys.implementation.name == "pypy":
 else:
     try:
         import orjson
+
         ORJSON_AVAILABLE = True
     except ImportError:
         ORJSON_AVAILABLE = False
