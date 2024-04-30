@@ -19,7 +19,7 @@ import pytest
 
 ## Application
 import pythonjsonlogger
-from pythonjsonlogger.core import RESERVED_ATTRS, BaseJsonFormatter
+from pythonjsonlogger.core import RESERVED_ATTRS, BaseJsonFormatter, merge_record_extra
 from pythonjsonlogger.json import JsonFormatter
 
 if pythonjsonlogger.ORJSON_AVAILABLE:
@@ -79,7 +79,17 @@ def get_traceback_from_exception_followed_by_log_call(env_: LoggingEnvironment) 
 
 ### TESTS
 ### ============================================================================
-## Common Tests
+def test_merge_record_extra():
+    record = logging.LogRecord(
+        "name", level=1, pathname="", lineno=1, msg="Some message", args=None, exc_info=None
+    )
+    output = merge_record_extra(record, target={"foo": "bar"}, reserved=[])
+    assert output["foo"] == "bar"
+    assert output["msg"] == "Some message"
+    return
+
+
+## Common Formatter Tests
 ## -----------------------------------------------------------------------------
 @pytest.mark.parametrize("class_", ALL_FORMATTERS)
 def test_default_format(env: LoggingEnvironment, class_: type[BaseJsonFormatter]):
