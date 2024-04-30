@@ -15,6 +15,7 @@ from inspect import istraceback
 import json
 import traceback
 from typing import Any, Callable, Optional, Union
+import warnings
 
 ## Application
 from . import core
@@ -97,3 +98,15 @@ class JsonFormatter(core.BaseJsonFormatter):
             indent=self.json_indent,
             ensure_ascii=self.json_ensure_ascii,
         )
+
+
+### DEPRECATED COMPATIBILITY
+### ============================================================================
+def __getattr__(name: str):
+    if name == "RESERVED_ATTRS":
+        warnings.warn(
+            "RESERVED_ATTRS has been moved to pythonjsonlogger.core",
+            DeprecationWarning,
+        )
+        return core.RESERVED_ATTRS
+    raise AttributeError(f"module {__name__} has no attribute {name}")
