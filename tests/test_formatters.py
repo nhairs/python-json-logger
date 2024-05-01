@@ -387,7 +387,7 @@ def test_ensure_ascii_true(env: LoggingEnvironment):
 
     # Note: we don't use env.load_json as we want to know the raw output
     msg = env.buffer.getvalue().split('"message": "', 1)[1].split('"', 1)[0]
-    assert msg, r"\u041f\u0440\u0438\u0432\u0435\u0442"
+    assert msg == r"\u041f\u0440\u0438\u0432\u0435\u0442"
     return
 
 
