@@ -111,6 +111,7 @@ class SillyFormatter(JsonFormatter):
     def process_log_record(log_record):
         new_record = {k[::-1]: v for k, v in log_record.items()}
         return new_record
+```
 
 #### Supporting custom styles
 
