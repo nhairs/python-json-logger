@@ -77,7 +77,7 @@ def str_to_object(obj: Any) -> Any:
     Args:
         obj: the object or string to process
 
-    *New in 4.0*
+    *New in 3.1*
     """
 
     if not isinstance(obj, str):
@@ -103,7 +103,7 @@ def merge_record_extra(
         rename_fields: an optional dict, used to rename field names in the output.
             e.g. Rename `levelname` to `log.level`: `{'levelname': 'log.level'}`
 
-    *Changed in 4.0*: `reserved` is now `Container[str]`.
+    *Changed in 3.1*: `reserved` is now `Container[str]`.
     """
     if rename_fields is None:
         rename_fields = {}
@@ -120,6 +120,8 @@ class BaseJsonFormatter(logging.Formatter):
     """Base class for pythonjsonlogger formatters
 
     Must not be used directly
+
+    *New in 3.1*
     """
 
     _style: Union[logging.PercentStyle, str]  # type: ignore[assignment]
@@ -144,9 +146,9 @@ class BaseJsonFormatter(logging.Formatter):
         """
         Args:
             fmt: string representing fields to log
-            datefmt: format to use when formatting asctime field
+            datefmt: format to use when formatting `asctime` field
             style: how to extract log fields from `fmt`
-            validate: validate fmt against style, if implementing a custom style you
+            validate: validate `fmt` against style, if implementing a custom `style` you
                 must set this to `False`.
             defaults: ignored - kept for compatibility with python 3.10+
             prefix: an optional string prefix added at the beginning of
@@ -162,7 +164,7 @@ class BaseJsonFormatter(logging.Formatter):
                 to log record using string as key. If True boolean is passed, timestamp key
                 will be "timestamp". Defaults to False/off.
 
-        *Changed in 4.0*: you can now use custom values for style by setting validate to `False`.
+        *Changed in 3.1*: you can now use custom values for style by setting validate to `False`.
         The value is stored in `self._style` as a string. The `parse` method will need to be
         overridden in order to support the new style.
         """
