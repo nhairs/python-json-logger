@@ -24,7 +24,11 @@ from . import core
 ### CLASSES
 ### ============================================================================
 class JsonEncoder(json.JSONEncoder):
-    """A custom encoder extending the default JSONEncoder"""
+    """A custom encoder extending the default JSONEncoder
+
+    Refs:
+    - https://docs.python.org/3/library/json.html
+    """
 
     def default(self, o: Any) -> Any:
         if isinstance(o, (date, datetime, time)):

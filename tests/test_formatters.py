@@ -25,12 +25,16 @@ from pythonjsonlogger.json import JsonFormatter
 if pythonjsonlogger.ORJSON_AVAILABLE:
     from pythonjsonlogger.orjson import OrjsonFormatter
 
+if pythonjsonlogger.MSGSPEC_AVAILABLE:
+    from pythonjsonlogger.msgspec import MsgspecFormatter
 
 ### SETUP
 ### ============================================================================
 ALL_FORMATTERS: list[type[BaseJsonFormatter]] = [JsonFormatter]
 if pythonjsonlogger.ORJSON_AVAILABLE:
     ALL_FORMATTERS.append(OrjsonFormatter)
+if pythonjsonlogger.MSGSPEC_AVAILABLE:
+    ALL_FORMATTERS.append(MsgspecFormatter)
 
 _LOGGER_COUNT = 0
 
@@ -328,11 +332,12 @@ def test_rename_reserved_attrs(env: LoggingEnvironment, class_: type[BaseJsonFor
 
 @freeze_time(datetime.datetime(2017, 7, 14, 2, 40))
 @pytest.mark.parametrize("class_", ALL_FORMATTERS)
-def test_default_encoder_with_timestamp(
-    env: LoggingEnvironment, class_: type[BaseJsonFormatter]
-):
+def test_default_encoder_with_timestamp(env: LoggingEnvironment, class_: type[BaseJsonFormatter]):
     if pythonjsonlogger.ORJSON_AVAILABLE and class_ is OrjsonFormatter:
         # https://github.com/spulec/freezegun/issues/448#issuecomment-1686070438
+        pytest.xfail()
+
+    if pythonjsonlogger.MSGSPEC_AVAILABLE and class_ is MsgspecFormatter:
         pytest.xfail()
 
     env.set_formatter(class_(timestamp=True))

@@ -6,7 +6,7 @@ from __future__ import annotations
 ## Standard Library
 
 ## Installed
-import orjson
+import msgspec.json
 
 ## Application
 from . import core
@@ -14,11 +14,11 @@ from . import core
 
 ### CLASSES
 ### ============================================================================
-class OrjsonFormatter(core.BaseJsonFormatter):
-    """JSON formatter using orjson for encoding.
+class MsgspecFormatter(core.BaseJsonFormatter):
+    """JSON formatter using msgspec.json for encoding.
 
     Refs:
-    - https://github.com/ijl/orjson
+    - https://jcristharif.com/msgspec/api.html#msgspec.json.Encoder
     """
 
     # pylint: disable=too-many-arguments
@@ -26,26 +26,18 @@ class OrjsonFormatter(core.BaseJsonFormatter):
         self,
         *args,
         json_default: core.OptionalCallableOrStr = None,
-        json_indent: bool = False,
         **kwargs,
     ) -> None:
         """
         Args:
-            json_default: a function for encoding non-standard objects see:
-                https://github.com/ijl/orjson#default
-            json_indent: indent output with 2 spaces. see:
-                https://github.com/ijl/orjson#opt_indent_2
+            json_default: a function for encoding non-standard objects see: `msgspec.json.Encode:enc_hook`
         """
         super().__init__(*args, **kwargs)
 
         self.json_default = core.str_to_object(json_default)
-        self.json_indent = json_indent
+        self._encoder = msgspec.json.Encoder(enc_hook=self.json_default)
         return
 
     def jsonify_log_record(self, log_record: core.LogRecord) -> str:
         """Returns a json string of the log record."""
-        opt = orjson.OPT_NON_STR_KEYS
-        if self.json_indent:
-            opt |= orjson.OPT_INDENT_2
-
-        return orjson.dumps(log_record, default=self.json_default, option=opt).decode("utf8")
+        return self._encoder.encode(log_record).decode("utf8")

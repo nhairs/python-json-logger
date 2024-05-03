@@ -26,6 +26,14 @@ else:
         ORJSON_AVAILABLE = False
 
 
+try:
+    import msgspec
+
+    MSGSPEC_AVAILABLE = True
+except ImportError:
+    MSGSPEC_AVAILABLE = False
+
+
 ### DEPRECATED COMPATIBILITY
 ### ============================================================================
 def __getattr__(name: str):

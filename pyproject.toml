@@ -47,9 +47,14 @@ orjson = [
     "orjson;implementation_name!='pypy'",
 ]
 
+msgspec = [
+    "msgspec",
+]
+
 dev = [
     ## Optional but required for dev
     "orjson;implementation_name!='pypy' and python_version<'3.13'",
+    "msgspec",
     ## Lint
     "validate-pyproject[all]",
     "black",
