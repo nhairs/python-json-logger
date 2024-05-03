@@ -237,7 +237,7 @@ def test_log_extra(env: LoggingEnvironment, class_: type[BaseJsonFormatter]):
 
 
 @pytest.mark.parametrize("class_", ALL_FORMATTERS)
-def test_json_custom_logic_adds_field(env: LoggingEnvironment, class_: type[BaseJsonFormatter]):
+def test_custom_logic_adds_field(env: LoggingEnvironment, class_: type[BaseJsonFormatter]):
     class CustomJsonFormatter(class_):  # type: ignore[valid-type,misc]
 
         def process_log_record(self, log_record):
@@ -328,7 +328,7 @@ def test_rename_reserved_attrs(env: LoggingEnvironment, class_: type[BaseJsonFor
 
 @freeze_time(datetime.datetime(2017, 7, 14, 2, 40))
 @pytest.mark.parametrize("class_", ALL_FORMATTERS)
-def test_json_default_encoder_with_timestamp(
+def test_default_encoder_with_timestamp(
     env: LoggingEnvironment, class_: type[BaseJsonFormatter]
 ):
     if pythonjsonlogger.ORJSON_AVAILABLE and class_ is OrjsonFormatter:
@@ -381,7 +381,7 @@ def test_json_custom_default(env: LoggingEnvironment):
     return
 
 
-def test_ensure_ascii_true(env: LoggingEnvironment):
+def test_json_ensure_ascii_true(env: LoggingEnvironment):
     env.set_formatter(JsonFormatter())
     env.logger.info("Привет")
 
@@ -391,7 +391,7 @@ def test_ensure_ascii_true(env: LoggingEnvironment):
     return
 
 
-def test_ensure_ascii_false(env: LoggingEnvironment):
+def test_json_ensure_ascii_false(env: LoggingEnvironment):
     env.set_formatter(JsonFormatter(json_ensure_ascii=False))
     env.logger.info("Привет")
 
