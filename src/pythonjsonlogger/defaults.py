@@ -19,7 +19,7 @@ import uuid
 if sys.version_info >= (3, 10):
     from typing import TypeGuard
 else:
-    from typing_extension import TypeGuard
+    from typing_extensions import TypeGuard
 
 ## Installed
 
