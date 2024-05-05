@@ -26,7 +26,7 @@ Until the PEP 541 request is complete you will need to install directly from git
 To install from releases:
 
 ```shell
-# 3.0.0 wheel
+# e.g. 3.0.0 wheel
 pip install 'python-json-logger@https://github.com/nhairs/python-json-logger/releases/download/v3.0.0/python_json_logger-3.0.0-py3-none-any.whl'
 ```
 
@@ -53,38 +53,30 @@ pip install -e .
 
 ## Usage
 
+Python JSON Logger provides `logging.Formatter`s that encode the logged message into JSON. Although a variety of JSON encoders are supported, in the following examples we will use the `pythonjsonlogger.json.JsonFormatter` which uses the the `json` module from the standard library.
+
 ### Integrating with Python's logging framework
 
-Json outputs are provided by the JsonFormatter logging formatter. You can add the custom formatter like below:
+To produce JSON output, attach the formatter to a logging handler:
 
 ```python
     import logging
-    from pythonjsonlogger import jsonlogger
+    from pythonjsonlogger.json import JsonFormatter
 
     logger = logging.getLogger()
 
     logHandler = logging.StreamHandler()
-    formatter = jsonlogger.JsonFormatter()
+    formatter = JsonFormatter()
     logHandler.setFormatter(formatter)
     logger.addHandler(logHandler)
 ```
 
-### Customizing fields
+### Output fields
 
-The fmt parser can also be overidden if you want to have required fields that differ from the default of just `message`.
-
-These two invocations are equivalent:
+You can control the logged fields by setting the `fmt` argument when creating the formatter. By default formatters will follow the same `style` of `fmt` as the `logging` module: `%`, `$`, and `{`. All [`LogRecord` attributes](https://docs.python.org/3/library/logging.html#logrecord-attributes) can be output using their name.
 
 ```python
-class CustomJsonFormatter(jsonlogger.JsonFormatter):
-    def parse(self):
-        return self._fmt.split(';')
-
-formatter = CustomJsonFormatter('one;two')
-
-# is equivalent to:
-
-formatter = jsonlogger.JsonFormatter('%(one)s %(two)s')
+formatter = JsonFormatter("{message}{asctime}{exc_info}", style="{")
 ```
 
 You can also add extra fields to your json output by specifying a dict in place of message, as well as by specifying an `extra={}` argument.
@@ -94,9 +86,9 @@ Contents of these dictionaries will be added at the root level of the entry and 
 You can also use the `add_fields` method to add to or generally normalize the set of default set of fields, it is called for every log event. For example, to unify default fields with those provided by [structlog](http://www.structlog.org/) you could do something like this:
 
 ```python
-class CustomJsonFormatter(jsonlogger.JsonFormatter):
+class CustomJsonFormatter(JsonFormatter):
     def add_fields(self, log_record, record, message_dict):
-        super(CustomJsonFormatter, self).add_fields(log_record, record, message_dict)
+        super().add_fields(log_record, record, message_dict)
         if not log_record.get('timestamp'):
             # this doesn't use record.created, so it is slightly off
             now = datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%fZ')
@@ -105,32 +97,55 @@ class CustomJsonFormatter(jsonlogger.JsonFormatter):
             log_record['level'] = log_record['level'].upper()
         else:
             log_record['level'] = record.levelname
+        return
 
 formatter = CustomJsonFormatter('%(timestamp)s %(level)s %(name)s %(message)s')
 ```
 
 Items added to the log record will be included in *every* log message, no matter what the format requires.
 
-### Adding custom object serialization
+You can also override the `process_log_record` method to modify fields before they are serialized to JSON.
+
+```python
+class SillyFormatter(JsonFormatter):
+    def process_log_record(log_record):
+        new_record = {k[::-1]: v for k, v in log_record.items()}
+        return new_record
+```
+
+#### Supporting custom styles
+
+It is possible to support custom `style`s by setting `validate=False` and overriding the `parse` method.
+
+For example:
+
+```python
+class CommaSupport(JsonFormatter):
+    def parse(self) -> list[str]:
+        if isinstance(self._style, str) and self._style == ",":
+            return self._fmt.split(",")
+        return super().parse()
+
+formatter = CommaSupport("message,asctime", style=",", validate=False)
+```
+
+### Custom object serialization
+
+Most formatters support `json_default` which is used to control how objects are serialized.
 
 For custom handling of object serialization you can specify default json object translator or provide a custom encoder
 
 ```python
-def json_translate(obj):
+def my_default(obj):
     if isinstance(obj, MyClass):
         return {"special": obj.special}
 
-formatter = jsonlogger.JsonFormatter(json_default=json_translate,
-                                     json_encoder=json.JSONEncoder)
-logHandler.setFormatter(formatter)
-
-logger.info({"special": "value", "run": 12})
-logger.info("classic message", extra={"special": "value", "run": 12})
+formatter = JsonFormatter(json_default=my_default)
 ```
 
 ### Using a Config File
 
-To use the module with a config file using the [`fileConfig` function](https://docs.python.org/3/library/logging.config.html#logging.config.fileConfig), use the class `pythonjsonlogger.jsonlogger.JsonFormatter`. Here is a sample config file.
+To use the module with a config file using the [`fileConfig` function](https://docs.python.org/3/library/logging.config.html#logging.config.fileConfig), use the class `pythonjsonlogger.json.JsonFormatter`. Here is a sample config file.
 
 ```ini
 [loggers]
@@ -161,6 +176,13 @@ format = %(message)s
 class = pythonjsonlogger.jsonlogger.JsonFormatter
 ```
 
+### Alternate JSON Encoders
+
+The following JSON encoders are also supported:
+
+- [orjson](https://github.com/ijl/orjson) - `pythonjsonlogger.orjon.OrjsonFormatter`
+- [msgspec](https://github.com/jcrist/msgspec) - `pythonjsonlogger.msgspec.MsgspecFormatter`
+
 ## Example Output
 
 Sample JSON with a full formatter (basically the log message from the unit test). Every log message will appear on 1 line like a typical logger.
@@ -180,7 +202,7 @@ Sample JSON with a full formatter (basically the log message from the unit test)
     "msecs": 506.24799728393555,
     "pathname": "tests/tests.py",
     "lineno": 60,
-    "asctime": ["12-05-05 22:11:08,506248"],
+    "asctime": "12-05-05 22:11:08,506248",
     "message": "testing logging format",
     "filename": "tests.py",
     "levelname": "INFO",

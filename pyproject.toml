@@ -4,18 +4,21 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "python-json-logger"
-version = "3.0.1"
+version = "3.1.0.rc1"
 description = "JSON Log Formatter for the Python Logging Package"
 authors = [
     {name = "Zakaria Zajac", email = "zak@madzak.com"},
+    {name = "Nicholas Hairs", email = "info+python-json-logger@nicholashairs.com"},
 ]
 maintainers  = [
     {name = "Nicholas Hairs", email = "info+python-json-logger@nicholashairs.com"},
 ]
 
 # Dependency Information
-requires-python = ">=3.7"
-# dependencies = []
+requires-python = ">=3.8"
+dependencies = [
+    "typing_extensions",
+]
 
 # Extra information
 readme = "README.md"
@@ -26,7 +29,6 @@ classifiers = [
     "License :: OSI Approved :: BSD License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
@@ -41,15 +43,18 @@ classifiers = [
 GitHub = "https://github.com/nhairs/python-json-logger"
 
 [project.optional-dependencies]
-lint = [
+dev = [
+    ## Optional but required for dev
+    "orjson;implementation_name!='pypy' and python_version<'3.13'",
+    "msgspec;implementation_name!='pypy' and python_version<'3.13'",
+    ## Lint
     "validate-pyproject[all]",
     "black",
     "pylint",
     "mypy",
-]
-
-test = [
+    ## Test
     "pytest",
+    "freezegun",
 ]
 
 [tool.setuptools.packages.find]

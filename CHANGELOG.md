@@ -4,6 +4,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.1.0.rc1](https://github.com/nhairs/python-json-logger/compare/v3.0.1...v3.1.0.rc1) - 2023-05-03
+
+This splits common funcitonality out to allow supporting other JSON encoders. Although this is a large refactor, backwards compatibility has been maintained.
+
+### Added
+- `.core` - more details below.
+- Orjson encoder support via `.orjson.OrjsonFormatter`.
+- MsgSpec encoder support via `.msgspec.MsgspecFormatter`.
+
+### Changed
+- `.jsonlogger` has been moved to `.json` with core functionality moved to `.core`.
+- `.core.BaseJsonFormatter` properly supports all `logging.Formatter` arguments:
+  - `fmt` is unchanged.
+  - `datefmt` is unchanged.
+  - `style` can now support non-standard arguments by setting `validate` to `False`
+  - `validate` allows non-standard `style` arguments or prevents calling `validate` on standard `style` arguments.
+  - `default` is ignored.
+
+### Deprecated
+- `.jsonlogger` is now `.json`
+- `.jsonlogger.RESERVED_ATTRS` is now `.core.RESERVED_ATTRS`.
+- `.jsonlogger.merge_record_extra` is now `.core.merge_record_extra`.
+
+### Removed
+- Python 3.7 support dropped
+- `.jsonlogger.JsonFormatter._str_to_fn` replaced with `.core.str_to_object`.
+
 ## [3.0.1](https://github.com/nhairs/python-json-logger/compare/v3.0.0...v3.0.1) - 2023-04-01
 
 ### Fixes
