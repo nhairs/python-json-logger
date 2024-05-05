@@ -6,12 +6,15 @@ from __future__ import annotations
 ## Standard Library
 from dataclasses import dataclass
 import datetime
+import enum
 import io
 import json
 import logging
 import sys
 import traceback
+from types import TracebackType
 from typing import Any, Generator
+import uuid
 
 ## Installed
 from freezegun import freeze_time
@@ -79,6 +82,34 @@ def get_traceback_from_exception_followed_by_log_call(env_: LoggingEnvironment) 
         if str_traceback.endswith("\n"):
             str_traceback = str_traceback[:-1]
     return str_traceback
+
+
+class SomeClass:
+    def __init__(self, thing: int):
+        self.thing = thing
+        return
+
+
+@dataclass
+class SomeDataclass:
+    things: str
+    stuff: int
+    junk: bool
+
+
+try:
+    raise ValueError
+except ValueError as e:
+    STATIC_TRACEBACK = e.__traceback__
+    del e
+
+
+class MultiEnum(enum.Enum):
+    NONE = None
+    BOOL = False
+    STR = "somestring"
+    INT = 99
+    BYTES = b"somebytes"
 
 
 ### TESTS
@@ -344,10 +375,111 @@ def test_default_encoder_with_timestamp(env: LoggingEnvironment, class_: type[Ba
     env.set_formatter(class_(timestamp=True))
 
     env.logger.info("Hello")
-    print(env.buffer.getvalue())
     log_json = env.load_json()
 
     assert log_json["timestamp"] == "2017-07-14T02:40:00+00:00"
+    return
+
+
+@pytest.mark.parametrize("class_", ALL_FORMATTERS)
+@pytest.mark.parametrize(
+    ["obj", "type_"],
+    [
+        ("somestring", str),
+        (1234, int),
+        (1234.5, float),
+        (False, bool),
+        (None, type(None)),
+        (b"somebytes", str),
+        (datetime.time(16, 45, 30, 100), str),
+        (datetime.date.today(), str),
+        (datetime.datetime.utcnow(), str),
+        (uuid.uuid4(), str),
+        (Exception, str),
+        (Exception("Foo occurred"), str),
+        (BaseException, str),
+        (BaseException("BaseFoo occurred"), str),
+        (STATIC_TRACEBACK, str),
+        (SomeDataclass(things="le_things", stuff=99, junk=False), dict),
+        (SomeDataclass, str),
+        (SomeClass, str),
+        (SomeClass(1234), str),
+        (MultiEnum.NONE, type(None)),
+        (MultiEnum.BOOL, bool),
+        (MultiEnum.STR, str),
+        (MultiEnum.INT, int),
+        (MultiEnum.BYTES, str),
+        (MultiEnum, str),
+    ],
+)
+def test_common_types_encoded(
+    env: LoggingEnvironment, class_: type[BaseJsonFormatter], obj: object, type_: type
+):
+    ## Known bad cases
+    if class_ is JsonFormatter:
+        if obj is SomeDataclass or isinstance(obj, SomeDataclass) or isinstance(obj, enum.Enum):
+            pytest.xfail()
+
+    if pythonjsonlogger.ORJSON_AVAILABLE and class_ is OrjsonFormatter:
+        if (
+            obj is Exception
+            or obj is BaseException
+            or isinstance(obj, BaseException)
+            or obj is SomeDataclass
+            or obj is SomeClass
+            or isinstance(obj, SomeClass)
+            or isinstance(obj, bytes)
+            or isinstance(obj, TracebackType)
+            or isinstance(obj, enum.EnumMeta)
+            or obj is MultiEnum.BYTES
+        ):
+            pytest.xfail()
+
+    if pythonjsonlogger.MSGSPEC_AVAILABLE and class_ is MsgspecFormatter:
+        if (
+            obj is Exception
+            or obj is BaseException
+            or isinstance(obj, BaseException)
+            or obj is SomeDataclass
+            or obj is SomeClass
+            or isinstance(obj, SomeClass)
+            or isinstance(obj, TracebackType)
+            or isinstance(obj, enum.EnumMeta)
+            or (
+                isinstance(obj, enum.Enum)
+                and obj in {MultiEnum.BYTES, MultiEnum.NONE, MultiEnum.BOOL}
+            )
+        ):
+            pytest.xfail()
+
+    ## Test
+    env.set_formatter(class_())
+    extra = {
+        "extra": obj,
+        "extra_dict": {"item": obj},
+        "extra_list": [obj],
+    }
+    env.logger.info("hello", extra=extra)
+    log_json = env.load_json()
+
+    assert isinstance(log_json["extra"], type_)
+    assert isinstance(log_json["extra_dict"]["item"], type_)
+    assert isinstance(log_json["extra_list"][0], type_)
+    return
+
+
+@pytest.mark.parametrize("class_", ALL_FORMATTERS)
+def test_custom_default(env: LoggingEnvironment, class_: type[BaseJsonFormatter]):
+    def custom_default(obj):
+        if isinstance(obj, SomeClass):
+            return {"TYPE": obj.thing}
+        return None
+
+    env.set_formatter(class_(json_default=custom_default))  # type: ignore[call-arg]
+    env.logger.info("hello", extra={"extra": SomeClass(999)})
+    log_json = env.load_json()
+
+    assert log_json["extra"] == {"TYPE": 999}
     return
 
 
@@ -369,21 +501,6 @@ def test_json_default_encoder(env: LoggingEnvironment):
     assert log_json["otherdate"] == "1789-07-14"
     assert log_json["otherdatetime"] == "1789-07-14T23:59:00"
     assert log_json["otherdatetimeagain"] == "1900-01-01T00:00:00"
-    return
-
-
-def test_json_custom_default(env: LoggingEnvironment):
-    def custom(o):
-        return "very custom"
-
-    env.set_formatter(JsonFormatter(json_default=custom))
-
-    msg = {"adate": datetime.datetime(1999, 12, 31, 23, 59), "normal": "value"}
-    env.logger.info(msg)
-    log_json = env.load_json()
-
-    assert log_json["adate"] == "very custom"
-    assert log_json["normal"] == "value"
     return
 
 
