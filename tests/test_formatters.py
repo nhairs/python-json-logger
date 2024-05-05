@@ -334,10 +334,11 @@ def test_rename_reserved_attrs(env: LoggingEnvironment, class_: type[BaseJsonFor
 @pytest.mark.parametrize("class_", ALL_FORMATTERS)
 def test_default_encoder_with_timestamp(env: LoggingEnvironment, class_: type[BaseJsonFormatter]):
     if pythonjsonlogger.ORJSON_AVAILABLE and class_ is OrjsonFormatter:
-        # https://github.com/spulec/freezegun/issues/448#issuecomment-1686070438
+        # https://github.com/ijl/orjson/issues/481
         pytest.xfail()
 
     if pythonjsonlogger.MSGSPEC_AVAILABLE and class_ is MsgspecFormatter:
+        # https://github.com/jcrist/msgspec/issues/678
         pytest.xfail()
 
     env.set_formatter(class_(timestamp=True))
