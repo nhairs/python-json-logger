@@ -176,6 +176,13 @@ format = %(message)s
 class = pythonjsonlogger.jsonlogger.JsonFormatter
 ```
 
+### Alternate JSON Encoders
+
+The following JSON encoders are also supported:
+
+- [orjson](https://github.com/ijl/orjson) - `pythonjsonlogger.orjon.OrjsonFormatter`
+- [msgspec](https://github.com/jcrist/msgspec) - `pythonjsonlogger.msgspec.MsgspecFormatter`
+
 ## Example Output
 
 Sample JSON with a full formatter (basically the log message from the unit test). Every log message will appear on 1 line like a typical logger.
