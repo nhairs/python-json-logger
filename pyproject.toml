@@ -43,14 +43,6 @@ classifiers = [
 GitHub = "https://github.com/nhairs/python-json-logger"
 
 [project.optional-dependencies]
-orjson = [
-    "orjson;implementation_name!='pypy'",
-]
-
-msgspec = [
-    "msgspec;implementation_name!='pypy'",
-]
-
 dev = [
     ## Optional but required for dev
     "orjson;implementation_name!='pypy' and python_version<'3.13'",
