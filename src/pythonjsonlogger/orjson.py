@@ -4,12 +4,31 @@
 from __future__ import annotations
 
 ## Standard Library
+from typing import Any
 
 ## Installed
 import orjson
 
 ## Application
 from . import core
+from . import defaults as d
+
+
+### FUNCTIONS
+### ============================================================================
+def orjson_default(obj: Any) -> Any:
+    """orjson default encoder function for non-standard types"""
+    if d.use_exception_default(obj):
+        return d.exception_default(obj)
+    if d.use_traceback_default(obj):
+        return d.traceback_default(obj)
+    if d.use_bytes_default(obj):
+        return d.bytes_default(obj)
+    if d.use_enum_default(obj):
+        return d.enum_default(obj)
+    if d.use_type_default(obj):
+        return d.type_default(obj)
+    return d.unknown_default(obj)
 
 
 ### CLASSES
@@ -25,7 +44,7 @@ class OrjsonFormatter(core.BaseJsonFormatter):
     def __init__(
         self,
         *args,
-        json_default: core.OptionalCallableOrStr = None,
+        json_default: core.OptionalCallableOrStr = orjson_default,
         json_indent: bool = False,
         **kwargs,
     ) -> None:

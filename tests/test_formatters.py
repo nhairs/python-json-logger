@@ -22,6 +22,7 @@ import pytest
 
 ## Application
 import pythonjsonlogger
+import pythonjsonlogger.defaults
 from pythonjsonlogger.core import RESERVED_ATTRS, BaseJsonFormatter, merge_record_extra
 from pythonjsonlogger.json import JsonFormatter
 
@@ -75,7 +76,7 @@ def env() -> Generator[LoggingEnvironment, None, None]:
 def get_traceback_from_exception_followed_by_log_call(env_: LoggingEnvironment) -> str:
     try:
         raise Exception("test")
-    except Exception:
+    except Exception as e:
         env_.logger.exception("hello")
         str_traceback = traceback.format_exc()
         # Formatter removes trailing new line
@@ -109,7 +110,10 @@ class MultiEnum(enum.Enum):
     BOOL = False
     STR = "somestring"
     INT = 99
-    BYTES = b"somebytes"
+    BYTES = b"some-bytes"
+
+
+NO_TEST = object()  # Sentinal
 
 
 ### TESTS
@@ -383,72 +387,62 @@ def test_default_encoder_with_timestamp(env: LoggingEnvironment, class_: type[Ba
 
 @pytest.mark.parametrize("class_", ALL_FORMATTERS)
 @pytest.mark.parametrize(
-    ["obj", "type_"],
+    ["obj", "type_", "expected"],
     [
-        ("somestring", str),
-        (1234, int),
-        (1234.5, float),
-        (False, bool),
-        (None, type(None)),
-        (b"somebytes", str),
-        (datetime.time(16, 45, 30, 100), str),
-        (datetime.date.today(), str),
-        (datetime.datetime.utcnow(), str),
-        (uuid.uuid4(), str),
-        (Exception, str),
-        (Exception("Foo occurred"), str),
-        (BaseException, str),
-        (BaseException("BaseFoo occurred"), str),
-        (STATIC_TRACEBACK, str),
-        (SomeDataclass(things="le_things", stuff=99, junk=False), dict),
-        (SomeDataclass, str),
-        (SomeClass, str),
-        (SomeClass(1234), str),
-        (MultiEnum.NONE, type(None)),
-        (MultiEnum.BOOL, bool),
-        (MultiEnum.STR, str),
-        (MultiEnum.INT, int),
-        (MultiEnum.BYTES, str),
-        (MultiEnum, str),
+        ("somestring", str, "somestring"),
+        (1234, int, 1234),
+        (1234.5, float, 1234.5),
+        (False, bool, False),
+        (None, type(None), None),
+        (b"some-bytes", str, "c29tZS1ieXRlcw=="),
+        (datetime.time(16, 45, 30, 100), str, NO_TEST),
+        (datetime.date.today(), str, NO_TEST),
+        (datetime.datetime.utcnow(), str, NO_TEST),
+        (
+            uuid.UUID("urn:uuid:12345678-1234-5678-1234-567812345678"),
+            str,
+            "12345678-1234-5678-1234-567812345678",
+        ),
+        (Exception, str, "Exception"),
+        (Exception("Foo occurred"), str, "Exception: Foo occurred"),
+        (BaseException, str, "BaseException"),
+        (BaseException("BaseFoo occurred"), str, "BaseException: BaseFoo occurred"),
+        (STATIC_TRACEBACK, str, pythonjsonlogger.defaults.traceback_default(STATIC_TRACEBACK)),  # type: ignore[arg-type]
+        (
+            SomeDataclass(things="le_things", stuff=99, junk=False),
+            dict,
+            {"things": "le_things", "stuff": 99, "junk": False},
+        ),
+        (SomeDataclass, str, "SomeDataclass"),
+        (SomeClass, str, "SomeClass"),
+        (SomeClass(1234), str, NO_TEST),
+        (MultiEnum.NONE, type(None), None),
+        (MultiEnum.BOOL, bool, MultiEnum.BOOL.value),
+        (MultiEnum.STR, str, MultiEnum.STR.value),
+        (MultiEnum.INT, int, MultiEnum.INT.value),
+        (MultiEnum.BYTES, str, "c29tZS1ieXRlcw=="),
+        (MultiEnum, list, [None, False, "somestring", 99, "c29tZS1ieXRlcw=="]),
     ],
 )
 def test_common_types_encoded(
-    env: LoggingEnvironment, class_: type[BaseJsonFormatter], obj: object, type_: type
+    env: LoggingEnvironment,
+    class_: type[BaseJsonFormatter],
+    obj: object,
+    type_: type,
+    expected: Any,
 ):
     ## Known bad cases
     if class_ is JsonFormatter:
-        if obj is SomeDataclass or isinstance(obj, SomeDataclass) or isinstance(obj, enum.Enum):
+        if False:
             pytest.xfail()
 
     if pythonjsonlogger.ORJSON_AVAILABLE and class_ is OrjsonFormatter:
-        if (
-            obj is Exception
-            or obj is BaseException
-            or isinstance(obj, BaseException)
-            or obj is SomeDataclass
-            or obj is SomeClass
-            or isinstance(obj, SomeClass)
-            or isinstance(obj, bytes)
-            or isinstance(obj, TracebackType)
-            or isinstance(obj, enum.EnumMeta)
-            or obj is MultiEnum.BYTES
-        ):
+        if False:
             pytest.xfail()
 
     if pythonjsonlogger.MSGSPEC_AVAILABLE and class_ is MsgspecFormatter:
-        if (
-            obj is Exception
-            or obj is BaseException
-            or isinstance(obj, BaseException)
-            or obj is SomeDataclass
-            or obj is SomeClass
-            or isinstance(obj, SomeClass)
-            or isinstance(obj, TracebackType)
-            or isinstance(obj, enum.EnumMeta)
-            or (
-                isinstance(obj, enum.Enum)
-                and obj in {MultiEnum.BYTES, MultiEnum.NONE, MultiEnum.BOOL}
-            )
+        if obj is SomeDataclass or (
+            isinstance(obj, enum.Enum) and obj in {MultiEnum.BYTES, MultiEnum.NONE, MultiEnum.BOOL}
         ):
             pytest.xfail()
 
@@ -465,6 +459,18 @@ def test_common_types_encoded(
     assert isinstance(log_json["extra"], type_)
     assert isinstance(log_json["extra_dict"]["item"], type_)
     assert isinstance(log_json["extra_list"][0], type_)
+
+    if expected is NO_TEST:
+        return
+
+    if expected is None or isinstance(expected, bool):
+        assert log_json["extra"] is expected
+        assert log_json["extra_dict"]["item"] is expected
+        assert log_json["extra_list"][0] is expected
+    else:
+        assert log_json["extra"] == expected
+        assert log_json["extra_dict"]["item"] == expected
+        assert log_json["extra_list"][0] == expected
     return
 
 
