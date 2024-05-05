@@ -55,6 +55,8 @@ dev = [
     ## Test
     "pytest",
     "freezegun",
+    ## Build
+    "build",
 ]
 
 [tool.setuptools.packages.find]
