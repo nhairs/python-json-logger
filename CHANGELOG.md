@@ -4,14 +4,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [3.1.0.rc1](https://github.com/nhairs/python-json-logger/compare/v3.0.1...v3.1.0.rc1) - 2023-05-03
+## [3.1.0.rc2](https://github.com/nhairs/python-json-logger/compare/v3.0.1...v3.1.0.rc1) - 2023-05-03
 
 This splits common funcitonality out to allow supporting other JSON encoders. Although this is a large refactor, backwards compatibility has been maintained.
 
 ### Added
 - `.core` - more details below.
-- Orjson encoder support via `.orjson.OrjsonFormatter`.
-- MsgSpec encoder support via `.msgspec.MsgspecFormatter`.
+- `.defaults` module that provides many functions for handling unsupported types.
+- Orjson encoder support via `.orjson.OrjsonFormatter` with the following additions:
+  - bytes are URL safe base64 encoded.
+  - Exceptions are "pretty printed" using the exception name and message e.g. `"ValueError: bad value passed"`
+  - Enum values use their value, Enum classes now return all values as a list.
+  - Tracebacks are supported
+  - Classes (aka types) are support
+  - Will fallback on `__str__` if available, else `__repr__` if available, else will use `__could_not_encode__`
+- MsgSpec encoder support via `.msgspec.MsgspecFormatter` with the following additions:
+  - Exceptions are "pretty printed" using the exception name and message e.g. `"ValueError: bad value passed"`
+  - Enum classes now return all values as a list.
+  - Tracebacks are supported
+  - Classes (aka types) are support
+  - Will fallback on `__str__` if available, else `__repr__` if available, else will use `__could_not_encode__`
 
 ### Changed
 - `.jsonlogger` has been moved to `.json` with core functionality moved to `.core`.
@@ -21,6 +33,12 @@ This splits common funcitonality out to allow supporting other JSON encoders. Al
   - `style` can now support non-standard arguments by setting `validate` to `False`
   - `validate` allows non-standard `style` arguments or prevents calling `validate` on standard `style` arguments.
   - `default` is ignored.
+- `.json.JsonEncoder` default encodings changed:
+  - bytes are URL safe base64 encoded.
+  - Exception formatting detected using `BaseException` instead of `Exception`. Now "pretty prints" the exception using the exception name and message e.g. `"ValueError: bad value passed"`
+  - Dataclasses are now supported
+  - Enum values now use their value, Enum classes now return all values as a list.
+  - Will fallback on `__str__` if available, else `__repr__` if available, else will use `__could_not_encode__`
 
 ### Deprecated
 - `.jsonlogger` is now `.json`
