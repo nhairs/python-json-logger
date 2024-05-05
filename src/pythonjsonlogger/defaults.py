@@ -31,11 +31,11 @@ else:
 def unknown_default(obj: Any) -> str:
     try:
         return str(obj)
-    except Exception:
+    except Exception:  # pylint: disable=broad-exception-caught
         pass
     try:
         return repr(obj)
-    except Exception:
+    except Exception:  # pylint: disable=broad-exception-caught
         pass
     return "__could_not_encode__"
 
