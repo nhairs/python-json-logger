@@ -29,10 +29,14 @@ else:
 ### FUNCTIONS
 ### ============================================================================
 def unknown_default(obj: Any) -> str:
-    if hasattr(obj, "__str__"):
+    try:
         return str(obj)
-    if hasattr(obj, "__repr__"):
+    except Exception:
+        pass
+    try:
         return repr(obj)
+    except Exception:
+        pass
     return "__could_not_encode__"
 
 
