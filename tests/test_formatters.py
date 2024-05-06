@@ -16,6 +16,11 @@ from types import TracebackType
 from typing import Any, Generator
 import uuid
 
+if sys.version_info >= (3, 9):
+    import zoneinfo
+else:
+    from backports import zoneinfo
+
 ## Installed
 from freezegun import freeze_time
 import pytest
@@ -398,14 +403,20 @@ def test_default_encoder_with_timestamp(env: LoggingEnvironment, class_: type[Ba
     ["obj", "type_", "expected"],
     [
         ("somestring", str, "somestring"),
+        ("some unicode Привет", str, "some unicode Привет"),
         (1234, int, 1234),
         (1234.5, float, 1234.5),
         (False, bool, False),
         (None, type(None), None),
         (b"some-bytes", str, "c29tZS1ieXRlcw=="),
-        (datetime.time(16, 45, 30, 100), str, NO_TEST),
-        (datetime.date.today(), str, NO_TEST),
-        (datetime.datetime.utcnow(), str, NO_TEST),
+        (datetime.time(16, 45, 30, 100), str, "16:45:30.000100"),
+        (datetime.date(2024, 5, 5), str, "2024-05-05"),
+        (datetime.datetime(2024, 5, 5, 16, 45, 30, 100), str, "2024-05-05T16:45:30.000100"),
+        (
+            datetime.datetime(2024, 5, 5, 16, 45, 30, 100, zoneinfo.ZoneInfo("Australia/Sydney")),
+            str,
+            "2024-05-05T16:45:30.000100+10:00",
+        ),
         (
             uuid.UUID("urn:uuid:12345678-1234-5678-1234-567812345678"),
             str,

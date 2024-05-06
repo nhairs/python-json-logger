@@ -55,6 +55,8 @@ dev = [
     ## Test
     "pytest",
     "freezegun",
+    "backports.zoneinfo;python_version<'3.9'",
+    "tzdata",
     ## Build
     "build",
 ]
