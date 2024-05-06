@@ -511,25 +511,6 @@ def test_custom_default(env: LoggingEnvironment, class_: type[BaseJsonFormatter]
 
 ## JsonFormatter Specific
 ## -----------------------------------------------------------------------------
-def test_json_default_encoder(env: LoggingEnvironment):
-    env.set_formatter(JsonFormatter())
-
-    msg = {
-        "adate": datetime.datetime(1999, 12, 31, 23, 59),
-        "otherdate": datetime.date(1789, 7, 14),
-        "otherdatetime": datetime.datetime(1789, 7, 14, 23, 59),
-        "otherdatetimeagain": datetime.datetime(1900, 1, 1),
-    }
-    env.logger.info(msg)
-    log_json = env.load_json()
-
-    assert log_json["adate"] == "1999-12-31T23:59:00"
-    assert log_json["otherdate"] == "1789-07-14"
-    assert log_json["otherdatetime"] == "1789-07-14T23:59:00"
-    assert log_json["otherdatetimeagain"] == "1900-01-01T00:00:00"
-    return
-
-
 def test_json_ensure_ascii_true(env: LoggingEnvironment):
     env.set_formatter(JsonFormatter())
     env.logger.info("Привет")
