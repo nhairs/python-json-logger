@@ -462,6 +462,7 @@ def test_common_types_encoded(
 
     if pythonjsonlogger.MSGSPEC_AVAILABLE and class_ is MsgspecFormatter:
         if obj is SomeDataclass or (
+            # https://github.com/jcrist/msgspec/issues/680
             isinstance(obj, enum.Enum) and obj in {MultiEnum.BYTES, MultiEnum.NONE, MultiEnum.BOOL}
         ):
             pytest.xfail()

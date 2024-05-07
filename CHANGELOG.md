@@ -24,6 +24,7 @@ This splits common funcitonality out to allow supporting other JSON encoders. Al
   - Tracebacks are supported
   - Classes (aka types) are support
   - Will fallback on `__str__` if available, else `__repr__` if available, else will use `__could_not_encode__`
+  - Note: msgspec only supprts enum values of type `int` or `str` [jcrist/msgspec#680](https://github.com/jcrist/msgspec/issues/680)
 
 ### Changed
 - `.jsonlogger` has been moved to `.json` with core functionality moved to `.core`.
