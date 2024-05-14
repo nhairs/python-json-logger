@@ -22,7 +22,7 @@ else:
     from backports import zoneinfo
 
 ## Installed
-from freezegun import freeze_time
+import freezegun
 import pytest
 
 ## Application
@@ -378,18 +378,23 @@ def test_rename_reserved_attrs(env: LoggingEnvironment, class_: type[BaseJsonFor
     return
 
 
-@freeze_time(datetime.datetime(2017, 7, 14, 2, 40))
+@freezegun.freeze_time(datetime.datetime(2017, 7, 14, 2, 40))
 @pytest.mark.parametrize("class_", ALL_FORMATTERS)
 def test_default_encoder_with_timestamp(env: LoggingEnvironment, class_: type[BaseJsonFormatter]):
-    if pythonjsonlogger.ORJSON_AVAILABLE and class_ is OrjsonFormatter:
+    if (pythonjsonlogger.ORJSON_AVAILABLE and class_ is OrjsonFormatter) or (
+        pythonjsonlogger.MSGSPEC_AVAILABLE and class_ is MsgspecFormatter
+    ):
+        # FakeDatetime not supported
         # https://github.com/ijl/orjson/issues/481
-        pytest.xfail()
-
-    if pythonjsonlogger.MSGSPEC_AVAILABLE and class_ is MsgspecFormatter:
         # https://github.com/jcrist/msgspec/issues/678
-        pytest.xfail()
+        def json_default(obj: Any) -> Any:
+            if isinstance(obj, freezegun.api.FakeDate):
+                return obj.isoformat()
+            raise ValueError(f"Unexpected object: {obj!r}")
 
-    env.set_formatter(class_(timestamp=True))
+        env.set_formatter(class_(timestamp=True, json_default=json_default))  # type: ignore[call-arg]
+    else:
+        env.set_formatter(class_(timestamp=True))
 
     env.logger.info("Hello")
     log_json = env.load_json()
