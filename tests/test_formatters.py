@@ -457,14 +457,6 @@ def test_common_types_encoded(
     expected: Any,
 ):
     ## Known bad cases
-    if class_ is JsonFormatter:
-        if False:
-            pytest.xfail()
-
-    if pythonjsonlogger.ORJSON_AVAILABLE and class_ is OrjsonFormatter:
-        if False:
-            pytest.xfail()
-
     if pythonjsonlogger.MSGSPEC_AVAILABLE and class_ is MsgspecFormatter:
         # Dataclass: https://github.com/jcrist/msgspec/issues/681
         # Enum: https://github.com/jcrist/msgspec/issues/680
