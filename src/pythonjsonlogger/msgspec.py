@@ -4,12 +4,29 @@
 from __future__ import annotations
 
 ## Standard Library
+from typing import Any
 
 ## Installed
 import msgspec.json
 
 ## Application
 from . import core
+from . import defaults as d
+
+
+### FUNCTIONS
+### ============================================================================
+def msgspec_default(obj: Any) -> Any:
+    """msgspec default encoder function for non-standard types"""
+    if d.use_exception_default(obj):
+        return d.exception_default(obj)
+    if d.use_traceback_default(obj):
+        return d.traceback_default(obj)
+    if d.use_enum_default(obj):
+        return d.enum_default(obj)
+    if d.use_type_default(obj):
+        return d.type_default(obj)
+    return d.unknown_default(obj)
 
 
 ### CLASSES
@@ -25,7 +42,7 @@ class MsgspecFormatter(core.BaseJsonFormatter):
     def __init__(
         self,
         *args,
-        json_default: core.OptionalCallableOrStr = None,
+        json_default: core.OptionalCallableOrStr = msgspec_default,
         **kwargs,
     ) -> None:
         """

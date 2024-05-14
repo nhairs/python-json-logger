@@ -10,15 +10,14 @@ variety of types.
 from __future__ import annotations
 
 ## Standard Library
-from datetime import date, datetime, time
-from inspect import istraceback
+import datetime
 import json
-import traceback
 from typing import Any, Callable, Optional, Union
 import warnings
 
 ## Application
 from . import core
+from . import defaults as d
 
 
 ### CLASSES
@@ -31,33 +30,39 @@ class JsonEncoder(json.JSONEncoder):
     """
 
     def default(self, o: Any) -> Any:
-        if isinstance(o, (date, datetime, time)):
+        if d.use_datetime_any(o):
             return self.format_datetime_obj(o)
 
-        if istraceback(o):
-            return "".join(traceback.format_tb(o)).strip()
+        if d.use_exception_default(o):
+            return d.exception_default(o)
 
-        # pylint: disable=unidiomatic-typecheck
-        if type(o) == Exception or isinstance(o, Exception) or type(o) == type:
-            return str(o)
+        if d.use_traceback_default(o):
+            return d.traceback_default(o)
+
+        if d.use_enum_default(o):
+            return d.enum_default(o)
+
+        if d.use_bytes_default(o):
+            return d.bytes_default(o)
+
+        if d.use_dataclass_default(o):
+            return d.dataclass_default(o)
+
+        if d.use_type_default(o):
+            return d.type_default(o)
 
         try:
             return super().default(o)
-
         except TypeError:
-            try:
-                return str(o)
+            return d.unknown_default(o)
 
-            except Exception:  # pylint: disable=broad-exception-caught
-                return None
-
-    def format_datetime_obj(self, o):
+    def format_datetime_obj(self, o: datetime.time | datetime.date | datetime.datetime) -> str:
         """Format datetime objects found in self.default
 
         This allows subclasses to change the datetime format without understanding the
         internals of the default method.
         """
-        return o.isoformat()
+        return d.datetime_any(o)
 
 
 class JsonFormatter(core.BaseJsonFormatter):
