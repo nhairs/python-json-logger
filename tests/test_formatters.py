@@ -377,6 +377,30 @@ def test_exc_info_renamed(env: LoggingEnvironment, class_: type[BaseJsonFormatte
 
 
 @pytest.mark.parametrize("class_", ALL_FORMATTERS)
+def test_exc_info_renamed_not_required(env: LoggingEnvironment, class_: type[BaseJsonFormatter]):
+    env.set_formatter(class_(rename_fields={"exc_info": "stack_trace"}))
+
+    expected_value = get_traceback_from_exception_followed_by_log_call(env)
+    log_json = env.load_json()
+
+    assert log_json["stack_trace"] == expected_value
+    assert "exc_info" not in log_json
+    return
+
+
+@pytest.mark.parametrize("class_", ALL_FORMATTERS)
+def test_exc_info_renamed_no_error(env: LoggingEnvironment, class_: type[BaseJsonFormatter]):
+    env.set_formatter(class_(rename_fields={"exc_info": "stack_trace"}))
+
+    env.logger.info("message")
+    log_json = env.load_json()
+
+    assert "stack_trace" not in log_json
+    assert "exc_info" not in log_json
+    return
+
+
+@pytest.mark.parametrize("class_", ALL_FORMATTERS)
 def test_custom_object_serialization(env: LoggingEnvironment, class_: type[BaseJsonFormatter]):
     def encode_complex(z):
         if isinstance(z, complex):

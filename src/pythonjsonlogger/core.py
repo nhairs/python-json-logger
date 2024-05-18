@@ -63,8 +63,6 @@ STYLE_STRING_TEMPLATE_REGEX = re.compile(r"\$\{(.+?)\}", re.IGNORECASE)
 STYLE_STRING_FORMAT_REGEX = re.compile(r"\{(.+?)\}", re.IGNORECASE)
 STYLE_PERCENT_REGEX = re.compile(r"%\((.+?)\)", re.IGNORECASE)
 
-MISSING = object()  # sentinal
-
 ## Type Aliases
 ## -----------------------------------------------------------------------------
 OptionalCallableOrStr: TypeAlias = Optional[Union[Callable, str]]
@@ -304,9 +302,7 @@ class BaseJsonFormatter(logging.Formatter):
                 `logger.info({"is_this_message_dict": True})`
         """
         for field in self._required_fields:
-            value = record.__dict__.get(field, MISSING)
-            if value is not MISSING:
-                log_record[self._get_rename(field)] = value
+            log_record[self._get_rename(field)] = record.__dict__.get(field)
 
         for data_dict in [self.static_fields, message_dict]:
             for key, value in data_dict.items():
