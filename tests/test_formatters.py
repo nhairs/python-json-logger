@@ -187,15 +187,32 @@ def test_rename_base_field(env: LoggingEnvironment, class_: type[BaseJsonFormatt
 
 
 @pytest.mark.parametrize("class_", ALL_FORMATTERS)
-def test_rename_nonexistent_field(env: LoggingEnvironment, class_: type[BaseJsonFormatter]):
-    env.set_formatter(class_(rename_fields={"nonexistent_key": "new_name"}))
+def test_rename_missing(env: LoggingEnvironment, class_: type[BaseJsonFormatter]):
+    env.set_formatter(class_(rename_fields={"missing_field": "new_field"}))
 
-    stderr_watcher = io.StringIO()
-    sys.stderr = stderr_watcher
-    env.logger.info("testing logging rename")
-    sys.stderr == sys.__stderr__
+    msg = "test rename missing field"
+    env.logger.info(msg)
+    log_json = env.load_json()
 
-    assert "KeyError: 'nonexistent_key'" not in stderr_watcher.getvalue()
+    assert log_json["message"] == msg
+    assert "missing_field" not in log_json
+    assert "new_field" not in log_json
+    return
+
+
+@pytest.mark.parametrize("class_", ALL_FORMATTERS)
+def test_rename_keep_missing(env: LoggingEnvironment, class_: type[BaseJsonFormatter]):
+    env.set_formatter(
+        class_(rename_fields={"missing_field": "new_field"}, rename_fields_keep_missing=True)
+    )
+
+    msg = "test keep rename missing field"
+    env.logger.info(msg)
+    log_json = env.load_json()
+
+    assert log_json["message"] == msg
+    assert "missing_field" not in log_json
+    assert log_json["new_field"] is None
     return
 
 
