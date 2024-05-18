@@ -63,6 +63,8 @@ STYLE_STRING_TEMPLATE_REGEX = re.compile(r"\$\{(.+?)\}", re.IGNORECASE)
 STYLE_STRING_FORMAT_REGEX = re.compile(r"\{(.+?)\}", re.IGNORECASE)
 STYLE_PERCENT_REGEX = re.compile(r"%\((.+?)\)", re.IGNORECASE)
 
+MISSING = object()  # sentinal
+
 ## Type Aliases
 ## -----------------------------------------------------------------------------
 OptionalCallableOrStr: TypeAlias = Optional[Union[Callable, str]]
@@ -138,6 +140,7 @@ class BaseJsonFormatter(logging.Formatter):
         *,
         prefix: str = "",
         rename_fields: Optional[Dict[str, str]] = None,
+        rename_fields_keep_missing: bool = False,
         static_fields: Optional[Dict[str, Any]] = None,
         reserved_attrs: Optional[Sequence[str]] = None,
         timestamp: Union[bool, str] = False,
@@ -154,7 +157,8 @@ class BaseJsonFormatter(logging.Formatter):
             prefix: an optional string prefix added at the beginning of
                 the formatted string
             rename_fields: an optional dict, used to rename field names in the output.
-                Rename message to @message: {'message': '@message'}
+                Rename `message` to `@message`: `{'message': '@message'}`
+            rename_fields_keep_missing: When renaming fields, include missing fields in the output.
             static_fields: an optional dict, used to add fields with static values to all logs
             reserved_attrs: an optional list of fields that will be skipped when
                 outputting json log record. Defaults to all log record attributes:
@@ -164,14 +168,18 @@ class BaseJsonFormatter(logging.Formatter):
                 to log record using string as key. If True boolean is passed, timestamp key
                 will be "timestamp". Defaults to False/off.
 
-        *Changed in 3.1*: you can now use custom values for style by setting validate to `False`.
-        The value is stored in `self._style` as a string. The `parse` method will need to be
-        overridden in order to support the new style.
+        *Changed in 3.1*:
+
+        - you can now use custom values for style by setting validate to `False`.
+          The value is stored in `self._style` as a string. The `parse` method will need to be
+          overridden in order to support the new style.
+        - Renaming fields now preserves the order that fields were added in and avoids adding
+          missing fields. The original behaviour, missing fields have a value of `None`, is still
+          available by setting `rename_fields_keep_missing` to `True`.
         """
         ## logging.Formatter compatibility
         ## ---------------------------------------------------------------------
-        # Note: validate added in 3.8
-        # Note: defaults added in 3.10
+        # Note: validate added in 3.8, defaults added in 3.10
         if style in logging._STYLES:
             _style = logging._STYLES[style][0](fmt)  # type: ignore[operator]
             if validate:
@@ -192,6 +200,7 @@ class BaseJsonFormatter(logging.Formatter):
         ## ---------------------------------------------------------------------
         self.prefix = prefix
         self.rename_fields = rename_fields if rename_fields is not None else {}
+        self.rename_fields_keep_missing = rename_fields_keep_missing
         self.static_fields = static_fields if static_fields is not None else {}
         self.reserved_attrs = set(reserved_attrs if reserved_attrs is not None else RESERVED_ATTRS)
         self.timestamp = timestamp
@@ -215,6 +224,7 @@ class BaseJsonFormatter(logging.Formatter):
             record.message = ""
         else:
             record.message = record.getMessage()
+
         # only format time if needed
         if "asctime" in self._required_fields:
             record.asctime = self.formatTime(record, self.datefmt)
@@ -225,6 +235,7 @@ class BaseJsonFormatter(logging.Formatter):
             message_dict["exc_info"] = self.formatException(record.exc_info)
         if not message_dict.get("exc_info") and record.exc_text:
             message_dict["exc_info"] = record.exc_text
+
         # Display formatted record of stack frames
         # default format is a string returned from :func:`traceback.print_stack`
         if record.stack_info and not message_dict.get("stack_info"):
@@ -289,13 +300,18 @@ class BaseJsonFormatter(logging.Formatter):
         Args:
             log_record: data that will be logged
             record: the record to extract data from
-            message_dict: ???
+            message_dict: dictionary that was logged instead of a message. e.g
+                `logger.info({"is_this_message_dict": True})`
         """
         for field in self._required_fields:
-            log_record[field] = record.__dict__.get(field)
+            value = record.__dict__.get(field, MISSING)
+            if value is not MISSING:
+                log_record[self._get_rename(field)] = value
 
-        log_record.update(self.static_fields)
-        log_record.update(message_dict)
+        for data_dict in [self.static_fields, message_dict]:
+            for key, value in data_dict.items():
+                log_record[self._get_rename(key)] = value
+
         merge_record_extra(
             record,
             log_record,
@@ -304,19 +320,19 @@ class BaseJsonFormatter(logging.Formatter):
         )
 
         if self.timestamp:
-            # TODO: Can this use isinstance instead?
-            # pylint: disable=unidiomatic-typecheck
-            key = self.timestamp if type(self.timestamp) == str else "timestamp"
-            log_record[key] = datetime.fromtimestamp(record.created, tz=timezone.utc)
+            key = self.timestamp if isinstance(self.timestamp, str) else "timestamp"
+            log_record[self._get_rename(key)] = datetime.fromtimestamp(
+                record.created, tz=timezone.utc
+            )
 
-        self._perform_rename_log_fields(log_record)
+        if self.rename_fields_keep_missing:
+            for field in self.rename_fields.values():
+                if field not in log_record:
+                    log_record[field] = None
         return
 
-    def _perform_rename_log_fields(self, log_record: Dict[str, Any]) -> None:
-        for old_field_name, new_field_name in self.rename_fields.items():
-            log_record[new_field_name] = log_record[old_field_name]
-            del log_record[old_field_name]
-        return
+    def _get_rename(self, key: str) -> str:
+        return self.rename_fields.get(key, key)
 
     # Child Methods
     # ..........................................................................

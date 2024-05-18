@@ -195,7 +195,39 @@ def test_rename_nonexistent_field(env: LoggingEnvironment, class_: type[BaseJson
     env.logger.info("testing logging rename")
     sys.stderr == sys.__stderr__
 
-    assert "KeyError: 'nonexistent_key'" in stderr_watcher.getvalue()
+    assert "KeyError: 'nonexistent_key'" not in stderr_watcher.getvalue()
+    return
+
+
+@pytest.mark.parametrize("class_", ALL_FORMATTERS)
+def test_rename_preserve_order(env: LoggingEnvironment, class_: type[BaseJsonFormatter]):
+    env.set_formatter(
+        class_("{levelname}{message}{asctime}", style="{", rename_fields={"levelname": "LEVEL"})
+    )
+
+    env.logger.info("testing logging rename order")
+    log_json = env.load_json()
+
+    assert list(log_json.keys())[0] == "LEVEL"
+    return
+
+
+@pytest.mark.parametrize("class_", ALL_FORMATTERS)
+def test_rename_once(env: LoggingEnvironment, class_: type[BaseJsonFormatter]):
+    env.set_formatter(
+        class_(
+            "{levelname}{message}{asctime}",
+            style="{",
+            rename_fields={"levelname": "LEVEL", "message": "levelname"},
+        )
+    )
+
+    msg = "something"
+    env.logger.info(msg)
+    log_json = env.load_json()
+
+    assert log_json["LEVEL"] == "INFO"
+    assert log_json["levelname"] == msg
     return
 
 
@@ -368,10 +400,6 @@ def test_rename_reserved_attrs(env: LoggingEnvironment, class_: type[BaseJsonFor
     env.logger.info("message")
     log_json = env.load_json()
 
-    # Note: this check is fragile if we make the following changes in the future (we might):
-    # - renaming fields no longer requires the field to be present (#6)
-    # - we add the ability (and data above) to rename a field to an existing field name
-    #   e.g. {"exc_info": "trace_original", "@custom_trace": "exc_info"}
     for old_name, new_name in reserved_attrs_map.items():
         assert new_name in log_json
         assert old_name not in log_json
