@@ -187,15 +187,64 @@ def test_rename_base_field(env: LoggingEnvironment, class_: type[BaseJsonFormatt
 
 
 @pytest.mark.parametrize("class_", ALL_FORMATTERS)
-def test_rename_nonexistent_field(env: LoggingEnvironment, class_: type[BaseJsonFormatter]):
-    env.set_formatter(class_(rename_fields={"nonexistent_key": "new_name"}))
+def test_rename_missing(env: LoggingEnvironment, class_: type[BaseJsonFormatter]):
+    env.set_formatter(class_(rename_fields={"missing_field": "new_field"}))
 
-    stderr_watcher = io.StringIO()
-    sys.stderr = stderr_watcher
-    env.logger.info("testing logging rename")
-    sys.stderr == sys.__stderr__
+    msg = "test rename missing field"
+    env.logger.info(msg)
+    log_json = env.load_json()
 
-    assert "KeyError: 'nonexistent_key'" in stderr_watcher.getvalue()
+    assert log_json["message"] == msg
+    assert "missing_field" not in log_json
+    assert "new_field" not in log_json
+    return
+
+
+@pytest.mark.parametrize("class_", ALL_FORMATTERS)
+def test_rename_keep_missing(env: LoggingEnvironment, class_: type[BaseJsonFormatter]):
+    env.set_formatter(
+        class_(rename_fields={"missing_field": "new_field"}, rename_fields_keep_missing=True)
+    )
+
+    msg = "test keep rename missing field"
+    env.logger.info(msg)
+    log_json = env.load_json()
+
+    assert log_json["message"] == msg
+    assert "missing_field" not in log_json
+    assert log_json["new_field"] is None
+    return
+
+
+@pytest.mark.parametrize("class_", ALL_FORMATTERS)
+def test_rename_preserve_order(env: LoggingEnvironment, class_: type[BaseJsonFormatter]):
+    env.set_formatter(
+        class_("{levelname}{message}{asctime}", style="{", rename_fields={"levelname": "LEVEL"})
+    )
+
+    env.logger.info("testing logging rename order")
+    log_json = env.load_json()
+
+    assert list(log_json.keys())[0] == "LEVEL"
+    return
+
+
+@pytest.mark.parametrize("class_", ALL_FORMATTERS)
+def test_rename_once(env: LoggingEnvironment, class_: type[BaseJsonFormatter]):
+    env.set_formatter(
+        class_(
+            "{levelname}{message}{asctime}",
+            style="{",
+            rename_fields={"levelname": "LEVEL", "message": "levelname"},
+        )
+    )
+
+    msg = "something"
+    env.logger.info(msg)
+    log_json = env.load_json()
+
+    assert log_json["LEVEL"] == "INFO"
+    assert log_json["levelname"] == msg
     return
 
 
@@ -328,6 +377,30 @@ def test_exc_info_renamed(env: LoggingEnvironment, class_: type[BaseJsonFormatte
 
 
 @pytest.mark.parametrize("class_", ALL_FORMATTERS)
+def test_exc_info_renamed_not_required(env: LoggingEnvironment, class_: type[BaseJsonFormatter]):
+    env.set_formatter(class_(rename_fields={"exc_info": "stack_trace"}))
+
+    expected_value = get_traceback_from_exception_followed_by_log_call(env)
+    log_json = env.load_json()
+
+    assert log_json["stack_trace"] == expected_value
+    assert "exc_info" not in log_json
+    return
+
+
+@pytest.mark.parametrize("class_", ALL_FORMATTERS)
+def test_exc_info_renamed_no_error(env: LoggingEnvironment, class_: type[BaseJsonFormatter]):
+    env.set_formatter(class_(rename_fields={"exc_info": "stack_trace"}))
+
+    env.logger.info("message")
+    log_json = env.load_json()
+
+    assert "stack_trace" not in log_json
+    assert "exc_info" not in log_json
+    return
+
+
+@pytest.mark.parametrize("class_", ALL_FORMATTERS)
 def test_custom_object_serialization(env: LoggingEnvironment, class_: type[BaseJsonFormatter]):
     def encode_complex(z):
         if isinstance(z, complex):
@@ -368,10 +441,6 @@ def test_rename_reserved_attrs(env: LoggingEnvironment, class_: type[BaseJsonFor
     env.logger.info("message")
     log_json = env.load_json()
 
-    # Note: this check is fragile if we make the following changes in the future (we might):
-    # - renaming fields no longer requires the field to be present (#6)
-    # - we add the ability (and data above) to rename a field to an existing field name
-    #   e.g. {"exc_info": "trace_original", "@custom_trace": "exc_info"}
     for old_name, new_name in reserved_attrs_map.items():
         assert new_name in log_json
         assert old_name not in log_json
