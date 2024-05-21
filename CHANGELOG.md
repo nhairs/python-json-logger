@@ -34,7 +34,7 @@ This splits common funcitonality out to allow supporting other JSON encoders. Al
   - `style` can now support non-standard arguments by setting `validate` to `False`
   - `validate` allows non-standard `style` arguments or prevents calling `validate` on standard `style` arguments.
   - `default` is ignored.
-- `.json.JsonEncoder` default encodings changed:
+- `.json.JsonFormatter` default encodings changed:
   - bytes are URL safe base64 encoded.
   - Exception formatting detected using `BaseException` instead of `Exception`. Now "pretty prints" the exception using the exception name and message e.g. `"ValueError: bad value passed"`
   - Dataclasses are now supported
