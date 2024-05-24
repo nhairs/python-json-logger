@@ -122,7 +122,7 @@ def main_3():
 main_3()
 ```
 
-### Using `fileConfig`
+## Using `fileConfig`
 
 To use the module with a config file using the [`fileConfig` function](https://docs.python.org/3/library/logging.config.html#logging.config.fileConfig), use the class `pythonjsonlogger.json.JsonFormatter`. Here is a sample config file.
 

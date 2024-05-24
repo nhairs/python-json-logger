@@ -47,10 +47,10 @@ mypy src tests
 pytest
 ```
 
-If making changes to the documentation you can preview the changes locally using `mike`. Changes to the README can be previewed using [`grip`](https://github.com/joeyespo/grip) (not included in `dev` dependencies).
+If making changes to the documentation you can preview the changes locally using `mkdocs`. Changes to the README can be previewed using [`grip`](https://github.com/joeyespo/grip) (not included in `dev` dependencies).
 
 ```shell
-mike serve
+mkdocs serve
 ```
 
 !!! note

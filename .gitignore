@@ -16,3 +16,6 @@ env
 # IDE
 .vscode
 .idea
+
+# generated docs
+site

@@ -39,24 +39,50 @@ logger.addHandler(logHandler)
 
 ### Output fields
 
-#### Format Fields
+#### Required Fields
 You can control the logged fields by setting the `fmt` argument when creating the formatter. By default formatters will follow the same `style` of `fmt` as the `logging` module: `%`, `$`, and `{`. All [`LogRecord` attributes](https://docs.python.org/3/library/logging.html#logrecord-attributes) can be output using their name.
 
 ```python
 formatter = JsonFormatter("{message}{asctime}{exc_info}", style="{")
 ```
 
-#### Extra Fields
-You can also add extra fields to your json output by specifying a dict in place of message, as well as by specifying an `extra={}` argument. Contents of these dictionaries will be added at the root level of the entry and may override basic fields.
+#### Message Fields
 
-Non-standard attributes added to a `LogRecord` will also be included in the logged data.
+Instead of logging a string message you can log using a `dict`.
+
+```python
+logger.info({
+    "my_data": 1,
+    "message": "if you don't include this it will be an empty string",
+    "other_stuff": False,
+})
+```
+
+!!! warning
+    Be aware that if you log using a `dict`, other formatters may not be able to handle it.
+
+You can also add additional message fields using the `extra` argument.
+
+```python
+logger.info(
+    "this logs the same additional fields as above",
+    extra={
+        "my_data": 1,
+        "other_stuff": False,
+    },
+)
+```
+
+Finally, any non-standard attributes added to a `LogRecord` will also be included in the logged data. See [Cookbook: Request / Trace IDs](cookbook.md#request-trace-ids) for an example.
 
 #### Static Fields
 
-Static data that is added to every log record can be set using the `static_fields` argument.
+Static fields that are added to every log record can be set using the `static_fields` argument.
 
 ```python
-formatter = JsonFormatter(static_fields={"True gets logged on every record?": True})
+formatter = JsonFormatter(
+    static_fields={"True gets logged on every record?": True}
+)
 ```
 
 ### Excluding fields
@@ -66,7 +92,9 @@ You can prevent fields being added to the output data by adding them to `reserve
 ```python
 from pythonjsonlogger.core import RESERVED_ATTRS
 
-formatter = JsonFormatter(reserved_attrs=RESERVED_ATTRS+["request_id", "my_other_field"])
+formatter = JsonFormatter(
+    reserved_attrs=RESERVED_ATTRS+["request_id", "my_other_field"]
+)
 ```
 
 ### Renaming fields
@@ -74,7 +102,11 @@ formatter = JsonFormatter(reserved_attrs=RESERVED_ATTRS+["request_id", "my_other
 You can rename fields using the `rename_fields` argument.
 
 ```python
-formatter = JsonFormatter("{message}{levelname}", style="{", rename_fields={"levelname": "LEVEL"})
+formatter = JsonFormatter(
+    "{message}{levelname}",
+    style="{",
+    rename_fields={"levelname": "LEVEL"},
+)
 ```
 
 ### Custom object serialization
