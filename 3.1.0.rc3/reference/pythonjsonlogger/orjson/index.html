@@ -853,6 +853,8 @@
 
     <div class="doc doc-contents first">
 
+      <p>JSON Formatter using <a href="https://github.com/ijl/orjson">msgspec</a></p>
+
 
 
   <div class="doc doc-children">
@@ -875,8 +877,8 @@
 <a href="#pythonjsonlogger.orjson.OrjsonFormatter" class="headerlink" title="Permanent link">🔗</a></h2>
 <div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">OrjsonFormatter</span><span class="p">(</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="o">*</span><span class="n">args</span><span class="p">,</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">json_default</span><span class="p">:</span> <span class="n"><span title="pythonjsonlogger.core.OptionalCallableOrStr">OptionalCallableOrStr</span></span> <span class="o">=</span> <span class="n">orjson_default</span><span class="p">,</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">json_indent</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">json_default</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="pythonjsonlogger.core.OptionalCallableOrStr" href="../core/#pythonjsonlogger.core.OptionalCallableOrStr">OptionalCallableOrStr</a></span> <span class="o">=</span> <span class="n">orjson_default</span><span class="p">,</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">json_indent</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="o">**</span><span class="n">kwargs</span>
 <a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">)</span>
 </code></pre></div>
@@ -886,51 +888,80 @@
               Bases: <code><a class="autorefs autorefs-internal" title="pythonjsonlogger.core.BaseJsonFormatter" href="../core/#pythonjsonlogger.core.BaseJsonFormatter">BaseJsonFormatter</a></code></p>
 
 
-      <p>JSON formatter using orjson for encoding.</p>
-<p>Refs:
-- https://github.com/ijl/orjson</p>
+      <p>JSON formatter using <a href="https://github.com/ijl/orjson">orjson</a> for encoding.</p>
 
 
 
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
+<table>
       <thead>
         <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
         </tr>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>json_default</code></td>
-            <td>
-                  <code><span title="pythonjsonlogger.core.OptionalCallableOrStr">OptionalCallableOrStr</span></code>
-            </td>
-            <td>
+            <td><code>args</code></td>
+            <td class="doc-param-details">
               <div class="doc-md-description">
-                <p>a function for encoding non-standard objects see:
-https://github.com/ijl/orjson#default</p>
+                <p>see <a class="autorefs autorefs-internal" href="../core/#pythonjsonlogger.core.BaseJsonFormatter">BaseJsonFormatter</a></p>
               </div>
+              <p>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>()</code>
+                  </span>
+              </p>
             </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="pythonjsonlogger.orjson.orjson_default" href="#pythonjsonlogger.orjson.orjson_default">orjson_default</a></code>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>json_default</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>a function for encoding non-standard objects</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><a class="autorefs autorefs-internal" title="pythonjsonlogger.core.OptionalCallableOrStr" href="../core/#pythonjsonlogger.core.OptionalCallableOrStr">OptionalCallableOrStr</a></code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code><a class="autorefs autorefs-internal" title="pythonjsonlogger.orjson.orjson_default" href="#pythonjsonlogger.orjson.orjson_default">orjson_default</a></code>
+                  </span>
+              </p>
             </td>
           </tr>
           <tr class="doc-section-item">
             <td><code>json_indent</code></td>
-            <td>
-                  <code>bool</code>
-            </td>
-            <td>
+            <td class="doc-param-details">
               <div class="doc-md-description">
-                <p>indent output with 2 spaces. see:
-https://github.com/ijl/orjson#opt_indent_2</p>
+                <p>indent output with 2 spaces.</p>
               </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
             </td>
-            <td>
-                  <code>False</code>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>kwargs</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>see <a class="autorefs autorefs-internal" href="../core/#pythonjsonlogger.core.BaseJsonFormatter">BaseJsonFormatter</a></p>
+              </div>
+              <p>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>{}</code>
+                  </span>
+              </p>
             </td>
           </tr>
       </tbody>
@@ -958,9 +989,9 @@ https://github.com/ijl/orjson#opt_indent_2</p>
 
 <a href="#pythonjsonlogger.orjson.OrjsonFormatter.add_fields" class="headerlink" title="Permanent link">🔗</a></h3>
 <div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">add_fields</span><span class="p">(</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">log_record</span><span class="p">:</span> <span class="n"><span title="typing.Dict">Dict</span></span><span class="p">[</span><span class="n">str</span><span class="p">,</span> <span class="n"><span title="typing.Any">Any</span></span><span class="p">],</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">record</span><span class="p">:</span> <span class="n"><span title="logging.LogRecord">LogRecord</span></span><span class="p">,</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">message_dict</span><span class="p">:</span> <span class="n"><span title="typing.Dict">Dict</span></span><span class="p">[</span><span class="n">str</span><span class="p">,</span> <span class="n"><span title="typing.Any">Any</span></span><span class="p">],</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">log_record</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="typing.Dict" href="https://docs.python.org/3/library/typing.html#typing.Dict">Dict</a></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">,</span> <span class="n"><a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a></span><span class="p">],</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">record</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="logging.LogRecord" href="https://docs.python.org/3/library/logging.html#logging.LogRecord">LogRecord</a></span><span class="p">,</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">message_dict</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="typing.Dict" href="https://docs.python.org/3/library/typing.html#typing.Dict">Dict</a></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">,</span> <span class="n"><a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a></span><span class="p">],</span>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </code></pre></div>
 
@@ -970,58 +1001,55 @@ https://github.com/ijl/orjson#opt_indent_2</p>
 <p>This method can be overridden to implement custom logic for adding fields.</p>
 
 
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
+<table>
       <thead>
         <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
         </tr>
       </thead>
       <tbody>
           <tr class="doc-section-item">
             <td><code>log_record</code></td>
-            <td>
-                  <code><span title="typing.Dict">Dict</span>[str, <span title="typing.Any">Any</span>]</code>
-            </td>
-            <td>
+            <td class="doc-param-details">
               <div class="doc-md-description">
                 <p>data that will be logged</p>
               </div>
-            </td>
-            <td>
-                <em>required</em>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><a class="autorefs autorefs-external" title="typing.Dict" href="https://docs.python.org/3/library/typing.html#typing.Dict">Dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>]</code>
+                  </span>
+              </p>
             </td>
           </tr>
           <tr class="doc-section-item">
             <td><code>record</code></td>
-            <td>
-                  <code><span title="logging.LogRecord">LogRecord</span></code>
-            </td>
-            <td>
+            <td class="doc-param-details">
               <div class="doc-md-description">
                 <p>the record to extract data from</p>
               </div>
-            </td>
-            <td>
-                <em>required</em>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><a class="autorefs autorefs-external" title="logging.LogRecord" href="https://docs.python.org/3/library/logging.html#logging.LogRecord">LogRecord</a></code>
+                  </span>
+              </p>
             </td>
           </tr>
           <tr class="doc-section-item">
             <td><code>message_dict</code></td>
-            <td>
-                  <code><span title="typing.Dict">Dict</span>[str, <span title="typing.Any">Any</span>]</code>
-            </td>
-            <td>
+            <td class="doc-param-details">
               <div class="doc-md-description">
                 <p>dictionary that was logged instead of a message. e.g
 <code>logger.info({"is_this_message_dict": True})</code></p>
               </div>
-            </td>
-            <td>
-                <em>required</em>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><a class="autorefs autorefs-external" title="typing.Dict" href="https://docs.python.org/3/library/typing.html#typing.Dict">Dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>]</code>
+                  </span>
+              </p>
             </td>
           </tr>
       </tbody>
@@ -1039,7 +1067,7 @@ https://github.com/ijl/orjson#opt_indent_2</p>
 
 
 <a href="#pythonjsonlogger.orjson.OrjsonFormatter.format" class="headerlink" title="Permanent link">🔗</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nb">format</span><span class="p">(</span><span class="nf">record</span><span class="p">:</span> <span class="n"><span title="logging.LogRecord">LogRecord</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">str</span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nb">format</span><span class="p">(</span><span class="nf">record</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="logging.LogRecord" href="https://docs.python.org/3/library/logging.html#logging.LogRecord">LogRecord</a></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -1047,29 +1075,26 @@ https://github.com/ijl/orjson#opt_indent_2</p>
       <p>Formats a log record and serializes to json</p>
 
 
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
+<table>
       <thead>
         <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
         </tr>
       </thead>
       <tbody>
           <tr class="doc-section-item">
             <td><code>record</code></td>
-            <td>
-                  <code><span title="logging.LogRecord">LogRecord</span></code>
-            </td>
-            <td>
+            <td class="doc-param-details">
               <div class="doc-md-description">
                 <p>the record to format</p>
               </div>
-            </td>
-            <td>
-                <em>required</em>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><a class="autorefs autorefs-external" title="logging.LogRecord" href="https://docs.python.org/3/library/logging.html#logging.LogRecord">LogRecord</a></code>
+                  </span>
+              </p>
             </td>
           </tr>
       </tbody>
@@ -1087,7 +1112,7 @@ https://github.com/ijl/orjson#opt_indent_2</p>
 
 
 <a href="#pythonjsonlogger.orjson.OrjsonFormatter.jsonify_log_record" class="headerlink" title="Permanent link">🔗</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">jsonify_log_record</span><span class="p">(</span><span class="n">log_record</span><span class="p">:</span> <span class="n"><span title="pythonjsonlogger.core.LogRecord">LogRecord</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">str</span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">jsonify_log_record</span><span class="p">(</span><span class="n">log_record</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="pythonjsonlogger.core.LogRecord" href="../core/#pythonjsonlogger.core.LogRecord">LogRecord</a></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -1106,7 +1131,7 @@ https://github.com/ijl/orjson#opt_indent_2</p>
 
 
 <a href="#pythonjsonlogger.orjson.OrjsonFormatter.parse" class="headerlink" title="Permanent link">🔗</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">parse</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n"><span title="typing.List">List</span></span><span class="p">[</span><span class="n">str</span><span class="p">]</span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">parse</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-external" title="typing.List" href="https://docs.python.org/3/library/typing.html#typing.List">List</a></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">]</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -1117,20 +1142,21 @@ to include in all log messages.</p>
 <p>You can support custom styles by overriding this method.</p>
 
 
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
+<table>
       <thead>
         <tr>
-          <th>Type</th>
-          <th>Description</th>
+          <th><span class="doc-section-title">RETURNS</span></th>
+          <th><span>DESCRIPTION</span></th>
         </tr>
       </thead>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="typing.List">List</span>[str]</code>
+                <span class="doc-returns-annotation">
+                    <code><a class="autorefs autorefs-external" title="typing.List" href="https://docs.python.org/3/library/typing.html#typing.List">List</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>]</code>
+                </span>
             </td>
-            <td>
+            <td class="doc-returns-details">
               <div class="doc-md-description">
                 <p>list of fields to be extracted and serialized</p>
               </div>
@@ -1151,7 +1177,7 @@ to include in all log messages.</p>
 
 
 <a href="#pythonjsonlogger.orjson.OrjsonFormatter.process_log_record" class="headerlink" title="Permanent link">🔗</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">process_log_record</span><span class="p">(</span><span class="n">log_record</span><span class="p">:</span> <span class="n"><span title="pythonjsonlogger.core.LogRecord">LogRecord</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="pythonjsonlogger.core.LogRecord">LogRecord</span></span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">process_log_record</span><span class="p">(</span><span class="n">log_record</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="pythonjsonlogger.core.LogRecord" href="../core/#pythonjsonlogger.core.LogRecord">LogRecord</a></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-internal" title="pythonjsonlogger.core.LogRecord" href="../core/#pythonjsonlogger.core.LogRecord">LogRecord</a></span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -1161,29 +1187,26 @@ to include in all log messages.</p>
 is serialized.</p>
 
 
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
+<table>
       <thead>
         <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
         </tr>
       </thead>
       <tbody>
           <tr class="doc-section-item">
             <td><code>log_record</code></td>
-            <td>
-                  <code><span title="pythonjsonlogger.core.LogRecord">LogRecord</span></code>
-            </td>
-            <td>
+            <td class="doc-param-details">
               <div class="doc-md-description">
                 <p>incoming data</p>
               </div>
-            </td>
-            <td>
-                <em>required</em>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><a class="autorefs autorefs-internal" title="pythonjsonlogger.core.LogRecord" href="../core/#pythonjsonlogger.core.LogRecord">LogRecord</a></code>
+                  </span>
+              </p>
             </td>
           </tr>
       </tbody>
@@ -1201,7 +1224,7 @@ is serialized.</p>
 
 
 <a href="#pythonjsonlogger.orjson.OrjsonFormatter.serialize_log_record" class="headerlink" title="Permanent link">🔗</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">serialize_log_record</span><span class="p">(</span><span class="n">log_record</span><span class="p">:</span> <span class="n"><span title="pythonjsonlogger.core.LogRecord">LogRecord</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">str</span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">serialize_log_record</span><span class="p">(</span><span class="n">log_record</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="pythonjsonlogger.core.LogRecord" href="../core/#pythonjsonlogger.core.LogRecord">LogRecord</a></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -1209,29 +1232,26 @@ is serialized.</p>
       <p>Returns the final representation of the log record.</p>
 
 
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
+<table>
       <thead>
         <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
         </tr>
       </thead>
       <tbody>
           <tr class="doc-section-item">
             <td><code>log_record</code></td>
-            <td>
-                  <code><span title="pythonjsonlogger.core.LogRecord">LogRecord</span></code>
-            </td>
-            <td>
+            <td class="doc-param-details">
               <div class="doc-md-description">
                 <p>the log record</p>
               </div>
-            </td>
-            <td>
-                <em>required</em>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><a class="autorefs autorefs-internal" title="pythonjsonlogger.core.LogRecord" href="../core/#pythonjsonlogger.core.LogRecord">LogRecord</a></code>
+                  </span>
+              </p>
             </td>
           </tr>
       </tbody>
@@ -1258,7 +1278,7 @@ is serialized.</p>
 
 
 <a href="#pythonjsonlogger.orjson.orjson_default" class="headerlink" title="Permanent link">🔗</a></h2>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">orjson_default</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n"><span title="typing.Any">Any</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="typing.Any">Any</span></span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">orjson_default</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a></span>
 </code></pre></div>
 
     <div class="doc doc-contents ">

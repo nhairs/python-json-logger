@@ -2,62 +2,62 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://nhairs.github.io/python-json-logger/latest/</loc>
-         <lastmod>2024-05-24</lastmod>
+         <lastmod>2024-05-26</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://nhairs.github.io/python-json-logger/latest/changelog/</loc>
-         <lastmod>2024-05-24</lastmod>
+         <lastmod>2024-05-26</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://nhairs.github.io/python-json-logger/latest/contributing/</loc>
-         <lastmod>2024-05-24</lastmod>
+         <lastmod>2024-05-26</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://nhairs.github.io/python-json-logger/latest/cookbook/</loc>
-         <lastmod>2024-05-24</lastmod>
+         <lastmod>2024-05-26</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://nhairs.github.io/python-json-logger/latest/quickstart/</loc>
-         <lastmod>2024-05-24</lastmod>
+         <lastmod>2024-05-26</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://nhairs.github.io/python-json-logger/latest/security/</loc>
-         <lastmod>2024-05-24</lastmod>
+         <lastmod>2024-05-26</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://nhairs.github.io/python-json-logger/latest/reference/pythonjsonlogger/</loc>
-         <lastmod>2024-05-24</lastmod>
+         <lastmod>2024-05-26</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://nhairs.github.io/python-json-logger/latest/reference/pythonjsonlogger/core/</loc>
-         <lastmod>2024-05-24</lastmod>
+         <lastmod>2024-05-26</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://nhairs.github.io/python-json-logger/latest/reference/pythonjsonlogger/defaults/</loc>
-         <lastmod>2024-05-24</lastmod>
+         <lastmod>2024-05-26</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://nhairs.github.io/python-json-logger/latest/reference/pythonjsonlogger/json/</loc>
-         <lastmod>2024-05-24</lastmod>
+         <lastmod>2024-05-26</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://nhairs.github.io/python-json-logger/latest/reference/pythonjsonlogger/msgspec/</loc>
-         <lastmod>2024-05-24</lastmod>
+         <lastmod>2024-05-26</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://nhairs.github.io/python-json-logger/latest/reference/pythonjsonlogger/orjson/</loc>
-         <lastmod>2024-05-24</lastmod>
+         <lastmod>2024-05-26</lastmod>
          <changefreq>daily</changefreq>
     </url>
 </urlset>

@@ -501,6 +501,15 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#contacting-the-maintainers" class="md-nav__link">
+    <span class="md-ellipsis">
+      Contacting the Maintainers
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -868,6 +877,15 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#contacting-the-maintainers" class="md-nav__link">
+    <span class="md-ellipsis">
+      Contacting the Maintainers
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -908,7 +926,7 @@
 </ul>
 <h3 id="2-fork-the-repository-and-make-your-changes">2. Fork the repository and make your changes<a class="headerlink" href="#2-fork-the-repository-and-make-your-changes" title="Permanent link">🔗</a></h3>
 <p>We don't have styling documentation, so where possible try to match existing code. This includes the use of "headings" and "dividers" (this will make sense when you look at the code).</p>
-<p>All devlopment tooling can be installed (usually into a virtual environment), using the <code>dev</code> optiontal dependency:</p>
+<p>All devlopment tooling can be installed (usually into a virtual environment), using the <code>dev</code> optional dependency:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s1">&#39;.[dev]&#39;</span><span class="sb">`</span>
 </code></pre></div>
 <p>Before creating your pull request you'll want to format your code and run the linters and tests:</p>
@@ -947,7 +965,7 @@
 <li>Summary of changes</li>
 <li>How the pull request was tested - especially if not covered by unit testing.</li>
 </ul>
-<p>Once you've submitted your pull request make sure that all CI jobs are passing. Pull requests will failing jobs will not be reviewed.</p>
+<p>Once you've submitted your pull request make sure that all CI jobs are passing. Pull requests with failing jobs will not be reviewed.</p>
 <h3 id="5-code-review">5. Code review<a class="headerlink" href="#5-code-review" title="Permanent link">🔗</a></h3>
 <p>Your code will be reviewed by a maintainer.</p>
 <p>If you're not familiar with code review start by reading <a href="https://google.github.io/eng-practices/review/">this guide</a>.</p>
@@ -958,13 +976,18 @@
 </div>
 <h2 id="common-topics">Common Topics<a class="headerlink" href="#common-topics" title="Permanent link">🔗</a></h2>
 <h3 id="adding-a-new-encoder">Adding a new encoder<a class="headerlink" href="#adding-a-new-encoder" title="Permanent link">🔗</a></h3>
-<p>New encoders may be added, however how popular / common a library is will be taken into consideration before being added.</p>
+<p>New encoders may be added, however how popular / common a library is will be taken into consideration before being added. You should open an issue before creating a pull request.</p>
 <h3 id="versioning-and-breaking-compatability">Versioning and breaking compatability<a class="headerlink" href="#versioning-and-breaking-compatability" title="Permanent link">🔗</a></h3>
 <p>This project uses semantic versioning.</p>
-<p>In general backwards compatability is always preferred. This library is widely used and not particularly sophisticated, there must be a good reason for breaking changes.</p>
+<p>In general backwards compatability is always preferred. This library is widely used and not particularly sophisticated and as such there must be a good reason for breaking changes.</p>
+<p>Feature changes MUST be compatible with all <a href="https://endoflife.date/python">security supported versions of Python</a> and SHOULD be compatible with all unsupported versions of Python where <a href="https://pypistats.org/packages/python-json-logger">recent downloads over the last 90 days exceeds 5% of all downloads</a>.</p>
+<p>In general, only the latest <code>major.minor</code> version of Python JSON Logger is supported. Bug fixes and feature backports requiring a version branch may be considered but must be discussed with the maintainers first.</p>
+<p>See also <a href="../security/">Security Policy</a>.</p>
 <h3 id="spelling">Spelling<a class="headerlink" href="#spelling" title="Permanent link">🔗</a></h3>
 <p>The original implementation of this project used US spelling so it will continue to use US spelling for all code.</p>
 <p>Documentation is more flexible and may use a variety of English spellings.</p>
+<h3 id="contacting-the-maintainers">Contacting the Maintainers<a class="headerlink" href="#contacting-the-maintainers" title="Permanent link">🔗</a></h3>
+<p>In general it is preferred to keep communication to GitHub, e.g. through comments on issues and pull requests. If you do need to contact the maintainers privately, please do so using the email addresses in the maintainers section of the <code>pyproject.toml</code>.</p>
 
 
 

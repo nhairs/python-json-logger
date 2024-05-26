@@ -971,16 +971,20 @@
 
 <h1 id="quick-start">Quick Start<a class="headerlink" href="#quick-start" title="Permanent link">🔗</a></h1>
 <h2 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">🔗</a></h2>
-<p>Note: All versions of this fork use version <code>&gt;=3.0.0</code> - to use pre-fork versions use <code>python-json-logger&lt;3.0.0</code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>All versions of this fork use version <code>&gt;=3.0.0</code>.</p>
+<p>To use pre-fork versions use <code>python-json-logger&lt;3</code>.</p>
+</div>
 <h3 id="install-via-pip">Install via pip<a class="headerlink" href="#install-via-pip" title="Permanent link">🔗</a></h3>
 <p>Until the PEP 541 request is complete you will need to install directly from github.</p>
 <h4 id="install-from-github">Install from GitHub<a class="headerlink" href="#install-from-github" title="Permanent link">🔗</a></h4>
-<p>To install from releases:</p>
+<p>To install from <a href="https://github.com/nhairs/python-json-logger/releases">releases</a> (including development releases), you can use the URL to the specific wheel.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># e.g. 3.0.0 wheel</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s1">&#39;python-json-logger@https://github.com/nhairs/python-json-logger/releases/download/v3.0.0/python_json_logger-3.0.0-py3-none-any.whl&#39;</span>
 </code></pre></div>
 <h2 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">🔗</a></h2>
-<p>Python JSON Logger provides <code>logging.Formatter</code>s that encode the logged message into JSON. Although a variety of JSON encoders are supported, in the following examples we will use the <a class="autorefs autorefs-internal" href="../reference/pythonjsonlogger/json/#pythonjsonlogger.json.JsonFormatter">pythonjsonlogger.json.JsonFormatter</a> which uses the the <code>json</code> module from the standard library.</p>
+<p>Python JSON Logger provides <a href="https://docs.python.org/3/library/logging.html#logging.Formatter"><code>logging.Formatter</code></a> classes that encode the logged message into JSON. Although <a href="#alternate-json-encoders">a variety of JSON encoders are supported</a>, the following examples will use the <a class="autorefs autorefs-internal" href="../reference/pythonjsonlogger/json/#pythonjsonlogger.json.JsonFormatter">JsonFormatter</a> which uses the the <code>json</code> module from the standard library.</p>
 <h3 id="integrating-with-pythons-logging-framework">Integrating with Python's logging framework<a class="headerlink" href="#integrating-with-pythons-logging-framework" title="Permanent link">🔗</a></h3>
 <p>To produce JSON output, attach the formatter to a logging handler:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">import</span> <span class="nn">logging</span>
@@ -1027,7 +1031,7 @@
 <a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="p">)</span>
 </code></pre></div>
 <h3 id="excluding-fields">Excluding fields<a class="headerlink" href="#excluding-fields" title="Permanent link">🔗</a></h3>
-<p>You can prevent fields being added to the output data by adding them to <code>reserved_attrs</code>.</p>
+<p>You can prevent fields being added to the output data by adding them to <code>reserved_attrs</code>. By default all <a href="https://docs.python.org/3/library/logging.html#logrecord-attributes"><code>LogRecord</code> attributes</a> are exluded.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">from</span> <span class="nn">pythonjsonlogger.core</span> <span class="kn">import</span> <span class="n">RESERVED_ATTRS</span>
 <a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
 <a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="n">formatter</span> <span class="o">=</span> <span class="n">JsonFormatter</span><span class="p">(</span>
@@ -1044,7 +1048,6 @@
 </code></pre></div>
 <h3 id="custom-object-serialization">Custom object serialization<a class="headerlink" href="#custom-object-serialization" title="Permanent link">🔗</a></h3>
 <p>Most formatters support <code>json_default</code> which is used to control how objects are serialized.</p>
-<p>For custom handling of object serialization you can specify default json object translator or provide a custom encoder</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="k">def</span> <span class="nf">my_default</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
 <a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">MyClass</span><span class="p">):</span>
 <a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;special&quot;</span><span class="p">:</span> <span class="n">obj</span><span class="o">.</span><span class="n">special</span><span class="p">}</span>

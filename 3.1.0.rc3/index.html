@@ -800,15 +800,19 @@
 <p><a href="https://github.com/nhairs/python-json-logger"><img alt="License" src="https://img.shields.io/github/license/nhairs/python-json-logger.svg" /></a>
 <img alt="Build Status" src="https://github.com/nhairs/python-json-logger/actions/workflows/test-suite.yml/badge.svg" /></p>
 <h2 id="introduction">Introduction<a class="headerlink" href="#introduction" title="Permanent link">🔗</a></h2>
-<p>This library is provided to allow standard python logging to output log data as json objects. With JSON we can make our logs more readable by machines and we can stop writing custom parsers for syslog type records.</p>
+<p>Python JSON Logger enables you produce JSON logs when using Python's <code>logging</code> package.</p>
+<p>JSON logs are machine readable allowing for much easier parsing and ingestion into log aggregation tools.</p>
+<p>This library assumes that you are famliar with the <code>logging</code> standard library package; if you are not you should start by reading the official <a href="https://docs.python.org/3/howto/logging.html">Logging HOWTO</a>.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>This repository is a maintained fork of <a href="https://github.com/madzak/python-json-logger">madzak/python-json-logger</a> pending <a href="https://github.com/pypi/support/issues/3607">a PEP 541 request</a> for the PyPI package.  The future direction of the project is being discussed <a href="https://github.com/nhairs/python-json-logger/issues/1">here</a>.</p>
 </div>
 <h2 id="features">Features<a class="headerlink" href="#features" title="Permanent link">🔗</a></h2>
 <ul>
-<li><strong>TODO?:</strong> TODO.</li>
-<li><strong>Multiple Encoders:</strong> In addition to the standard libary's <code>json</code> module, also supports 3rd party encoders: <code>orjson</code>, <code>msgspec</code></li>
+<li><strong>Standard Library Compatible:</strong> Implement JSON logging without modifying your existing log setup.</li>
+<li><strong>Supports Multiple JSON Encoders:</strong> In addition to the standard libary's <code>json</code> module, also supports the <a class="autorefs autorefs-internal" href="reference/pythonjsonlogger/orjson/#pythonjsonlogger.orjson"><code>orjson</code></a>, <a class="autorefs autorefs-internal" href="reference/pythonjsonlogger/msgspec/#pythonjsonlogger.msgspec"><code>msgspec</code></a> JSON encoders.</li>
+<li><strong>Fully Customizable Output Fields:</strong> Control required, excluded, and static fields including automatically picking up custom attributes on <code>LogRecord</code> objects. Fields can be renamed before they are output.</li>
+<li><strong>Encode Any Type:</strong> Encoders are customized to ensure that something sane is logged for any input including those that aren't supported by default. For example formatting UUID objects into their string representation and bytes objects into a base 64 encoded string.</li>
 </ul>
 <h2 id="quick-start">Quick Start<a class="headerlink" href="#quick-start" title="Permanent link">🔗</a></h2>
 <p>Follow our <a href="quickstart/">Quickstart Guide</a>.</p>
@@ -830,7 +834,7 @@
 <h2 id="bugs-feature-requests-etc">Bugs, Feature Requests etc<a class="headerlink" href="#bugs-feature-requests-etc" title="Permanent link">🔗</a></h2>
 <p>Please <a href="https://github.com/nhairs/python-json-logger/issues">submit an issue on github</a>.</p>
 <p>In the case of bug reports, please help us help you by following best practices <a href="https://marker.io/blog/write-bug-report/"><sup>1</sup></a> <a href="https://www.chiark.greenend.org.uk/~sgtatham/bugs.html"><sup>2</sup></a>.</p>
-<p>In the case of feature requests, please provide background to the problem you are trying to solve so to help find a solution that makes the most sense for the library as well as your usecase.</p>
+<p>In the case of feature requests, please provide background to the problem you are trying to solve so that we can a solution that makes the most sense for the library as well as your use case.</p>
 <h2 id="license">License<a class="headerlink" href="#license" title="Permanent link">🔗</a></h2>
 <p>This project is licensed under the BSD 2 Clause License - see <a href="https://github.com/nhairs/python-json-logger/blob/main/LICENSE"><code>LICENSE</code></a></p>
 <h2 id="authors-and-maintainers">Authors and Maintainers<a class="headerlink" href="#authors-and-maintainers" title="Permanent link">🔗</a></h2>
