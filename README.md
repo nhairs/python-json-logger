@@ -6,14 +6,14 @@
 #
 # Python JSON Logger
 
-This library is provided to allow standard python logging to output log data as json objects. With JSON we can make our logs more readable by machines and we can stop writing custom parsers for syslog type records.
+Python JSON Logger enables you produce JSON logs when using Python's `logging` package.
+
+JSON logs are machine readable allowing for much easier parsing and ingestion into log aggregation tools.
 
 
 ### 🚨 Important 🚨
 
 This repository is a maintained fork of [madzak/python-json-logger](https://github.com/madzak/python-json-logger) pending [a PEP 541 request](https://github.com/pypi/support/issues/3607) for the PyPI package.  The future direction of the project is being discussed [here](https://github.com/nhairs/python-json-logger/issues/1).
-
-[**Changelog**](https://github.com/nhairs/python-json-logger/blob/main/CHANGELOG.md)
 
 ## Documentation
 
