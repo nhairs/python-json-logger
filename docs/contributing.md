@@ -27,7 +27,7 @@ The following are things that can be worked on without an existing issue:
 
 We don't have styling documentation, so where possible try to match existing code. This includes the use of "headings" and "dividers" (this will make sense when you look at the code).
 
-All devlopment tooling can be installed (usually into a virtual environment), using the `dev` optiontal dependency:
+All devlopment tooling can be installed (usually into a virtual environment), using the `dev` optional dependency:
 
 ```shell
 pip install -e '.[dev]'`
@@ -77,7 +77,7 @@ Your pull request description should include the following:
 - Summary of changes
 - How the pull request was tested - especially if not covered by unit testing.
 
-Once you've submitted your pull request make sure that all CI jobs are passing. Pull requests will failing jobs will not be reviewed.
+Once you've submitted your pull request make sure that all CI jobs are passing. Pull requests with failing jobs will not be reviewed.
 
 ### 5. Code review
 
@@ -95,16 +95,26 @@ If you're not familiar with code review start by reading [this guide](https://go
 
 ### Adding a new encoder
 
-New encoders may be added, however how popular / common a library is will be taken into consideration before being added.
+New encoders may be added, however how popular / common a library is will be taken into consideration before being added. You should open an issue before creating a pull request.
 
 ### Versioning and breaking compatability
 
 This project uses semantic versioning.
 
-In general backwards compatability is always preferred. This library is widely used and not particularly sophisticated, there must be a good reason for breaking changes.
+In general backwards compatability is always preferred. This library is widely used and not particularly sophisticated and as such there must be a good reason for breaking changes.
+
+Feature changes MUST be compatible with all [security supported versions of Python](https://endoflife.date/python) and SHOULD be compatible with all unsupported versions of Python where [recent downloads over the last 90 days exceeds 5% of all downloads](https://pypistats.org/packages/python-json-logger).
+
+In general, only the latest `major.minor` version of Python JSON Logger is supported. Bug fixes and feature backports requiring a version branch may be considered but must be discussed with the maintainers first.
+
+See also [Security Policy](security.md).
 
 ### Spelling
 
 The original implementation of this project used US spelling so it will continue to use US spelling for all code.
 
 Documentation is more flexible and may use a variety of English spellings.
+
+### Contacting the Maintainers
+
+In general it is preferred to keep communication to GitHub, e.g. through comments on issues and pull requests. If you do need to contact the maintainers privately, please do so using the email addresses in the maintainers section of the `pyproject.toml`.

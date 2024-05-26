@@ -25,9 +25,6 @@ else:
 
 ### CONSTANTS
 ### ============================================================================
-# skip natural LogRecord attributes
-# http://docs.python.org/library/logging.html#logrecord-attributes
-# Changed in 3.0.0, is now list[str] instead of tuple[str, ...]
 RESERVED_ATTRS: List[str] = [
     "args",
     "asctime",
@@ -52,6 +49,16 @@ RESERVED_ATTRS: List[str] = [
     "thread",
     "threadName",
 ]
+"""Default reserved attributes.
+
+These come from the [default attributes of `LogRecord` objects](http://docs.python.org/library/logging.html#logrecord-attributes).
+
+Note:
+    Although considered a constant, this list is dependent on the Python version due to
+    different `LogRecord` objects having different attributes in different Python versions.
+
+*Changed in 3.0*: `RESERVED_ATTRS` is now `list[str]` instead of `tuple[str, ...]`.
+"""
 
 if sys.version_info >= (3, 12):
     # taskName added in python 3.12
@@ -66,7 +73,10 @@ STYLE_PERCENT_REGEX = re.compile(r"%\((.+?)\)", re.IGNORECASE)
 ## Type Aliases
 ## -----------------------------------------------------------------------------
 OptionalCallableOrStr: TypeAlias = Optional[Union[Callable, str]]
+"""Type alias"""
+
 LogRecord: TypeAlias = Dict[str, Any]
+"""Type alias"""
 
 
 ### FUNCTIONS
@@ -117,9 +127,9 @@ def merge_record_extra(
 ### CLASSES
 ### ============================================================================
 class BaseJsonFormatter(logging.Formatter):
-    """Base class for pythonjsonlogger formatters
+    """Base class for all formatters
 
-    Must not be used directly
+    Must not be used directly.
 
     *New in 3.1*
     """
@@ -159,8 +169,7 @@ class BaseJsonFormatter(logging.Formatter):
             rename_fields_keep_missing: When renaming fields, include missing fields in the output.
             static_fields: an optional dict, used to add fields with static values to all logs
             reserved_attrs: an optional list of fields that will be skipped when
-                outputting json log record. Defaults to all log record attributes:
-                http://docs.python.org/library/logging.html#logrecord-attributes
+                outputting json log record. Defaults to [all log record attributes][pythonjsonlogger.core.RESERVED_ATTRS].
             timestamp: an optional string/boolean field to add a timestamp when
                 outputting the json log record. If string is passed, timestamp will be added
                 to log record using string as key. If True boolean is passed, timestamp key

@@ -85,8 +85,8 @@ plugins:
         python:
           paths:
             - src
-          #import:
-          #  - https://docs.python.org/3/objects.inv
+          import:
+            - https://docs.python.org/3/objects.inv
           #  - https://mkdocstrings.github.io/objects.inv
           #  - https://mkdocstrings.github.io/griffe/objects.inv
           options:
@@ -106,6 +106,7 @@ plugins:
             summary: true
             unwrap_annotated: true
             show_source: false
+            docstring_section_style: spacy
   - literate-nav:
       nav_file: SUMMARY.txt
   - mike:

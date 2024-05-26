@@ -39,17 +39,20 @@ class SillyFormatter(JsonFormatter):
 There are many ways to add consistent request IDs to your logging. The exact method will depend on your needs and application.
 
 ```python
+## Common Setup
+## -----------------------------------------------------------------------------
 import logging
 import uuid
 from pythonjsonlogger.json import JsonFormatter
 
-## Setup
-## -----------------------------------------------------------------------------
 logger = logging.getLogger("test")
 logger.setLevel(logging.INFO)
 handler = logging.StreamHandler()
 logger.addHandler(handler)
+```
 
+One method would be to inject the request ID into each log call using the `extra` argument.
+```python
 ## Solution 1
 ## -----------------------------------------------------------------------------
 formatter = JsonFormatter()
@@ -58,14 +61,20 @@ handler.setFormatter(formatter)
 def main_1():
     print("========== MAIN 1 ==========")
     for i in range(3):
-        request_id = uuid.uuid4().hex
+        request_id = uuid.uuid4()
         logger.info("loop start", extra={"request_id": request_id})
         logger.info(f"loop {i}", extra={"request_id": request_id})
         logger.info("loop end", extra={"request_id": request_id})
     return
 
 main_1()
+```
 
+Another method would be to use a filter to modify the `LogRecord` attributes. This would also allow us to use it in any other standard logging machinery. For this example I've manually set a `REQUEST_ID` global and some helper functions, but you might already have stuff available to you; for example, if you're using a web-framework with baked in request IDs.
+
+This is based on the [logging cookbook filter recipie](https://docs.python.org/3/howto/logging-cookbook.html#using-filters-to-impart-contextual-information).
+
+```python
 ## Solution 2
 ## -----------------------------------------------------------------------------
 REQUEST_ID: str | None = None
@@ -75,11 +84,9 @@ def get_request_id() -> str:
 
 def generate_request_id():
     global REQUEST_ID
-    REQUEST_ID = uuid.uuid4().hex
+    REQUEST_ID = str(uuid.uuid4())
 
 class RequestIdFilter(logging.Filter):
-    # Ref: https://docs.python.org/3/howto/logging-cookbook.html#using-filters-to-impart-contextual-information
-
     def filter(self, record):
         record.record_id = get_request_id()
         return True
@@ -99,7 +106,11 @@ def main_2():
 main_2()
 
 logger.removeFilter(request_id_filter)
+```
 
+Another method would be to create a custom formatter class and override the `process_log_record` method. This allows us to inject fields into the record before we log it without modifying the original `LogRecord`.
+
+```python
 ## Solution 3
 ## -----------------------------------------------------------------------------
 # Reuse REQUEST_ID stuff from solution 2

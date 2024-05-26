@@ -8,7 +8,12 @@
 
 ## Introduction
 
-This library is provided to allow standard python logging to output log data as json objects. With JSON we can make our logs more readable by machines and we can stop writing custom parsers for syslog type records.
+Python JSON Logger enables you produce JSON logs when using Python's `logging` package.
+
+JSON logs are machine readable allowing for much easier parsing and ingestion into log aggregation tools.
+
+This library assumes that you are famliar with the `logging` standard library package; if you are not you should start by reading the official [Logging HOWTO](https://docs.python.org/3/howto/logging.html).
+
 
 !!! warning
     This repository is a maintained fork of [madzak/python-json-logger](https://github.com/madzak/python-json-logger) pending [a PEP 541 request](https://github.com/pypi/support/issues/3607) for the PyPI package.  The future direction of the project is being discussed [here](https://github.com/nhairs/python-json-logger/issues/1).
@@ -16,8 +21,10 @@ This library is provided to allow standard python logging to output log data as 
 
 ## Features
 
-- **TODO?:** TODO.
-- **Multiple Encoders:** In addition to the standard libary's `json` module, also supports 3rd party encoders: `orjson`, `msgspec`
+- **Standard Library Compatible:** Implement JSON logging without modifying your existing log setup.
+- **Supports Multiple JSON Encoders:** In addition to the standard libary's `json` module, also supports the [`orjson`][pythonjsonlogger.orjson], [`msgspec`][pythonjsonlogger.msgspec] JSON encoders.
+- **Fully Customizable Output Fields:** Control required, excluded, and static fields including automatically picking up custom attributes on `LogRecord` objects. Fields can be renamed before they are output.
+- **Encode Any Type:** Encoders are customized to ensure that something sane is logged for any input including those that aren't supported by default. For example formatting UUID objects into their string representation and bytes objects into a base 64 encoded string.
 
 ## Quick Start
 
@@ -46,8 +53,7 @@ Please [submit an issue on github](https://github.com/nhairs/python-json-logger/
 
 In the case of bug reports, please help us help you by following best practices [^1^](https://marker.io/blog/write-bug-report/) [^2^](https://www.chiark.greenend.org.uk/~sgtatham/bugs.html).
 
-In the case of feature requests, please provide background to the problem you are trying to solve so to help find a solution that makes the most sense for the library as well as your usecase.
-
+In the case of feature requests, please provide background to the problem you are trying to solve so that we can a solution that makes the most sense for the library as well as your use case.
 
 ## License
 
