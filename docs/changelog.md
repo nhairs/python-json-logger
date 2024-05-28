@@ -1,4 +1,4 @@
-# Changelog
+# Change Log
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
@@ -9,16 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 This splits common funcitonality out to allow supporting other JSON encoders. Although this is a large refactor, backwards compatibility has been maintained.
 
 ### Added
-- `.core` - more details below.
-- `.defaults` module that provides many functions for handling unsupported types.
-- Orjson encoder support via `.orjson.OrjsonFormatter` with the following additions:
+- `pythonjsonlogger.core` - more details below.
+- `pythonjsonlogger.defaults` module that provides many functions for handling unsupported types.
+- Orjson encoder support via `pythonjsonlogger.orjson.OrjsonFormatter` with the following additions:
   - bytes are URL safe base64 encoded.
   - Exceptions are "pretty printed" using the exception name and message e.g. `"ValueError: bad value passed"`
   - Enum values use their value, Enum classes now return all values as a list.
   - Tracebacks are supported
   - Classes (aka types) are support
   - Will fallback on `__str__` if available, else `__repr__` if available, else will use `__could_not_encode__`
-- MsgSpec encoder support via `.msgspec.MsgspecFormatter` with the following additions:
+- MsgSpec encoder support via `pythonjsonlogger.msgspec.MsgspecFormatter` with the following additions:
   - Exceptions are "pretty printed" using the exception name and message e.g. `"ValueError: bad value passed"`
   - Enum classes now return all values as a list.
   - Tracebacks are supported
@@ -27,39 +27,44 @@ This splits common funcitonality out to allow supporting other JSON encoders. Al
   - Note: msgspec only supprts enum values of type `int` or `str` [jcrist/msgspec#680](https://github.com/jcrist/msgspec/issues/680)
 
 ### Changed
-- `.jsonlogger` has been moved to `.json` with core functionality moved to `.core`.
-- `.core.BaseJsonFormatter` properly supports all `logging.Formatter` arguments:
+- `pythonjsonlogger.jsonlogger` has been moved to `pythonjsonlogger.json` with core functionality moved to `pythonjsonlogger.core`.
+- `pythonjsonlogger.core.BaseJsonFormatter` properly supports all `logging.Formatter` arguments:
   - `fmt` is unchanged.
   - `datefmt` is unchanged.
   - `style` can now support non-standard arguments by setting `validate` to `False`
   - `validate` allows non-standard `style` arguments or prevents calling `validate` on standard `style` arguments.
   - `default` is ignored.
-- `.json.JsonEncoder` default encodings changed:
+- `pythonjsonlogger.json.JsonFormatter` default encodings changed:
   - bytes are URL safe base64 encoded.
   - Exception formatting detected using `BaseException` instead of `Exception`. Now "pretty prints" the exception using the exception name and message e.g. `"ValueError: bad value passed"`
   - Dataclasses are now supported
   - Enum values now use their value, Enum classes now return all values as a list.
   - Will fallback on `__str__` if available, else `__repr__` if available, else will use `__could_not_encode__`
-- Renaming fields now preserves order (#7) and ignores missing fields (#6).
+- Renaming fields now preserves order ([#7](https://github.com/nhairs/python-json-logger/issues/7)) and ignores missing fields ([#6](https://github.com/nhairs/python-json-logger/issues/6)).
+- Documentation
+  - Generated documentation using `mkdocs` is stored in `docs/`
+  - Documentation within `README.md` has been moved to `docs/index.md` and `docs/qucikstart.md`.
+  - `CHANGELOG.md` has been moved to `docs/change-log.md`
+  - `SECURITY.md` has been moved and replaced with a symbolic link to `docs/security.md`.
 
 ### Deprecated
-- `.jsonlogger` is now `.json`
-- `.jsonlogger.RESERVED_ATTRS` is now `.core.RESERVED_ATTRS`.
-- `.jsonlogger.merge_record_extra` is now `.core.merge_record_extra`.
+- `pythonjsonlogger.jsonlogger` is now `pythonjsonlogger.json`
+- `pythonjsonlogger.jsonlogger.RESERVED_ATTRS` is now `pythonjsonlogger.core.RESERVED_ATTRS`.
+- `pythonjsonlogger.jsonlogger.merge_record_extra` is now `pythonjsonlogger.core.merge_record_extra`.
 
 ### Removed
 - Python 3.7 support dropped
-- `.jsonlogger.JsonFormatter._str_to_fn` replaced with `.core.str_to_object`.
+- `pythonjsonlogger.jsonlogger.JsonFormatter._str_to_fn` replaced with `pythonjsonlogger.core.str_to_object`.
 
 ## [3.0.1](https://github.com/nhairs/python-json-logger/compare/v3.0.0...v3.0.1) - 2023-04-01
 
 ### Fixes
 
-- Fix spelling of parameter `json_serialiser` -> `json_serializer` (#8) - @juliangilbey
+- Fix spelling of parameter `json_serialiser` -> `json_serializer` ([#8](https://github.com/nhairs/python-json-logger/issues/8)) - @juliangilbey
 
 ## [3.0.0](https://github.com/nhairs/python-json-logger/compare/v2.0.7...v3.0.0) - 2024-03-25
 
-Note: using new major version to seperate changes from this fork and the original (upstream). See #1 for details.
+Note: using new major version to seperate changes from this fork and the original (upstream). See [#1](https://github.com/nhairs/python-json-logger/issues/1) for details.
 
 ### Changes
 - Update supported Python versions - @nhairs

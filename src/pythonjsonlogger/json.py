@@ -23,11 +23,7 @@ from . import defaults as d
 ### CLASSES
 ### ============================================================================
 class JsonEncoder(json.JSONEncoder):
-    """A custom encoder extending the default JSONEncoder
-
-    Refs:
-    - https://docs.python.org/3/library/json.html
-    """
+    """A custom encoder extending [json.JSONEncoder](https://docs.python.org/3/library/json.html#json.JSONEncoder)"""
 
     def default(self, o: Any) -> Any:
         if d.use_datetime_any(o):
@@ -57,7 +53,7 @@ class JsonEncoder(json.JSONEncoder):
             return d.unknown_default(o)
 
     def format_datetime_obj(self, o: datetime.time | datetime.date | datetime.datetime) -> str:
-        """Format datetime objects found in self.default
+        """Format datetime objects found in `self.default`
 
         This allows subclasses to change the datetime format without understanding the
         internals of the default method.
@@ -66,7 +62,7 @@ class JsonEncoder(json.JSONEncoder):
 
 
 class JsonFormatter(core.BaseJsonFormatter):
-    """JSON formatter using the standard library's `json` for encoding"""
+    """JSON formatter using the standard library's [`json`](https://docs.python.org/3/library/json.html) for encoding"""
 
     def __init__(
         self,
@@ -80,13 +76,14 @@ class JsonFormatter(core.BaseJsonFormatter):
     ) -> None:
         """
         Args:
+            args: see [BaseJsonFormatter][pythonjsonlogger.core.BaseJsonFormatter]
             json_default: a function for encoding non-standard objects
-                as outlined in https://docs.python.org/3/library/json.html
-            json_encoder: optional custom encoder
-            json_serializer: a :meth:`json.dumps`-compatible callable
+            json_encoder: custom JSON encoder
+            json_serializer: a [`json.dumps`](https://docs.python.org/3/library/json.html#json.dumps)-compatible callable
                 that will be used to serialize the log record.
-            json_indent: indent parameter for json.dumps
-            json_ensure_ascii: ensure_ascii parameter for json.dumps
+            json_indent: indent parameter for the `json_serializer`
+            json_ensure_ascii: `ensure_ascii` parameter for the `json_serializer`
+            kwargs: see [BaseJsonFormatter][pythonjsonlogger.core.BaseJsonFormatter]
         """
         super().__init__(*args, **kwargs)
 
@@ -100,6 +97,7 @@ class JsonFormatter(core.BaseJsonFormatter):
         return
 
     def jsonify_log_record(self, log_record: core.LogRecord) -> str:
+        """Returns a json string of the log record."""
         return self.json_serializer(
             log_record,
             default=self.json_default,

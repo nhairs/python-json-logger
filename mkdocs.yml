@@ -1,0 +1,114 @@
+site_name: "Python JSON Logger"
+site_url: https://nhairs.github.io/python-json-logger
+repo_url: https://github.com/nhairs/python-json-logger
+edit_uri: tree/master/docs
+copyright: "<a href='https://github.com/nhairs/python-json-logger/graphs/contributors'> Copyright &copy; Python JSON Logger Contributors</a>"
+watch:
+  - mkdocs.yml
+  - README.md
+  - src/pythonjsonlogger
+  - docs
+
+nav:
+  - "Home": index.md
+  - quickstart.md
+  - cookbook.md
+  - changelog.md
+  - security.md
+  - contributing.md
+  - API Reference:
+    - ... | reference/pythonjsonlogger/*
+
+theme:
+  name: material
+
+  icon:
+    logo: material/code-braces
+
+  features:
+    - navigation.instant
+    - navigation.sections
+    - navigation.indexes
+    - navigation.expand
+    - navigation.top
+    - content.code.annotate
+    - content.code.copy
+    - toc.follow
+
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      primary: amber
+      scheme: default
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      primary: amber
+      scheme: slate
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/nhairs/python-json-logger
+  version:
+    provider: mike
+
+markdown_extensions:
+  - toc:
+      permalink: "🔗"
+  - admonition
+  - def_list
+  - mdx_truly_sane_lists
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.details
+  - pymdownx.caret
+
+plugins:
+  - autorefs
+  - search:
+      lang: en
+  - awesome-pages:
+      collapse_single_pages: true
+  - gen-files:
+      scripts:
+        - scripts/gen_ref_nav.py
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          paths:
+            - src
+          import:
+            - https://docs.python.org/3/objects.inv
+          #  - https://mkdocstrings.github.io/objects.inv
+          #  - https://mkdocstrings.github.io/griffe/objects.inv
+          options:
+            filters:
+              - "!^_"
+            heading_level: 1
+            inherited_members: true
+            merge_init_into_class: true
+            #preload_modules: []
+            separate_signature: true
+            show_root_heading: true
+            show_root_full_path: true
+            show_signature_annotations: true
+            show_symbol_type_heading: true
+            show_symbol_type_toc: true
+            signature_crossrefs: true
+            summary: true
+            unwrap_annotated: true
+            show_source: false
+            docstring_section_style: spacy
+  - literate-nav:
+      nav_file: SUMMARY.txt
+  - mike:
+      canonical_version: latest
+

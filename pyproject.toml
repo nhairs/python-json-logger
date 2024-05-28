@@ -39,7 +39,7 @@ classifiers = [
 ]
 
 [project.urls]
-# homepage = "https://nhairs.github.io/python-json-logger/latest/"
+Homepage = "https://nhairs.github.io/python-json-logger/latest/"
 GitHub = "https://github.com/nhairs/python-json-logger"
 
 [project.optional-dependencies]
@@ -59,6 +59,15 @@ dev = [
     "tzdata",
     ## Build
     "build",
+    ## Docs
+    "mkdocs",
+    "mkdocs-material>=8.5",
+    "mkdocs-awesome-pages-plugin",
+    "mdx_truly_sane_lists",
+    "mkdocstrings[python]",
+    "mkdocs-gen-files",
+    "mkdocs-literate-nav",
+    "mike",
 ]
 
 [tool.setuptools.packages.find]

@@ -1,3 +1,5 @@
+"""JSON Formatter using [`msgspec`](https://github.com/jcrist/msgspec)"""
+
 ### IMPORTS
 ### ============================================================================
 ## Future
@@ -32,13 +34,8 @@ def msgspec_default(obj: Any) -> Any:
 ### CLASSES
 ### ============================================================================
 class MsgspecFormatter(core.BaseJsonFormatter):
-    """JSON formatter using msgspec.json for encoding.
+    """JSON formatter using [`msgspec.json.Encoder`](https://jcristharif.com/msgspec/api.html#msgspec.json.Encoder) for encoding."""
 
-    Refs:
-    - https://jcristharif.com/msgspec/api.html#msgspec.json.Encoder
-    """
-
-    # pylint: disable=too-many-arguments
     def __init__(
         self,
         *args,
@@ -47,7 +44,9 @@ class MsgspecFormatter(core.BaseJsonFormatter):
     ) -> None:
         """
         Args:
-            json_default: a function for encoding non-standard objects see: `msgspec.json.Encode:enc_hook`
+            args: see [BaseJsonFormatter][pythonjsonlogger.core.BaseJsonFormatter]
+            json_default: a function for encoding non-standard objects
+            kwargs: see [BaseJsonFormatter][pythonjsonlogger.core.BaseJsonFormatter]
         """
         super().__init__(*args, **kwargs)
 

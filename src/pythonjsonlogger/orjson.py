@@ -1,3 +1,5 @@
+"""JSON Formatter using [msgspec](https://github.com/ijl/orjson)"""
+
 ### IMPORTS
 ### ============================================================================
 ## Future
@@ -34,13 +36,8 @@ def orjson_default(obj: Any) -> Any:
 ### CLASSES
 ### ============================================================================
 class OrjsonFormatter(core.BaseJsonFormatter):
-    """JSON formatter using orjson for encoding.
+    """JSON formatter using [orjson](https://github.com/ijl/orjson) for encoding."""
 
-    Refs:
-    - https://github.com/ijl/orjson
-    """
-
-    # pylint: disable=too-many-arguments
     def __init__(
         self,
         *args,
@@ -50,10 +47,10 @@ class OrjsonFormatter(core.BaseJsonFormatter):
     ) -> None:
         """
         Args:
-            json_default: a function for encoding non-standard objects see:
-                https://github.com/ijl/orjson#default
-            json_indent: indent output with 2 spaces. see:
-                https://github.com/ijl/orjson#opt_indent_2
+            args: see [BaseJsonFormatter][pythonjsonlogger.core.BaseJsonFormatter]
+            json_default: a function for encoding non-standard objects
+            json_indent: indent output with 2 spaces.
+            kwargs: see [BaseJsonFormatter][pythonjsonlogger.core.BaseJsonFormatter]
         """
         super().__init__(*args, **kwargs)
 
