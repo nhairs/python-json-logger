@@ -4,7 +4,11 @@ Recipies for common tasks.
 
 ## Include all fields
 
-This can be achieved by setting `reserved_attrs=[]` when creating the formatter.
+By default Python JSON Logger will not include fields [defined in the standard library](https://docs.python.org/3/library/logging.html#logrecord-attributes) unless they are included in the format. Manually including all these fields is tedious and Python version specific. Instead of adding them as explicit fields, we can add them implicitly be ensuring they are not in the `reserver_attrs` argument of the formatter.
+
+```python
+all_fields_formatter = JsonFormatter(reserved_attrs=[])
+```
 
 ## Custom Styles
 
@@ -166,3 +170,75 @@ format = %(message)s
 class = pythonjsonlogger.jsonlogger.JsonFormatter
 ```
 
+## Logging Expensive to Compute Data
+
+By the nature of Python's logging library, the JSON formatters will only ever run in handlers which are enabled for the given log level. This saves the performance hit of constructing JSON that is never used - but what about the data we pass into the logger? There are two options available to us: using if statements to avoid the call altogether, or using lazy string evaluation libraries.
+
+!!! note
+    The below strategies will work for data passed in the `msg` and `extra` arguments.
+
+To avoid the logging calls we use `logger.isEnabledFor` to ensure that we only start constructing our log messages if the logger is enabled:
+
+```python
+import logging
+import time
+
+from pythonjsonlogger.json import JsonFormatter
+
+def expensive_to_compute():
+    time.sleep(5)
+    return "world"
+
+## Setup
+## -------------------------------------
+logger = logging.getLogger()
+handler = logging.StreamHandler()
+formatter = JsonFormatter()
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+logger.setLevel(logging.INFO)
+
+## Log Using isEnabledFor
+## -------------------------------------
+start = time.time()
+if logger.isEnabledFor(logging.INFO):
+    logger.info(
+        {
+            "data": "hello {}".format(expensive_to_compute())
+        }
+    )
+print(f"Logging INFO using isEnabledFor took: {int(time.time() - start)}s")
+
+start = time.time()
+if logger.isEnabledFor(logging.DEBUG):
+    logger.debug(
+        {
+            "data": "hello {}".format(expensive_to_compute())
+        }
+    )
+print(f"Logging DEBUG using isEnabledFor took: {int(time.time() - start)}s")
+```
+
+For lazy string evaluation we can take advantage of the fact that the default JSON encoders included in this package will call `str` on unkown objects. We can use this to build our own lazy string evaluators, or we can use an existing external package. Pre-existing solutions include: [`lazy-string`](https://pypi.org/project/lazy-string/)'s `LazyString` or [`stringlike`](https://pypi.org/project/stringlike/)'s `CachedLazyString`.
+
+```python
+## Log Using lazy-string
+## -------------------------------------
+from lazy_string import LazyString as L
+
+start = time.time()
+logger.info(
+    {
+        "data": L("hello {}".format, L(expensive_to_compute))
+    }
+)
+print(f"Logging INFO using LazyString took: {int(time.time() - start)}s")
+
+start = time.time()
+logger.debug(
+    {
+        "data": L("hello {}".format, L(expensive_to_compute))
+    }
+)
+print(f"Logging DEBUG using LazyString took: {int(time.time() - start)}s")
+```

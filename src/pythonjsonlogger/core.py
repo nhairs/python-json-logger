@@ -66,9 +66,9 @@ if sys.version_info >= (3, 12):
     RESERVED_ATTRS.sort()
 
 
-STYLE_STRING_TEMPLATE_REGEX = re.compile(r"\$\{(.+?)\}", re.IGNORECASE)
-STYLE_STRING_FORMAT_REGEX = re.compile(r"\{(.+?)\}", re.IGNORECASE)
-STYLE_PERCENT_REGEX = re.compile(r"%\((.+?)\)", re.IGNORECASE)
+STYLE_STRING_TEMPLATE_REGEX = re.compile(r"\$\{(.+?)\}", re.IGNORECASE)  # $ style
+STYLE_STRING_FORMAT_REGEX = re.compile(r"\{(.+?)\}", re.IGNORECASE)  # { style
+STYLE_PERCENT_REGEX = re.compile(r"%\((.+?)\)", re.IGNORECASE)  # % style
 
 ## Type Aliases
 ## -----------------------------------------------------------------------------

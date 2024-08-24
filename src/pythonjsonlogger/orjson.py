@@ -1,4 +1,4 @@
-"""JSON Formatter using [msgspec](https://github.com/ijl/orjson)"""
+"""JSON Formatter using [orjson](https://github.com/ijl/orjson)"""
 
 ### IMPORTS
 ### ============================================================================

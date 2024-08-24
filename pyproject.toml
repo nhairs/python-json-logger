@@ -39,7 +39,7 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://nhairs.github.io/python-json-logger/latest/"
+Homepage = "https://nhairs.github.io/python-json-logger"
 GitHub = "https://github.com/nhairs/python-json-logger"
 
 [project.optional-dependencies]
