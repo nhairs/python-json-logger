@@ -102,6 +102,7 @@ def merge_record_extra(
     target: Dict,
     reserved: Container[str],
     rename_fields: Optional[Dict[str, str]] = None,
+    defaults: Optional[Dict[str, Any]] = None,
 ) -> Dict:
     """
     Merges extra attributes from LogRecord object into target dictionary
@@ -117,7 +118,8 @@ def merge_record_extra(
     """
     if rename_fields is None:
         rename_fields = {}
-    for key, value in record.__dict__.items():
+    record_dict = record.__dict__ if not defaults else (defaults | record.__dict__)
+    for key, value in record_dict.items():
         # this allows to have numeric keys
         if key not in reserved and not (hasattr(key, "startswith") and key.startswith("_")):
             target[rename_fields.get(key, key)] = value
@@ -161,7 +163,9 @@ class BaseJsonFormatter(logging.Formatter):
             style: how to extract log fields from `fmt`
             validate: validate `fmt` against style, if implementing a custom `style` you
                 must set this to `False`.
-            defaults: ignored - kept for compatibility with python 3.10+
+            defaults: a dictionary containing default values for unspecified
+                extras. {"key": 1234} will add the key to the json if
+                unspecified in the extras while logging a message.
             prefix: an optional string prefix added at the beginning of
                 the formatted string
             rename_fields: an optional dict, used to rename field names in the output.
@@ -215,6 +219,7 @@ class BaseJsonFormatter(logging.Formatter):
         self._required_fields = self.parse()
         self._skip_fields = set(self._required_fields)
         self._skip_fields.update(self.reserved_attrs)
+        self.defaults = defaults
         return
 
     def format(self, record: logging.LogRecord) -> str:
@@ -322,6 +327,7 @@ class BaseJsonFormatter(logging.Formatter):
             log_record,
             reserved=self._skip_fields,
             rename_fields=self.rename_fields,
+            defaults=self.defaults,
         )
 
         if self.timestamp:
