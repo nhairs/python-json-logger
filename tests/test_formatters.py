@@ -175,6 +175,18 @@ def test_percentage_format(env: LoggingEnvironment, class_: type[BaseJsonFormatt
 
 
 @pytest.mark.parametrize("class_", ALL_FORMATTERS)
+def test_defaults_field(env: LoggingEnvironment, class_: type[BaseJsonFormatter]):
+    env.set_formatter(class_(defaults={"first": 1, "second": 2}))
+
+    env.logger.info("testing defaults field", extra={"first": 1234})
+    log_json = env.load_json()
+
+    assert log_json["first"] == 1234
+    assert log_json["second"] == 2
+    return
+
+
+@pytest.mark.parametrize("class_", ALL_FORMATTERS)
 def test_rename_base_field(env: LoggingEnvironment, class_: type[BaseJsonFormatter]):
     env.set_formatter(class_(rename_fields={"message": "@message"}))
 
@@ -183,6 +195,19 @@ def test_rename_base_field(env: LoggingEnvironment, class_: type[BaseJsonFormatt
     log_json = env.load_json()
 
     assert log_json["@message"] == msg
+    return
+
+
+@pytest.mark.parametrize("class_", ALL_FORMATTERS)
+def test_rename_with_defaults(env: LoggingEnvironment, class_: type[BaseJsonFormatter]):
+    """Make sure that the default fields are also renamed."""
+    env.set_formatter(class_(rename_fields={"custom": "@custom"}, defaults={"custom": 1234}))
+
+    msg = "testing rename with defaults"
+    env.logger.info(msg)
+    log_json = env.load_json()
+
+    assert log_json["@custom"] == 1234
     return
 
 
