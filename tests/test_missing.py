@@ -54,7 +54,7 @@ def test_package_not_available_throw_extras():
 if not pythonjsonlogger.ORJSON_AVAILABLE:
 
     def test_orjson_import_error():
-        with pytest.raises(MissingPackageError, matches="orjson"):
+        with pytest.raises(MissingPackageError, match="orjson"):
             import pythonjsonlogger.orjson
         return
 
@@ -62,6 +62,6 @@ if not pythonjsonlogger.ORJSON_AVAILABLE:
 if not pythonjsonlogger.MSGSPEC_AVAILABLE:
 
     def test_orjson_import_error():
-        with pytest.raises(MissingPackageError, matches="msgspec"):
+        with pytest.raises(MissingPackageError, match="msgspec"):
             import pythonjsonlogger.msgspec
         return
