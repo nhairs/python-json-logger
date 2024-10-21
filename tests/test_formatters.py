@@ -525,6 +525,17 @@ def test_common_types_encoded(
     type_: type,
     expected: Any,
 ):
+    ## Known bad cases
+    if pythonjsonlogger.MSGSPEC_AVAILABLE and class_ is MsgspecFormatter and sys.version_info() < (3, 9):
+        # The fixes by msgspec are only available in python 3.9+
+        # Original issues:
+        # Dataclass: https://github.com/jcrist/msgspec/issues/681
+        # Enum: https://github.com/jcrist/msgspec/issues/680
+        if obj is SomeDataclass or (
+            isinstance(obj, enum.Enum) and obj in {MultiEnum.BYTES, MultiEnum.NONE, MultiEnum.BOOL}
+        ):
+            pytest.xfail()
+
     ## Test
     env.set_formatter(class_())
     extra = {
