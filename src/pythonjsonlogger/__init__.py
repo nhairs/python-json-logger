@@ -9,23 +9,12 @@ import warnings
 
 ## Application
 import pythonjsonlogger.json
+import pythonjsonlogger.utils
 
 ### CONSTANTS
 ### ============================================================================
-try:
-    import orjson
-
-    ORJSON_AVAILABLE = True
-except ImportError:
-    ORJSON_AVAILABLE = False
-
-
-try:
-    import msgspec
-
-    MSGSPEC_AVAILABLE = True
-except ImportError:
-    MSGSPEC_AVAILABLE = False
+ORJSON_AVAILABLE = pythonjsonlogger.utils.package_is_available("orjson")
+MSGSPEC_AVAILABLE = pythonjsonlogger.utils.package_is_available("msgspec")
 
 
 ### DEPRECATED COMPATIBILITY
