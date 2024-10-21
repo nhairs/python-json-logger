@@ -525,15 +525,6 @@ def test_common_types_encoded(
     type_: type,
     expected: Any,
 ):
-    ## Known bad cases
-    if pythonjsonlogger.MSGSPEC_AVAILABLE and class_ is MsgspecFormatter:
-        # Dataclass: https://github.com/jcrist/msgspec/issues/681
-        # Enum: https://github.com/jcrist/msgspec/issues/680
-        if obj is SomeDataclass or (
-            isinstance(obj, enum.Enum) and obj in {MultiEnum.BYTES, MultiEnum.NONE, MultiEnum.BOOL}
-        ):
-            pytest.xfail()
-
     ## Test
     env.set_formatter(class_())
     extra = {

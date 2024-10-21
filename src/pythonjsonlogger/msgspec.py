@@ -25,6 +25,7 @@ def msgspec_default(obj: Any) -> Any:
     if d.use_traceback_default(obj):
         return d.traceback_default(obj)
     if d.use_enum_default(obj):
+        # Note: although msgspec supports encoding enum values, it does not support enum calsses so we provide default.
         return d.enum_default(obj)
     if d.use_type_default(obj):
         return d.type_default(obj)
