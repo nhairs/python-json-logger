@@ -9,11 +9,15 @@ from __future__ import annotations
 from typing import Any
 
 ## Installed
-import msgspec.json
 
 ## Application
 from . import core
 from . import defaults as d
+from .utils import package_is_available
+
+# We import msgspec after checking it is available
+package_is_available("msgspec", throw_error=True)
+import msgspec.json  # pylint: disable=wrong-import-position,wrong-import-order
 
 
 ### FUNCTIONS
