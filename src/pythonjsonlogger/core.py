@@ -252,7 +252,7 @@ class BaseJsonFormatter(logging.Formatter):
         if record.stack_info and not message_dict.get("stack_info"):
             message_dict["stack_info"] = self.formatStack(record.stack_info)
 
-        log_record: LogRecord = self.defaults.copy()
+        log_record: LogRecord = {}
         self.add_fields(log_record, record, message_dict)
         log_record = self.process_log_record(log_record)
 
@@ -314,6 +314,9 @@ class BaseJsonFormatter(logging.Formatter):
             message_dict: dictionary that was logged instead of a message. e.g
                 `logger.info({"is_this_message_dict": True})`
         """
+        for field in self.defaults:
+            log_record[self._get_rename(field)] = self.defaults[field]
+
         for field in self._required_fields:
             log_record[self._get_rename(field)] = record.__dict__.get(field)
 
@@ -326,7 +329,6 @@ class BaseJsonFormatter(logging.Formatter):
             log_record,
             reserved=self._skip_fields,
             rename_fields=self.rename_fields,
-            defaults=self.defaults,
         )
 
         if self.timestamp:
