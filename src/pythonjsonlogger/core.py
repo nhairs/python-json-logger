@@ -161,7 +161,10 @@ class BaseJsonFormatter(logging.Formatter):
             style: how to extract log fields from `fmt`
             validate: validate `fmt` against style, if implementing a custom `style` you
                 must set this to `False`.
-            defaults: ignored - kept for compatibility with python 3.10+
+            defaults: a dictionary containing default values for unspecified
+                extras. {"key": 1234} will add the key to the json if
+                unspecified in the extras while logging a message.
+                These fields are added prior to renaming.
             prefix: an optional string prefix added at the beginning of
                 the formatted string
             rename_fields: an optional dict, used to rename field names in the output.
@@ -215,6 +218,7 @@ class BaseJsonFormatter(logging.Formatter):
         self._required_fields = self.parse()
         self._skip_fields = set(self._required_fields)
         self._skip_fields.update(self.reserved_attrs)
+        self.defaults = defaults if defaults is not None else {}
         return
 
     def format(self, record: logging.LogRecord) -> str:
@@ -310,6 +314,9 @@ class BaseJsonFormatter(logging.Formatter):
             message_dict: dictionary that was logged instead of a message. e.g
                 `logger.info({"is_this_message_dict": True})`
         """
+        for field in self.defaults:
+            log_record[self._get_rename(field)] = self.defaults[field]
+
         for field in self._required_fields:
             log_record[self._get_rename(field)] = record.__dict__.get(field)
 
