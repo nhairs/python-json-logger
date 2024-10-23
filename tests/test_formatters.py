@@ -347,8 +347,7 @@ def test_log_dict(env: LoggingEnvironment, class_: type[BaseJsonFormatter]):
 
 
 @pytest.mark.parametrize("class_", ALL_FORMATTERS)
-def test_log_dict_defaults(env: LoggingEnvironment,
-                           class_: type[BaseJsonFormatter]):
+def test_log_dict_defaults(env: LoggingEnvironment, class_: type[BaseJsonFormatter]):
     env.set_formatter(class_(defaults={"d1": 1234, "d2": "hello"}))
 
     msg = {"d2": "world"}
