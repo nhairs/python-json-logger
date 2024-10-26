@@ -161,10 +161,8 @@ class BaseJsonFormatter(logging.Formatter):
             style: how to extract log fields from `fmt`
             validate: validate `fmt` against style, if implementing a custom `style` you
                 must set this to `False`.
-            defaults: a dictionary containing default values for unspecified
-                extras. {"key": 1234} will add the key to the json if
-                unspecified in the extras while logging a message.
-                These fields are added prior to renaming.
+            defaults: a dictionary containing default fields that are added before all other fields and
+                may be overridden. The supplied fields are still subject to `rename_fields`.
             prefix: an optional string prefix added at the beginning of
                 the formatted string
             rename_fields: an optional dict, used to rename field names in the output.

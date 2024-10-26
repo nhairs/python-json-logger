@@ -208,6 +208,7 @@ def test_rename_with_defaults(env: LoggingEnvironment, class_: type[BaseJsonForm
     log_json = env.load_json()
 
     assert log_json["@custom"] == 1234
+    assert "custom" not in log_json
     return
 
 
