@@ -78,6 +78,18 @@ logger.info(
 
 Finally, any non-standard attributes added to a `LogRecord` will also be included in the logged data. See [Cookbook: Request / Trace IDs](cookbook.md#request-trace-ids) for an example.
 
+#### Default Fields
+
+Default fields that are added to every log record prior to any other field can be set using the `default` argument.
+
+```python
+formatter = JsonFormatter(
+    defaults={"environment": "dev"}
+)
+# ...
+logger.info("this overwrites the environment field", extras={"environment": "dev"})
+```
+
 #### Static Fields
 
 Static fields that are added to every log record can be set using the `static_fields` argument.
