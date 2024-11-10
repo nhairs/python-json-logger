@@ -132,6 +132,8 @@ class BaseJsonFormatter(logging.Formatter):
     Must not be used directly.
 
     *New in 3.1*
+
+    *Changed in 3.2*: `defaults` argument is no longer ignored.
     """
 
     _style: Union[logging.PercentStyle, str]  # type: ignore[assignment]
