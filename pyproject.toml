@@ -48,6 +48,7 @@ dev = [
     ## Optional but required for dev
     "orjson;implementation_name!='pypy'",
     "msgspec;implementation_name!='pypy' and python_version<'3.13'",
+    "msgspec-python313-pre;implementation_name!='pypy' and python_version=='3.13'",
     ## Lint
     "validate-pyproject[all]",
     "black",
