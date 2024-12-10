@@ -4,7 +4,7 @@ Contributions are welcome!
 
 ## Code of Conduct
 
-In general we follow the [Python Software Foundation Code of Conduct](https://policies.python.org/python.org/code-of-conduct/).
+In general we follow the [Python Software Foundation Code of Conduct](https://policies.python.org/python.org/code-of-conduct/). Please note that we are not affiliated with the PSF.
 
 ## Pull Request Process
 
