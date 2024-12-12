@@ -341,8 +341,7 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Install via pip">
-      <ul class="md-nav__list">
+</li>
         
           <li class="md-nav__item">
   <a href="#install-from-github" class="md-nav__link">
@@ -350,11 +349,6 @@
       Install from GitHub
     </span>
   </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
         
@@ -882,8 +876,7 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Install via pip">
-      <ul class="md-nav__list">
+</li>
         
           <li class="md-nav__item">
   <a href="#install-from-github" class="md-nav__link">
@@ -891,11 +884,6 @@
       Install from GitHub
     </span>
   </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
         
@@ -1041,90 +1029,91 @@
 <p>To use pre-fork versions use <code>python-json-logger&lt;3</code>.</p>
 </div>
 <h3 id="install-via-pip">Install via pip<a class="headerlink" href="#install-via-pip" title="Permanent link">🔗</a></h3>
-<p>Until the PEP 541 request is complete you will need to install directly from github.</p>
-<h4 id="install-from-github">Install from GitHub<a class="headerlink" href="#install-from-github" title="Permanent link">🔗</a></h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>pip<span class="w"> </span>install<span class="w"> </span>python-json-logger
+</code></pre></div>
+<h3 id="install-from-github">Install from GitHub<a class="headerlink" href="#install-from-github" title="Permanent link">🔗</a></h3>
 <p>To install from <a href="https://github.com/nhairs/python-json-logger/releases">releases</a> (including development releases), you can use the URL to the specific wheel.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># e.g. 3.0.0 wheel</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s1">&#39;python-json-logger@https://github.com/nhairs/python-json-logger/releases/download/v3.0.0/python_json_logger-3.0.0-py3-none-any.whl&#39;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># e.g. 3.0.0 wheel</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s1">&#39;python-json-logger@https://github.com/nhairs/python-json-logger/releases/download/v3.0.0/python_json_logger-3.0.0-py3-none-any.whl&#39;</span>
 </code></pre></div>
 <h2 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">🔗</a></h2>
 <p>Python JSON Logger provides <a href="https://docs.python.org/3/library/logging.html#logging.Formatter"><code>logging.Formatter</code></a> classes that encode the logged message into JSON. Although <a href="#alternate-json-encoders">a variety of JSON encoders are supported</a>, the following examples will use the <a class="autorefs autorefs-internal" href="../reference/pythonjsonlogger/json/#pythonjsonlogger.json.JsonFormatter">JsonFormatter</a> which uses the the <code>json</code> module from the standard library.</p>
 <h3 id="integrating-with-pythons-logging-framework">Integrating with Python's logging framework<a class="headerlink" href="#integrating-with-pythons-logging-framework" title="Permanent link">🔗</a></h3>
 <p>To produce JSON output, attach the formatter to a logging handler:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">import</span> <span class="nn">logging</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="kn">from</span> <span class="nn">pythonjsonlogger.json</span> <span class="kn">import</span> <span class="n">JsonFormatter</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="n">logHandler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">()</span>
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="n">formatter</span> <span class="o">=</span> <span class="n">JsonFormatter</span><span class="p">()</span>
-<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="n">logHandler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">formatter</span><span class="p">)</span>
-<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logHandler</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">import</span> <span class="nn">logging</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="kn">from</span> <span class="nn">pythonjsonlogger.json</span> <span class="kn">import</span> <span class="n">JsonFormatter</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="n">logHandler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">()</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="n">formatter</span> <span class="o">=</span> <span class="n">JsonFormatter</span><span class="p">()</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="n">logHandler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">formatter</span><span class="p">)</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logHandler</span><span class="p">)</span>
 </code></pre></div>
 <h3 id="output-fields">Output fields<a class="headerlink" href="#output-fields" title="Permanent link">🔗</a></h3>
 <h4 id="required-fields">Required Fields<a class="headerlink" href="#required-fields" title="Permanent link">🔗</a></h4>
 <p>You can control the logged fields by setting the <code>fmt</code> argument when creating the formatter. By default formatters will follow the same <code>style</code> of <code>fmt</code> as the <code>logging</code> module: <code>%</code>, <code>$</code>, and <code>{</code>. All <a href="https://docs.python.org/3/library/logging.html#logrecord-attributes"><code>LogRecord</code> attributes</a> can be output using their name.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">formatter</span> <span class="o">=</span> <span class="n">JsonFormatter</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{message}{asctime}{exc_info}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;{&quot;</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">formatter</span> <span class="o">=</span> <span class="n">JsonFormatter</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{message}{asctime}{exc_info}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;{&quot;</span><span class="p">)</span>
 </code></pre></div>
 <h4 id="message-fields">Message Fields<a class="headerlink" href="#message-fields" title="Permanent link">🔗</a></h4>
 <p>Instead of logging a string message you can log using a <code>dict</code>.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">({</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="s2">&quot;my_data&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;if you don&#39;t include this it will be an empty string&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="s2">&quot;other_stuff&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="p">})</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">({</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="s2">&quot;my_data&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    <span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;if you don&#39;t include this it will be an empty string&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    <span class="s2">&quot;other_stuff&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="p">})</span>
 </code></pre></div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>Be aware that if you log using a <code>dict</code>, other formatters may not be able to handle it.</p>
 </div>
 <p>You can also add additional message fields using the <code>extra</code> argument.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="s2">&quot;this logs the same additional fields as above&quot;</span><span class="p">,</span>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    <span class="n">extra</span><span class="o">=</span><span class="p">{</span>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>        <span class="s2">&quot;my_data&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>        <span class="s2">&quot;other_stuff&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>    <span class="p">},</span>
-<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>    <span class="s2">&quot;this logs the same additional fields as above&quot;</span><span class="p">,</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>    <span class="n">extra</span><span class="o">=</span><span class="p">{</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>        <span class="s2">&quot;my_data&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>        <span class="s2">&quot;other_stuff&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>    <span class="p">},</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="p">)</span>
 </code></pre></div>
 <p>Finally, any non-standard attributes added to a <code>LogRecord</code> will also be included in the logged data. See <a href="../cookbook/#request-trace-ids">Cookbook: Request / Trace IDs</a> for an example.</p>
 <h4 id="default-fields">Default Fields<a class="headerlink" href="#default-fields" title="Permanent link">🔗</a></h4>
 <p>Default fields that are added to every log record prior to any other field can be set using the <code>default</code> argument.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">formatter</span> <span class="o">=</span> <span class="n">JsonFormatter</span><span class="p">(</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>    <span class="n">defaults</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;environment&quot;</span><span class="p">:</span> <span class="s2">&quot;dev&quot;</span><span class="p">}</span>
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="p">)</span>
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="c1"># ...</span>
-<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;this overwrites the environment field&quot;</span><span class="p">,</span> <span class="n">extras</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;environment&quot;</span><span class="p">:</span> <span class="s2">&quot;dev&quot;</span><span class="p">})</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">formatter</span> <span class="o">=</span> <span class="n">JsonFormatter</span><span class="p">(</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>    <span class="n">defaults</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;environment&quot;</span><span class="p">:</span> <span class="s2">&quot;dev&quot;</span><span class="p">}</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="p">)</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="c1"># ...</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;this overwrites the environment field&quot;</span><span class="p">,</span> <span class="n">extras</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;environment&quot;</span><span class="p">:</span> <span class="s2">&quot;dev&quot;</span><span class="p">})</span>
 </code></pre></div>
 <h4 id="static-fields">Static Fields<a class="headerlink" href="#static-fields" title="Permanent link">🔗</a></h4>
 <p>Static fields that are added to every log record can be set using the <code>static_fields</code> argument.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">formatter</span> <span class="o">=</span> <span class="n">JsonFormatter</span><span class="p">(</span>
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>    <span class="n">static_fields</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;True gets logged on every record?&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">formatter</span> <span class="o">=</span> <span class="n">JsonFormatter</span><span class="p">(</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>    <span class="n">static_fields</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;True gets logged on every record?&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="p">)</span>
 </code></pre></div>
 <h3 id="excluding-fields">Excluding fields<a class="headerlink" href="#excluding-fields" title="Permanent link">🔗</a></h3>
 <p>You can prevent fields being added to the output data by adding them to <code>reserved_attrs</code>. By default all <a href="https://docs.python.org/3/library/logging.html#logrecord-attributes"><code>LogRecord</code> attributes</a> are exluded.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="kn">from</span> <span class="nn">pythonjsonlogger.core</span> <span class="kn">import</span> <span class="n">RESERVED_ATTRS</span>
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>
-<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="n">formatter</span> <span class="o">=</span> <span class="n">JsonFormatter</span><span class="p">(</span>
-<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>    <span class="n">reserved_attrs</span><span class="o">=</span><span class="n">RESERVED_ATTRS</span><span class="o">+</span><span class="p">[</span><span class="s2">&quot;request_id&quot;</span><span class="p">,</span> <span class="s2">&quot;my_other_field&quot;</span><span class="p">]</span>
-<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kn">from</span> <span class="nn">pythonjsonlogger.core</span> <span class="kn">import</span> <span class="n">RESERVED_ATTRS</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="n">formatter</span> <span class="o">=</span> <span class="n">JsonFormatter</span><span class="p">(</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>    <span class="n">reserved_attrs</span><span class="o">=</span><span class="n">RESERVED_ATTRS</span><span class="o">+</span><span class="p">[</span><span class="s2">&quot;request_id&quot;</span><span class="p">,</span> <span class="s2">&quot;my_other_field&quot;</span><span class="p">]</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="p">)</span>
 </code></pre></div>
 <h3 id="renaming-fields">Renaming fields<a class="headerlink" href="#renaming-fields" title="Permanent link">🔗</a></h3>
 <p>You can rename fields using the <code>rename_fields</code> argument.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">formatter</span> <span class="o">=</span> <span class="n">JsonFormatter</span><span class="p">(</span>
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>    <span class="s2">&quot;</span><span class="si">{message}{levelname}</span><span class="s2">&quot;</span><span class="p">,</span>
-<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>    <span class="n">style</span><span class="o">=</span><span class="s2">&quot;{&quot;</span><span class="p">,</span>
-<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>    <span class="n">rename_fields</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;levelname&quot;</span><span class="p">:</span> <span class="s2">&quot;LEVEL&quot;</span><span class="p">},</span>
-<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">formatter</span> <span class="o">=</span> <span class="n">JsonFormatter</span><span class="p">(</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>    <span class="s2">&quot;</span><span class="si">{message}{levelname}</span><span class="s2">&quot;</span><span class="p">,</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>    <span class="n">style</span><span class="o">=</span><span class="s2">&quot;{&quot;</span><span class="p">,</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>    <span class="n">rename_fields</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;levelname&quot;</span><span class="p">:</span> <span class="s2">&quot;LEVEL&quot;</span><span class="p">},</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="p">)</span>
 </code></pre></div>
 <h3 id="custom-object-serialization">Custom object serialization<a class="headerlink" href="#custom-object-serialization" title="Permanent link">🔗</a></h3>
 <p>Most formatters support <code>json_default</code> which is used to control how objects are serialized.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="k">def</span> <span class="nf">my_default</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">MyClass</span><span class="p">):</span>
-<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;special&quot;</span><span class="p">:</span> <span class="n">obj</span><span class="o">.</span><span class="n">special</span><span class="p">}</span>
-<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>
-<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="n">formatter</span> <span class="o">=</span> <span class="n">JsonFormatter</span><span class="p">(</span><span class="n">json_default</span><span class="o">=</span><span class="n">my_default</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="k">def</span> <span class="nf">my_default</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">MyClass</span><span class="p">):</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;special&quot;</span><span class="p">:</span> <span class="n">obj</span><span class="o">.</span><span class="n">special</span><span class="p">}</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="n">formatter</span> <span class="o">=</span> <span class="n">JsonFormatter</span><span class="p">(</span><span class="n">json_default</span><span class="o">=</span><span class="n">my_default</span><span class="p">)</span>
 </code></pre></div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
