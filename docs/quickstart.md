@@ -9,9 +9,11 @@
 
 ### Install via pip
 
-Until the PEP 541 request is complete you will need to install directly from github.
+```shell
+pip install python-json-logger
+```
 
-#### Install from GitHub
+### Install from GitHub
 
 To install from [releases](https://github.com/nhairs/python-json-logger/releases) (including development releases), you can use the URL to the specific wheel.
 
