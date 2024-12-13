@@ -16,7 +16,7 @@ import pythonjsonlogger
 ### ============================================================================
 def test_jsonlogger_deprecated():
     with pytest.deprecated_call():
-        pythonjsonlogger.jsonlogger
+        import pythonjsonlogger.jsonlogger
     return
 
 

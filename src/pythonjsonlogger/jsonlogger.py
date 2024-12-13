@@ -3,6 +3,8 @@
 It retains access to old names whilst sending deprecation warnings.
 """
 
+# pylint: disable=wrong-import-position,unused-import
+
 import warnings
 
 ## Throw warning
