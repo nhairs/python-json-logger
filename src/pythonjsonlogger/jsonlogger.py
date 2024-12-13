@@ -3,6 +3,8 @@
 It retains access to old names whilst sending deprecation warnings.
 """
 
+import warnings
+
 ## Throw warning
 warnings.warn(
     "pythonjsonlogger.jsonlogger has been moved to pythonjsonlogger.json",
