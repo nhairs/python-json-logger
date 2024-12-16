@@ -2,6 +2,7 @@
 *.swp
 build
 dist
+dist_uploaded
 *.egg-info
 
 # Tests and validation
