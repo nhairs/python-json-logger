@@ -33,6 +33,7 @@ def test_jsonlogger_reserved_attrs_deprecated():
 @pytest.mark.parametrize(
     "command",
     [
+        "from pythonjsonlogger import jsonlogger",
         "import pythonjsonlogger.jsonlogger",
         "from pythonjsonlogger.jsonlogger import JsonFormatter",
         "from pythonjsonlogger.jsonlogger import RESERVED_ATTRS",
