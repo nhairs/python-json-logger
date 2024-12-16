@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 ## Standard Library
+import subprocess
 
 ## Installed
 import pytest
@@ -25,4 +26,18 @@ def test_jsonlogger_reserved_attrs_deprecated():
         # Note: We use json instead of jsonlogger as jsonlogger will also produce
         # a DeprecationWarning and we specifically want the one for RESERVED_ATTRS
         pythonjsonlogger.json.RESERVED_ATTRS
+    return
+
+
+@pytest.mark.parametrize(
+    "command",
+    [
+        "import pythonjsonlogger.jsonlogger",
+        "from pythonjsonlogger.jsonlogger import JsonFormatter",
+        "from pythonjsonlogger.jsonlogger import RESERVED_ATTRS",
+    ],
+)
+def test_import(command: str):
+    output = subprocess.check_output(["python", "-c", f"{command};print('OK')"])
+    assert output.strip() == b"OK"
     return
