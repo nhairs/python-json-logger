@@ -5,6 +5,7 @@ from __future__ import annotations
 
 ## Standard Library
 import subprocess
+import sys
 
 ## Installed
 import pytest
@@ -38,6 +39,6 @@ def test_jsonlogger_reserved_attrs_deprecated():
     ],
 )
 def test_import(command: str):
-    output = subprocess.check_output(["python", "-c", f"{command};print('OK')"])
+    output = subprocess.check_output([sys.executable, "-c", f"{command};print('OK')"])
     assert output.strip() == b"OK"
     return
