@@ -155,6 +155,8 @@ class BaseJsonFormatter(logging.Formatter):
         reserved_attrs: Optional[Sequence[str]] = None,
         timestamp: Union[bool, str] = False,
         defaults: Optional[Dict[str, Any]] = None,
+        exc_info_as_array: bool = False,
+        stack_info_as_array: bool = False,
     ) -> None:
         """
         Args:
@@ -177,6 +179,8 @@ class BaseJsonFormatter(logging.Formatter):
                 outputting the json log record. If string is passed, timestamp will be added
                 to log record using string as key. If True boolean is passed, timestamp key
                 will be "timestamp". Defaults to False/off.
+            exc_info_as_array: break the exc_info into a list of lines based on line breaks.
+            stack_info_as_array: break the stack_info into a list of lines based on line breaks.
 
         *Changed in 3.1*:
 
@@ -219,6 +223,8 @@ class BaseJsonFormatter(logging.Formatter):
         self._skip_fields = set(self._required_fields)
         self._skip_fields.update(self.reserved_attrs)
         self.defaults = defaults if defaults is not None else {}
+        self.exc_info_as_array = exc_info_as_array
+        self.stack_info_as_array = stack_info_as_array
         return
 
     def format(self, record: logging.LogRecord) -> str:
@@ -247,10 +253,16 @@ class BaseJsonFormatter(logging.Formatter):
         if not message_dict.get("exc_info") and record.exc_text:
             message_dict["exc_info"] = record.exc_text
 
+        if self.exc_info_as_array and message_dict.get("exc_info"):
+            message_dict["exc_info"] = message_dict["exc_info"].splitlines()
+
         # Display formatted record of stack frames
         # default format is a string returned from :func:`traceback.print_stack`
         if record.stack_info and not message_dict.get("stack_info"):
             message_dict["stack_info"] = self.formatStack(record.stack_info)
+
+        if self.stack_info_as_array and message_dict.get("stack_info"):
+            message_dict["stack_info"] = message_dict["stack_info"].splitlines()
 
         log_record: LogRecord = {}
         self.add_fields(log_record, record, message_dict)
