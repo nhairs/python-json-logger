@@ -622,6 +622,55 @@ def test_custom_default(env: LoggingEnvironment, class_: type[BaseJsonFormatter]
     return
 
 
+@pytest.mark.parametrize("class_", ALL_FORMATTERS)
+def test_exc_info_as_array(env: LoggingEnvironment, class_: type[BaseJsonFormatter]):
+    env.set_formatter(class_(exc_info_as_array=True))
+
+    try:
+        raise Exception("Error")
+    except BaseException:
+        env.logger.exception("Error occurs")
+    log_json = env.load_json()
+
+    assert type(log_json["exc_info"]) is list
+    return
+
+
+@pytest.mark.parametrize("class_", ALL_FORMATTERS)
+def test_exc_info_as_array_no_exc_info(env: LoggingEnvironment, class_: type[BaseJsonFormatter]):
+    env.set_formatter(class_(exc_info_as_array=True))
+
+    env.logger.info("hello")
+    log_json = env.load_json()
+
+    assert log_json.get("exc_info") is None
+    return
+
+
+@pytest.mark.parametrize("class_", ALL_FORMATTERS)
+def test_stack_info_as_array(env: LoggingEnvironment, class_: type[BaseJsonFormatter]):
+    env.set_formatter(class_(stack_info_as_array=True))
+
+    env.logger.info("hello", stack_info=True)
+    log_json = env.load_json()
+
+    assert type(log_json["stack_info"]) is list
+    return
+
+
+@pytest.mark.parametrize("class_", ALL_FORMATTERS)
+def test_stack_info_as_array_no_stack_info(
+    env: LoggingEnvironment, class_: type[BaseJsonFormatter]
+):
+    env.set_formatter(class_(stack_info_as_array=True))
+
+    env.logger.info("hello", stack_info=False)
+    log_json = env.load_json()
+
+    assert log_json.get("stack_info") is None
+    return
+
+
 ## JsonFormatter Specific
 ## -----------------------------------------------------------------------------
 def test_json_ensure_ascii_true(env: LoggingEnvironment):
