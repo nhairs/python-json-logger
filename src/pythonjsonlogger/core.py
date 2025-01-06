@@ -253,16 +253,10 @@ class BaseJsonFormatter(logging.Formatter):
         if not message_dict.get("exc_info") and record.exc_text:
             message_dict["exc_info"] = record.exc_text
 
-        if self.exc_info_as_array and message_dict.get("exc_info"):
-            message_dict["exc_info"] = message_dict["exc_info"].splitlines()
-
         # Display formatted record of stack frames
         # default format is a string returned from :func:`traceback.print_stack`
         if record.stack_info and not message_dict.get("stack_info"):
             message_dict["stack_info"] = self.formatStack(record.stack_info)
-
-        if self.stack_info_as_array and message_dict.get("stack_info"):
-            message_dict["stack_info"] = message_dict["stack_info"].splitlines()
 
         log_record: LogRecord = {}
         self.add_fields(log_record, record, message_dict)
@@ -380,3 +374,23 @@ class BaseJsonFormatter(logging.Formatter):
             log_record: incoming data
         """
         return log_record
+
+    def formatException(self, ei) -> Union[str, list[str]]:
+        """Format and return the specified exception information.
+
+        If exc_info_as_array is set to True, This method returns an array of strings.
+        """
+        exception_info_str = super().formatException(ei)
+        return exception_info_str.splitlines() if self.exc_info_as_array else exception_info_str
+
+    def formatStack(self, stack_info) -> Union[str, list[str]]:
+        """Format and return the specified stack information.
+
+        If stack_info_as_array is set to True, This method returns an array of strings.
+        """
+        stack_info_str = super().formatStack(stack_info)
+        return (
+            stack_info_str.splitlines()
+            if self.stack_info_as_array
+            else stack_info_str.formatStack(stack_info)
+        )
