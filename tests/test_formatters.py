@@ -568,8 +568,14 @@ def test_common_types_encoded(
     if pythonjsonlogger.MSGSPEC_AVAILABLE and class_ is MsgspecFormatter:
         # Dataclass: https://github.com/jcrist/msgspec/issues/681
         # Enum: https://github.com/jcrist/msgspec/issues/680
-        if obj is SomeDataclass or (
-            isinstance(obj, enum.Enum) and obj in {MultiEnum.BYTES, MultiEnum.NONE, MultiEnum.BOOL}
+        # These have been fixed in msgspec 0.19.0, however they also dropped python 3.8 support.
+        # https://github.com/jcrist/msgspec/releases/tag/0.19.0
+        if sys.version_info < (3, 9) and (
+            obj is SomeDataclass
+            or (
+                isinstance(obj, enum.Enum)
+                and obj in {MultiEnum.BYTES, MultiEnum.NONE, MultiEnum.BOOL}
+            )
         ):
             pytest.xfail()
 
