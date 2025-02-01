@@ -16,35 +16,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install tox
+      - uses: astral-sh/setup-uv@v3
 
       - name: Lint with tox
-        run: tox -e lint
+        run: uvx tox -e lint
 
   test:
-    name: "Python Test ${{matrix.python-version}} ${{ matrix.os }}"
+    name: "Python Test ${{ matrix.os }}"
     needs: [lint]
     runs-on: "${{ matrix.os }}"
     strategy:
       fail-fast: false  # allow tests to run on all platforms
       matrix:
-        python-version:
-          - "pypy-3.8"
-          - "pypy-3.9"
-          - "pypy-3.10"
-          - "3.8"
-          - "3.9"
-          - "3.10"
-          - "3.11"
-          - "3.12"
-          - "3.13"
         os:
           - ubuntu-latest
           - windows-latest
@@ -52,15 +35,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install tox tox-gh-actions
+      - uses: astral-sh/setup-uv@v3
 
       - name: Test with tox
-        run: tox
+        run: uvx tox
