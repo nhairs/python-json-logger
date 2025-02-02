@@ -632,7 +632,7 @@ def test_exc_info_as_array(env: LoggingEnvironment, class_: type[BaseJsonFormatt
         env.logger.exception("Error occurs")
     log_json = env.load_json()
 
-    assert type(log_json["exc_info"]) is list
+    assert isinstance(log_json["exc_info"], list)
     return
 
 
