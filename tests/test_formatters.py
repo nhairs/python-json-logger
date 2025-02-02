@@ -643,7 +643,7 @@ def test_exc_info_as_array_no_exc_info(env: LoggingEnvironment, class_: type[Bas
     env.logger.info("hello")
     log_json = env.load_json()
 
-    assert log_json.get("exc_info") is None
+    assert "exc_info" not in log_json
     return
 
 
