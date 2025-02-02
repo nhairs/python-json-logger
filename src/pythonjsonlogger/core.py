@@ -392,5 +392,5 @@ class BaseJsonFormatter(logging.Formatter):
         return (
             stack_info_str.splitlines()
             if self.stack_info_as_array
-            else stack_info_str.formatStack(stack_info)
+            else stack_info_str
         )
