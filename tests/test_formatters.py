@@ -654,7 +654,7 @@ def test_stack_info_as_array(env: LoggingEnvironment, class_: type[BaseJsonForma
     env.logger.info("hello", stack_info=True)
     log_json = env.load_json()
 
-    assert type(log_json["stack_info"]) is list
+    assert isinstance(log_json["stack_info"], list)
     return
 
 
