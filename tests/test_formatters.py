@@ -667,7 +667,7 @@ def test_stack_info_as_array_no_stack_info(
     env.logger.info("hello", stack_info=False)
     log_json = env.load_json()
 
-    assert log_json.get("stack_info") is None
+    assert "stack_info" not in log_json
     return
 
 
