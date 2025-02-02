@@ -375,7 +375,7 @@ class BaseJsonFormatter(logging.Formatter):
         """
         return log_record
 
-    def formatException(self, ei) -> Union[str, list[str]]:
+    def formatException(self, ei) -> Union[str, list[str]]: #type: ignore
         """Format and return the specified exception information.
 
         If exc_info_as_array is set to True, This method returns an array of strings.
@@ -383,7 +383,7 @@ class BaseJsonFormatter(logging.Formatter):
         exception_info_str = super().formatException(ei)
         return exception_info_str.splitlines() if self.exc_info_as_array else exception_info_str
 
-    def formatStack(self, stack_info) -> Union[str, list[str]]:
+    def formatStack(self, stack_info) -> Union[str, list[str]]: #type: ignore
         """Format and return the specified stack information.
 
         If stack_info_as_array is set to True, This method returns an array of strings.
