@@ -134,6 +134,8 @@ class BaseJsonFormatter(logging.Formatter):
     *New in 3.1*
 
     *Changed in 3.2*: `defaults` argument is no longer ignored.
+
+    *Added in UNRELEASED*: `exc_info_as_array` and `stack_info_as_array` options are added.
     """
 
     _style: Union[logging.PercentStyle, str]  # type: ignore[assignment]
@@ -155,6 +157,8 @@ class BaseJsonFormatter(logging.Formatter):
         reserved_attrs: Optional[Sequence[str]] = None,
         timestamp: Union[bool, str] = False,
         defaults: Optional[Dict[str, Any]] = None,
+        exc_info_as_array: bool = False,
+        stack_info_as_array: bool = False,
     ) -> None:
         """
         Args:
@@ -177,6 +181,8 @@ class BaseJsonFormatter(logging.Formatter):
                 outputting the json log record. If string is passed, timestamp will be added
                 to log record using string as key. If True boolean is passed, timestamp key
                 will be "timestamp". Defaults to False/off.
+            exc_info_as_array: break the exc_info into a list of lines based on line breaks.
+            stack_info_as_array: break the stack_info into a list of lines based on line breaks.
 
         *Changed in 3.1*:
 
@@ -219,6 +225,8 @@ class BaseJsonFormatter(logging.Formatter):
         self._skip_fields = set(self._required_fields)
         self._skip_fields.update(self.reserved_attrs)
         self.defaults = defaults if defaults is not None else {}
+        self.exc_info_as_array = exc_info_as_array
+        self.stack_info_as_array = stack_info_as_array
         return
 
     def format(self, record: logging.LogRecord) -> str:
@@ -368,3 +376,19 @@ class BaseJsonFormatter(logging.Formatter):
             log_record: incoming data
         """
         return log_record
+
+    def formatException(self, ei) -> Union[str, list[str]]:  # type: ignore
+        """Format and return the specified exception information.
+
+        If exc_info_as_array is set to True, This method returns an array of strings.
+        """
+        exception_info_str = super().formatException(ei)
+        return exception_info_str.splitlines() if self.exc_info_as_array else exception_info_str
+
+    def formatStack(self, stack_info) -> Union[str, list[str]]:  # type: ignore
+        """Format and return the specified stack information.
+
+        If stack_info_as_array is set to True, This method returns an array of strings.
+        """
+        stack_info_str = super().formatStack(stack_info)
+        return stack_info_str.splitlines() if self.stack_info_as_array else stack_info_str
