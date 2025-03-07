@@ -4,12 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [UNRELEASED]
+## [3.3.0](https://github.com/nhairs/python-json-logger/compare/v3.2.1...v3.3.0) - 2025-03-06
 
 ### Added
-- `exc_info_as_array` and `stack_info_as_array` options are added to `pythonjsonlogger.core.BaseJsonFormatter`.
-  - If `exc_info_as_array` is True (Defualt: False), formatter encode exc_info into an array.
-  - If `stack_info_as_array` is True (Defualt: False), formatter encode stack_info into an array.
+- `exc_info_as_array` and `stack_info_as_array` options are added to `pythonjsonlogger.core.BaseJsonFormatter` allowing both to be encoded as list of lines instead of a single multi-line string. [#35](https://github.com/nhairs/python-json-logger/issues/35)
+
+### Security
+- Remove `msgspec-python313-pre` from `dev` dependencies preventing potential RCE. Details: [GHSA-wmxh-pxcx-9w24](https://github.com/nhairs/python-json-logger/security/advisories/GHSA-wmxh-pxcx-9w24#advisory-comment-121307)
+
+Thanks @1hakusai1 and @omnigodz
 
 ## [3.2.1](https://github.com/nhairs/python-json-logger/compare/v3.2.0...v3.2.1) - 2024-12-16
 
