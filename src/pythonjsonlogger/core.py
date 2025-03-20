@@ -215,9 +215,17 @@ class BaseJsonFormatter(logging.Formatter):
         ## JSON Logging specific
         ## ---------------------------------------------------------------------
         self.prefix = prefix
-        self.rename_fields = rename_fields if rename_fields is not None else {}
+        self.rename_fields = (
+            {k: rename_fields[k] for k, v in rename_fields.items()}
+            if rename_fields is not None
+            else {}
+        )
         self.rename_fields_keep_missing = rename_fields_keep_missing
-        self.static_fields = static_fields if static_fields is not None else {}
+        self.static_fields = (
+            {k: static_fields[k] for k, v in static_fields.items()}
+            if static_fields is not None
+            else {}
+        )
         self.reserved_attrs = set(reserved_attrs if reserved_attrs is not None else RESERVED_ATTRS)
         self.timestamp = timestamp
 
