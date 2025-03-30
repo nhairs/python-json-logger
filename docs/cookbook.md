@@ -139,9 +139,9 @@ main_3()
 
 ## Using `fileConfig`
 
-To use the module with a yaml config file using the [`fileConfig` function](https://docs.python.org/3/library/logging.config.html#logging.config.fileConfig), use the class `pythonjsonlogger.json.JsonFormatter`. Here is a sample config file.
+To use the module with a yaml config file using the [`fileConfig` function](https://docs.python.org/3/library/logging.config.html#logging.config.fileConfig), use the class `pythonjsonlogger.json.JsonFormatter`. Here is a sample config file:
 
-```yaml
+```yaml title="example_config.yaml"
 version: 1
 disable_existing_loggers: False
 formatters:
@@ -178,9 +178,9 @@ loggers:
     propagate: no
 ```
 
-then, you can have following logging_config.py file for resolving external references (*service*, *env* and *version*) from project metadata or environment variables.
+You'll notice that we are using `ext://...` for the `static_fields`. This will load data from other modules such as the one below.
 
-```python
+```python title="logging_config.py"
 import importlib.metadata
 import os
 

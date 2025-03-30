@@ -8,7 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Support `DictConfigurator` prefixes for `rename_fields` and `static_fields`. [#45](https://github.com/nhairs/python-json-logger/pull/45)
+  - Allows using values like `ext://sys.stderr` in `fileConfig`/`dictConfig` value fields.
 
+Thanks @rubensa
 
 ## [3.3.0](https://github.com/nhairs/python-json-logger/compare/v3.2.1...v3.3.0) - 2025-03-06
 

@@ -215,17 +215,18 @@ class BaseJsonFormatter(logging.Formatter):
         ## JSON Logging specific
         ## ---------------------------------------------------------------------
         self.prefix = prefix
-        # We recreate the dict to support internal/external reference which require getting the item to do the conversion.
-        # More details: https://github.com/nhairs/python-json-logger/pull/45
+
+        # We recreate the dict in rename_fields and static_fields to support internal/external
+        # references which require getting the item to do the conversion.
+        # For more details see: https://github.com/nhairs/python-json-logger/pull/45
         self.rename_fields = (
             {key: rename_fields[key] for key in rename_fields} if rename_fields is not None else {}
         )
-        self.rename_fields_keep_missing = rename_fields_keep_missing
-        # We recreate the dict to support internal/external reference which require getting the item to do the conversion.
-        # More details: https://github.com/nhairs/python-json-logger/pull/45
         self.static_fields = (
             {key: static_fields[key] for key in static_fields} if static_fields is not None else {}
         )
+
+        self.rename_fields_keep_missing = rename_fields_keep_missing
         self.reserved_attrs = set(reserved_attrs if reserved_attrs is not None else RESERVED_ATTRS)
         self.timestamp = timestamp
 
