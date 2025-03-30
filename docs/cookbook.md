@@ -139,35 +139,61 @@ main_3()
 
 ## Using `fileConfig`
 
-To use the module with a config file using the [`fileConfig` function](https://docs.python.org/3/library/logging.config.html#logging.config.fileConfig), use the class `pythonjsonlogger.json.JsonFormatter`. Here is a sample config file.
+To use the module with a yaml config file using the [`fileConfig` function](https://docs.python.org/3/library/logging.config.html#logging.config.fileConfig), use the class `pythonjsonlogger.json.JsonFormatter`. Here is a sample config file:
 
-```ini
-[loggers]
-keys = root,custom
+```yaml title="example_config.yaml"
+version: 1
+disable_existing_loggers: False
+formatters:
+  default:
+    "()": pythonjsonlogger.json.JsonFormatter
+    format: "%(asctime)s %(levelname)s %(name)s %(module)s %(funcName)s %(lineno)s %(message)s"
+    rename_fields:
+      "asctime": "timestamp"
+      "levelname": "status"
+    static_fields:
+      "service": ext://logging_config.PROJECT_NAME
+      "env": ext://logging_config.ENVIRONMENT
+      "version": ext://logging_config.PROJECT_VERSION
+      "app_log": "true"
+handlers:
+  default:
+    formatter: default
+    class: logging.StreamHandler
+    stream: ext://sys.stderr
+  access:
+    formatter: default
+    class: logging.StreamHandler
+    stream: ext://sys.stdout
+loggers:
+  uvicorn.error:
+    level: INFO
+    handlers:
+      - default
+    propagate: no
+  uvicorn.access:
+    level: INFO
+    handlers:
+      - access
+    propagate: no
+```
 
-[logger_root]
-handlers =
+You'll notice that we are using `ext://...` for the `static_fields`. This will load data from other modules such as the one below.
 
-[logger_custom]
-level = INFO
-handlers = custom
-qualname = custom
+```python title="logging_config.py"
+import importlib.metadata
+import os
 
-[handlers]
-keys = custom
 
-[handler_custom]
-class = StreamHandler
-level = INFO
-formatter = json
-args = (sys.stdout,)
+def get_version_metadata():
+    # https://stackoverflow.com/a/78082532
+    version = importlib.metadata.version(PROJECT_NAME)
+    return version
 
-[formatters]
-keys = json
 
-[formatter_json]
-format = %(message)s
-class = pythonjsonlogger.jsonlogger.JsonFormatter
+PROJECT_NAME = 'test-api'
+PROJECT_VERSION = get_version_metadata()
+ENVIRONMENT = os.environ.get('ENVIRONMENT', 'dev')
 ```
 
 ## Logging Expensive to Compute Data
