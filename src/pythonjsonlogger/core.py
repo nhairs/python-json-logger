@@ -7,11 +7,10 @@ from __future__ import annotations
 
 ## Standard Library
 from datetime import datetime, timezone
-import importlib
 import logging
 import re
 import sys
-from typing import Optional, Union, Callable, List, Dict, Container, Any, Sequence
+from typing import Optional, Union, List, Dict, Container, Any, Sequence
 
 if sys.version_info >= (3, 10):
     from typing import TypeAlias
@@ -72,31 +71,12 @@ STYLE_PERCENT_REGEX = re.compile(r"%\((.+?)\)", re.IGNORECASE)  # % style
 
 ## Type Aliases
 ## -----------------------------------------------------------------------------
-OptionalCallableOrStr: TypeAlias = Optional[Union[Callable, str]]
-"""Type alias"""
-
 LogRecord: TypeAlias = Dict[str, Any]
 """Type alias"""
 
 
 ### FUNCTIONS
 ### ============================================================================
-def str_to_object(obj: Any) -> Any:
-    """Import strings to an object, leaving non-strings as-is.
-
-    Args:
-        obj: the object or string to process
-
-    *New in 3.1*
-    """
-
-    if not isinstance(obj, str):
-        return obj
-
-    module_name, attribute_name = obj.rsplit(".", 1)
-    return getattr(importlib.import_module(module_name), attribute_name)
-
-
 def merge_record_extra(
     record: logging.LogRecord,
     target: Dict,

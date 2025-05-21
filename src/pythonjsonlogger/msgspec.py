@@ -6,7 +6,7 @@
 from __future__ import annotations
 
 ## Standard Library
-from typing import Any
+from typing import Any, Optional, Callable
 
 ## Installed
 
@@ -43,7 +43,7 @@ class MsgspecFormatter(core.BaseJsonFormatter):
     def __init__(
         self,
         *args,
-        json_default: core.OptionalCallableOrStr = msgspec_default,
+        json_default: Optional[Callable] = msgspec_default,
         **kwargs,
     ) -> None:
         """
@@ -54,7 +54,7 @@ class MsgspecFormatter(core.BaseJsonFormatter):
         """
         super().__init__(*args, **kwargs)
 
-        self.json_default = core.str_to_object(json_default)
+        self.json_default = json_default
         self._encoder = msgspec.json.Encoder(enc_hook=self.json_default)
         return
 
