@@ -58,6 +58,6 @@ class MsgspecFormatter(core.BaseJsonFormatter):
         self._encoder = msgspec.json.Encoder(enc_hook=self.json_default)
         return
 
-    def jsonify_log_record(self, log_record: core.LogRecord) -> str:
-        """Returns a json string of the log record."""
-        return self._encoder.encode(log_record).decode("utf8")
+    def jsonify_log_record(self, log_data: core.LogData) -> str:
+        """Returns a json string of the log data."""
+        return self._encoder.encode(log_data).decode("utf8")
