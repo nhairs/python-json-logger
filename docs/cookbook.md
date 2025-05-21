@@ -179,7 +179,7 @@ loggers:
     propagate: no
 ```
 
-You'll notice that we are using `ext://...` for the `static_fields`. This will load data from other modules such as the one below.
+You'll notice that we are using `ext://...` for `json_default` and`static_fields`. This will load data from other modules such as the one below.
 
 ```python title="logging_config.py"
 import importlib.metadata
