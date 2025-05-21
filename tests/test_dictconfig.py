@@ -19,12 +19,24 @@ import pytest
 _LOGGER_COUNT = 0
 EXT_VAL = 999
 
+
+class Dummy:
+    pass
+
+
+def my_json_default(obj: Any) -> Any:
+    if isinstance(obj, Dummy):
+        return "DUMMY"
+    return obj
+
+
 LOGGING_CONFIG = {
     "version": 1,
     "disable_existing_loggers": False,
     "formatters": {
         "default": {
             "()": "pythonjsonlogger.json.JsonFormatter",
+            "json_default": "ext://tests.test_dictconfig.my_json_default",
             "static_fields": {"ext-val": "ext://tests.test_dictconfig.EXT_VAL"},
         }
     },
@@ -73,8 +85,12 @@ def env() -> Generator[LoggingEnvironment, None, None]:
 ### TESTS
 ### ============================================================================
 def test_external_reference_support(env: LoggingEnvironment):
-    env.logger.info("hello")
+
+    assert logging.root.handlers[0].formatter.json_default is my_json_default  # type: ignore[union-attr]
+
+    env.logger.info("hello", extra={"dummy": Dummy()})
     log_json = env.load_json()
 
     assert log_json["ext-val"] == EXT_VAL
+    assert log_json["dummy"] == "DUMMY"
     return
