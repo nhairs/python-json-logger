@@ -67,9 +67,9 @@ class JsonFormatter(core.BaseJsonFormatter):
     def __init__(
         self,
         *args,
-        json_default: core.OptionalCallableOrStr = None,
-        json_encoder: core.OptionalCallableOrStr = None,
-        json_serializer: Union[Callable, str] = json.dumps,
+        json_default: Optional[Callable] = None,
+        json_encoder: Optional[Callable] = None,
+        json_serializer: Callable = json.dumps,
         json_indent: Optional[Union[int, str]] = None,
         json_ensure_ascii: bool = True,
         **kwargs,
@@ -87,9 +87,9 @@ class JsonFormatter(core.BaseJsonFormatter):
         """
         super().__init__(*args, **kwargs)
 
-        self.json_default = core.str_to_object(json_default)
-        self.json_encoder = core.str_to_object(json_encoder)
-        self.json_serializer = core.str_to_object(json_serializer)
+        self.json_default = json_default
+        self.json_encoder = json_encoder
+        self.json_serializer = json_serializer
         self.json_indent = json_indent
         self.json_ensure_ascii = json_ensure_ascii
         if not self.json_encoder and not self.json_default:
