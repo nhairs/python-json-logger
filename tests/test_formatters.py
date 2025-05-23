@@ -380,9 +380,9 @@ def test_log_extra(env: LoggingEnvironment, class_: type[BaseJsonFormatter]):
 def test_custom_logic_adds_field(env: LoggingEnvironment, class_: type[BaseJsonFormatter]):
     class CustomJsonFormatter(class_):  # type: ignore[valid-type,misc]
 
-        def process_log_record(self, log_record):
-            log_record["custom"] = "value"
-            return super().process_log_record(log_record)
+        def process_log_record(self, log_data):
+            log_data["custom"] = "value"
+            return super().process_log_record(log_data)
 
     env.set_formatter(CustomJsonFormatter())
     env.logger.info("message")
