@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Allows using values like `ext://sys.stderr` in `fileConfig`/`dictConfig` value fields.
 
 ### Changed
-- Rename `pythonjsonlogger.core.LogRecord` and `log_record` arguemtns to avoid confusion / overlapping with `logging.LogRecord`. [#38](https://github.com/nhairs/python-json-logger/issues/38)
+- Rename `pythonjsonlogger.core.LogRecord` and `log_record` arguments to avoid confusion / overlapping with `logging.LogRecord`. [#38](https://github.com/nhairs/python-json-logger/issues/38)
     - Affects arguments to `pythonjsonlogger.core.BaseJsonFormatter` (and any child classes).
         - `serialize_log_record`
         - `add_fields`
