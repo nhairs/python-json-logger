@@ -185,6 +185,32 @@ def test_comma_format(env: LoggingEnvironment, class_: type[BaseJsonFormatter]):
 
 
 @pytest.mark.parametrize("class_", ALL_FORMATTERS)
+def test_sequence_list_format(env: LoggingEnvironment, class_: type[BaseJsonFormatter]):
+    env.set_formatter(class_(["levelname", "message", "filename", "lineno", "asctime"]))
+
+    msg = "testing logging format"
+    env.logger.info(msg)
+    log_json = env.load_json()
+
+    assert log_json["message"] == msg
+    assert log_json.keys() == {"levelname", "message", "filename", "lineno", "asctime"}
+    return
+
+
+@pytest.mark.parametrize("class_", ALL_FORMATTERS)
+def test_sequence_tuple_format(env: LoggingEnvironment, class_: type[BaseJsonFormatter]):
+    env.set_formatter(class_(("levelname", "message", "filename", "lineno", "asctime")))
+
+    msg = "testing logging format"
+    env.logger.info(msg)
+    log_json = env.load_json()
+
+    assert log_json["message"] == msg
+    assert log_json.keys() == {"levelname", "message", "filename", "lineno", "asctime"}
+    return
+
+
+@pytest.mark.parametrize("class_", ALL_FORMATTERS)
 def test_defaults_field(env: LoggingEnvironment, class_: type[BaseJsonFormatter]):
     env.set_formatter(class_(defaults={"first": 1, "second": 2}))
 
