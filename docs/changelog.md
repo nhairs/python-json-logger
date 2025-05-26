@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Support `DictConfigurator` prefixes for `rename_fields` and `static_fields`. [#45](https://github.com/nhairs/python-json-logger/pull/45)
   - Allows using values like `ext://sys.stderr` in `fileConfig`/`dictConfig` value fields.
+- Support comma seperated lists for Formatter `fmt` (`style=","`) e.g. `"asctime,message,levelname"` [#15](https://github.com/nhairs/python-json-logger/issues/15)
+  - Note that this style is specific to `python-json-logger` and thus care should be taken not to pass this format to other logging Formatter implementations.
 
 ### Changed
 - Rename `pythonjsonlogger.core.LogRecord` and `log_record` arguments to avoid confusion / overlapping with `logging.LogRecord`. [#38](https://github.com/nhairs/python-json-logger/issues/38)
