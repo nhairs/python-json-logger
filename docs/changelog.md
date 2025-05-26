@@ -10,6 +10,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support `DictConfigurator` prefixes for `rename_fields` and `static_fields`. [#45](https://github.com/nhairs/python-json-logger/pull/45)
   - Allows using values like `ext://sys.stderr` in `fileConfig`/`dictConfig` value fields.
 
+### Changed
+- Rename `pythonjsonlogger.core.LogRecord` and `log_record` arguments to avoid confusion / overlapping with `logging.LogRecord`. [#38](https://github.com/nhairs/python-json-logger/issues/38)
+    - Affects arguments to `pythonjsonlogger.core.BaseJsonFormatter` (and any child classes).
+        - `serialize_log_record`
+        - `add_fields`
+        - `jsonify_log_record`
+        - `process_log_record`
+    - Note: functions referring to `log_record` have **not** had their function name changed.
+
 ### Removed
 - Remove support for providing strings instead of objects when instantiating formatters. Instead use the `DictConfigurator` `ext://` prefix format when using `fileConfig`/`dictConfig`. [#47](https://github.com/nhairs/python-json-logger/issues/47)
     - Affects `pythonjsonlogger.json.JsonFormatter`: `json_default`, `json_encoder`, `json_serializer`.
