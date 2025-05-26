@@ -172,7 +172,8 @@ def test_percentage_format(env: LoggingEnvironment, class_: type[BaseJsonFormatt
 
 @pytest.mark.parametrize("class_", ALL_FORMATTERS)
 def test_comma_format(env: LoggingEnvironment, class_: type[BaseJsonFormatter]):
-    env.set_formatter(class_("levelname,message,filename,lineno,asctime", style=","))
+    # Note: we have double comma `,,` to test handling "empty" names
+    env.set_formatter(class_("levelname,,message,filename,lineno,asctime,", style=","))
 
     msg = "testing logging format"
     env.logger.info(msg)
