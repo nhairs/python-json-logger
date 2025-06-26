@@ -25,7 +25,13 @@ The following are things that can be worked on without an existing issue:
 
 ### 2. Fork the repository and make your changes
 
-While there isn't extensive styling documentation, code style is enforced using `black` for formatting and `pylint` for linting (details below). Please ensure your changes pass these checks. Otherwise, try to match existing code. This includes the use of "headings" and "dividers" (this will make sense when you look at the code).
+#### Coding Style
+
+Before writing any code, please familiarize yourself with our [Python Style Guide](style-guide.md). This document outlines our coding conventions, formatting expectations, and common patterns used in the project. Adhering to this guide is crucial for maintaining code consistency and readability.
+
+While the style guide covers detailed conventions, always try to match the style of existing code in the module you are working on, especially regarding local patterns and structure.
+
+#### Development Setup
 
 All devlopment tooling can be installed (usually into a virtual environment), using the `dev` optional dependency:
 
