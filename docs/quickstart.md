@@ -104,7 +104,7 @@ formatter = JsonFormatter(
 
 ### Excluding fields
 
-You can prevent fields being added to the output data by adding them to `reserved_attrs`. By default all [`LogRecord` attributes](https://docs.python.org/3/library/logging.html#logrecord-attributes) are excluded.
+You can prevent fields being added to the output data by adding them to `reserved_attrs`. By default all [`LogRecord` attributes](https://docs.python.org/3/library/logging.html#logrecord-attributes) are exluded.
 
 ```python
 from pythonjsonlogger.core import RESERVED_ATTRS
