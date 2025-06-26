@@ -53,10 +53,14 @@ mypy src tests
 pytest
 ```
 
-If making changes to the documentation you can preview the changes locally using `mkdocs`. Changes to the README can be previewed using [`grip`](https://github.com/joeyespo/grip) (not included in `dev` dependencies).
+The above commands (`black`, `pylint`, `mypy`, `pytest`) should all be run before submitting a pull request.
+
+If making changes to the documentation you can preview the changes locally using `mkdocs`. Changes to the `README.md` can be previewed using a tool like [`grip`](https://github.com/joeyespo/grip) (installable via `pip install grip`).
 
 ```shell
 mkdocs serve
+# For README preview (after installing grip):
+# grip
 ```
 
 !!! note
