@@ -37,13 +37,12 @@ if pythonjsonlogger.ORJSON_AVAILABLE:
 if pythonjsonlogger.MSGSPEC_AVAILABLE:
     from pythonjsonlogger.msgspec import MsgspecFormatter
 
+# Import the centralized list (now named ALL_FORMATTERS directly)
+from tests import ALL_FORMATTERS
+
 ### SETUP
 ### ============================================================================
-ALL_FORMATTERS: list[type[BaseJsonFormatter]] = [JsonFormatter]
-if pythonjsonlogger.ORJSON_AVAILABLE:
-    ALL_FORMATTERS.append(OrjsonFormatter)
-if pythonjsonlogger.MSGSPEC_AVAILABLE:
-    ALL_FORMATTERS.append(MsgspecFormatter)
+# Local ALL_FORMATTERS definition has been removed.
 
 _LOGGER_COUNT = 0
 
