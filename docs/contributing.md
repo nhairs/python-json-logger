@@ -25,7 +25,7 @@ The following are things that can be worked on without an existing issue:
 
 ### 2. Fork the repository and make your changes
 
-Code style is enforced using `black` for formatting, `pylint` for linting, and `mypy` for type checking. Please ensure your changes pass these checks. For a summary of the main conventions, see the [Styling Guide](styling_guide.md). Otherwise, try to match existing code. This includes the use of "headings" and "dividers" (this will make sense when you look at the code).
+While there isn't extensive styling documentation, code style is enforced using `black` for formatting and `pylint` for linting (details below). Please ensure your changes pass these checks. Otherwise, try to match existing code. This includes the use of "headings" and "dividers" (this will make sense when you look at the code).
 
 All devlopment tooling can be installed (usually into a virtual environment), using the `dev` optional dependency:
 

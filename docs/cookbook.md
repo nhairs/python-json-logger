@@ -137,11 +137,9 @@ def main_3():
 main_3()
 ```
 
-## Using Dictionary-based Configuration (e.g., from YAML)
+## Using `fileConfig`
 
-While Python's [`logging.config.fileConfig`](https://docs.python.org/3/library/logging.config.html#logging.config.fileConfig) is designed for INI-style configuration files, [`logging.config.dictConfig`](https://docs.python.org/3/library/logging.config.html#logging.config.dictConfig) is used for dictionary-based configurations, often loaded from YAML or JSON files.
-
-To use `python-json-logger` with such a configuration, you specify the formatter class (e.g., `pythonjsonlogger.json.JsonFormatter`) in your dictionary. Here is a sample configuration loaded from a YAML file:
+To use the module with a yaml config file using the [`fileConfig` function](https://docs.python.org/3/library/logging.config.html#logging.config.fileConfig), use the class `pythonjsonlogger.json.JsonFormatter`. Here is a sample config file:
 
 ```yaml title="example_config.yaml"
 version: 1

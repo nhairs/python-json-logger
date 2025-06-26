@@ -37,8 +37,6 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 handler = logging.StreamHandler()
-# Note: The JsonFormatter class is available from pythonjsonlogger.json,
-# pythonjsonlogger.orjson, and pythonjsonlogger.msgspec
 handler.setFormatter(JsonFormatter())
 
 logger.addHandler(handler)

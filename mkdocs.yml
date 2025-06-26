@@ -16,7 +16,6 @@ nav:
   - changelog.md
   - security.md
   - contributing.md
-  - styling_guide.md
   - API Reference:
     - ... | reference/pythonjsonlogger/*
 
@@ -108,10 +107,8 @@ plugins:
             unwrap_annotated: true
             show_source: false
             docstring_section_style: spacy
-  # literate-nav was configured with a missing SUMMARY.txt and might be redundant
-  # due to the explicit nav structure and awesome-pages.
-  # - literate-nav:
-  #     nav_file: SUMMARY.txt
+  - literate-nav:
+      nav_file: SUMMARY.txt
   - mike:
       canonical_version: latest
 
