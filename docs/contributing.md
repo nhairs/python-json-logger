@@ -25,7 +25,7 @@ The following are things that can be worked on without an existing issue:
 
 ### 2. Fork the repository and make your changes
 
-We don't have styling documentation, so where possible try to match existing code. This includes the use of "headings" and "dividers" (this will make sense when you look at the code).
+Code style is enforced using `black` for formatting, `pylint` for linting, and `mypy` for type checking. Please ensure your changes pass these checks. For a summary of the main conventions, see the [Styling Guide](styling_guide.md). Otherwise, try to match existing code. This includes the use of "headings" and "dividers" (this will make sense when you look at the code).
 
 All devlopment tooling can be installed (usually into a virtual environment), using the `dev` optional dependency:
 
@@ -47,10 +47,14 @@ mypy src tests
 pytest
 ```
 
-If making changes to the documentation you can preview the changes locally using `mkdocs`. Changes to the README can be previewed using [`grip`](https://github.com/joeyespo/grip) (not included in `dev` dependencies).
+The above commands (`black`, `pylint`, `mypy`, `pytest`) should all be run before submitting a pull request.
+
+If making changes to the documentation you can preview the changes locally using `mkdocs`. Changes to the `README.md` can be previewed using a tool like [`grip`](https://github.com/joeyespo/grip) (installable via `pip install grip`).
 
 ```shell
 mkdocs serve
+# For README preview (after installing grip):
+# grip
 ```
 
 !!! note

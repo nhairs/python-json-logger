@@ -32,7 +32,7 @@ You can modify the `dict` of data that will be logged by overriding the `process
 
 ```python
 class SillyFormatter(JsonFormatter):
-    def process_log_record(log_record):
+    def process_log_record(self, log_record):
         new_record = {k[::-1]: v for k, v in log_record.items()}
         return new_record
 ```
@@ -92,7 +92,7 @@ def generate_request_id():
 
 class RequestIdFilter(logging.Filter):
     def filter(self, record):
-        record.record_id = get_request_id()
+        record.request_id = get_request_id() # Add request_id to the LogRecord
         return True
 
 request_id_filter = RequestIdFilter()
@@ -137,9 +137,11 @@ def main_3():
 main_3()
 ```
 
-## Using `fileConfig`
+## Using Dictionary-based Configuration (e.g., from YAML)
 
-To use the module with a yaml config file using the [`fileConfig` function](https://docs.python.org/3/library/logging.config.html#logging.config.fileConfig), use the class `pythonjsonlogger.json.JsonFormatter`. Here is a sample config file:
+While Python's [`logging.config.fileConfig`](https://docs.python.org/3/library/logging.config.html#logging.config.fileConfig) is designed for INI-style configuration files, [`logging.config.dictConfig`](https://docs.python.org/3/library/logging.config.html#logging.config.dictConfig) is used for dictionary-based configurations, often loaded from YAML or JSON files.
+
+To use `python-json-logger` with such a configuration, you specify the formatter class (e.g., `pythonjsonlogger.json.JsonFormatter`) in your dictionary. Here is a sample configuration loaded from a YAML file:
 
 ```yaml title="example_config.yaml"
 version: 1

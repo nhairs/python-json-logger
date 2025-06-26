@@ -89,7 +89,8 @@ formatter = JsonFormatter(
     defaults={"environment": "dev"}
 )
 # ...
-logger.info("this overwrites the environment field", extras={"environment": "dev"})
+# logger.info("this message will have environment=dev by default")
+logger.info("this overwrites the environment field", extra={"environment": "prod"})
 ```
 
 #### Static Fields
