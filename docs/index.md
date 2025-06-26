@@ -42,7 +42,6 @@ handler.setFormatter(JsonFormatter())
 logger.addHandler(handler)
 
 logger.info("Logging using python-json-logger!", extra={"more_data": True})
-# Expected output:
 # {"message": "Logging using python-json-logger!", "more_data": true}
 ```
 
