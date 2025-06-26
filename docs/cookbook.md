@@ -148,6 +148,7 @@ formatters:
   default:
     "()": pythonjsonlogger.json.JsonFormatter
     format: "%(asctime)s %(levelname)s %(name)s %(module)s %(funcName)s %(lineno)s %(message)s"
+    json_default: ext://logging_config.my_json_default
     rename_fields:
       "asctime": "timestamp"
       "levelname": "status"
@@ -178,11 +179,21 @@ loggers:
     propagate: no
 ```
 
-You'll notice that we are using `ext://...` for the `static_fields`. This will load data from other modules such as the one below.
+You'll notice that we are using `ext://...` for `json_default` and`static_fields`. This will load data from other modules such as the one below.
 
 ```python title="logging_config.py"
 import importlib.metadata
 import os
+
+
+class Dummy:
+    pass
+
+
+def my_json_default(obj: Any) -> Any:
+    if isinstance(obj, Dummy):
+        return "DUMMY"
+    return obj
 
 
 def get_version_metadata():

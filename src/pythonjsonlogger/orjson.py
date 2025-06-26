@@ -6,7 +6,7 @@
 from __future__ import annotations
 
 ## Standard Library
-from typing import Any
+from typing import Any, Optional, Callable
 
 ## Installed
 
@@ -45,7 +45,7 @@ class OrjsonFormatter(core.BaseJsonFormatter):
     def __init__(
         self,
         *args,
-        json_default: core.OptionalCallableOrStr = orjson_default,
+        json_default: Optional[Callable] = orjson_default,
         json_indent: bool = False,
         **kwargs,
     ) -> None:
@@ -58,7 +58,7 @@ class OrjsonFormatter(core.BaseJsonFormatter):
         """
         super().__init__(*args, **kwargs)
 
-        self.json_default = core.str_to_object(json_default)
+        self.json_default = json_default
         self.json_indent = json_indent
         return
 
