@@ -4,11 +4,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [UNRELEASED]
+## [4.0.0](https://github.com/nhairs/python-json-logger/compare/v3.3.3...v4.0.0) - UNRELEASED
 
 ### Added
 - Support `DictConfigurator` prefixes for `rename_fields` and `static_fields`. [#45](https://github.com/nhairs/python-json-logger/pull/45)
   - Allows using values like `ext://sys.stderr` in `fileConfig`/`dictConfig` value fields.
+
+### Removed
+- Remove support for providing strings instead of objects when instantiating formatters. Instead use the `DictConfigurator` `ext://` prefix format when using `fileConfig`/`dictConfig`. [#47](https://github.com/nhairs/python-json-logger/issues/47)
+    - Affects `pythonjsonlogger.json.JsonFormatter`: `json_default`, `json_encoder`, `json_serializer`.
+    - Affects `pythonjsonlogger.orjson.OrjsonFormatter`: `json_default`.
+    - Affects `pythonjsonlogger.msgspec.MsgspecFormatter`: `json_default`.
 
 Thanks @rubensa
 
