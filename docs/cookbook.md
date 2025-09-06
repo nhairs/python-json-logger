@@ -92,7 +92,7 @@ def generate_request_id():
 
 class RequestIdFilter(logging.Filter):
     def filter(self, record):
-        record.record_id = get_request_id()
+        record.request_id = get_request_id() # Add request_id to the LogRecord
         return True
 
 request_id_filter = RequestIdFilter()

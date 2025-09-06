@@ -118,7 +118,7 @@ class BaseJsonFormatter(logging.Formatter):
 
     *Changed in 3.2*: `defaults` argument is no longer ignored.
 
-    *Added in 4.0*: `exc_info_as_array` and `stack_info_as_array` options are added.
+    *Added in 3.3*: `exc_info_as_array` and `stack_info_as_array` options are added.
     """
 
     _style: Union[logging.PercentStyle, str]  # type: ignore[assignment]

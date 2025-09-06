@@ -89,7 +89,8 @@ formatter = JsonFormatter(
     defaults={"environment": "dev"}
 )
 # ...
-logger.info("this overwrites the environment field", extras={"environment": "dev"})
+logger.info("this message will have environment=dev by default")
+logger.info("this overwrites the environment field", extra={"environment": "prod"})
 ```
 
 #### Static Fields
@@ -104,7 +105,7 @@ formatter = JsonFormatter(
 
 ### Excluding fields
 
-You can prevent fields being added to the output data by adding them to `reserved_attrs`. By default all [`LogRecord` attributes](https://docs.python.org/3/library/logging.html#logrecord-attributes) are exluded.
+You can prevent fields being added to the output data by adding them to `reserved_attrs`. By default all [`LogRecord` attributes](https://docs.python.org/3/library/logging.html#logrecord-attributes) are excluded.
 
 ```python
 from pythonjsonlogger.core import RESERVED_ATTRS
