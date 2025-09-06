@@ -158,12 +158,22 @@ def test_default_format(env: LoggingEnvironment, class_: type[BaseJsonFormatter]
 
 @pytest.mark.parametrize("class_", ALL_FORMATTERS)
 def test_percentage_format(env: LoggingEnvironment, class_: type[BaseJsonFormatter]):
-    env.set_formatter(
-        class_(
-            # All kind of different styles to check the regex
-            "[%(levelname)8s] %(message)s %(filename)s:%(lineno)d %(asctime)"
-        )
-    )
+    # Note: We use different %s styles in the format to check the regex correctly collects them
+    env.set_formatter(class_("[%(levelname)8s] %(message)s %(filename)s:%(lineno)d %(asctime)"))
+
+    msg = "testing logging format"
+    env.logger.info(msg)
+    log_json = env.load_json()
+
+    assert log_json["message"] == msg
+    assert log_json.keys() == {"levelname", "message", "filename", "lineno", "asctime"}
+    return
+
+
+@pytest.mark.parametrize("class_", ALL_FORMATTERS)
+def test_comma_format(env: LoggingEnvironment, class_: type[BaseJsonFormatter]):
+    # Note: we have double comma `,,` to test handling "empty" names
+    env.set_formatter(class_("levelname,,message,filename,lineno,asctime,", style=","))
 
     msg = "testing logging format"
     env.logger.info(msg)

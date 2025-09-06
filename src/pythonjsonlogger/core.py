@@ -175,10 +175,16 @@ class BaseJsonFormatter(logging.Formatter):
         - Renaming fields now preserves the order that fields were added in and avoids adding
           missing fields. The original behaviour, missing fields have a value of `None`, is still
           available by setting `rename_fields_keep_missing` to `True`.
+
+        *Added in 4.0*:
+
+        - `fmt` now supports comma seperated lists (`style=","`). Note that this style is specific
+          to `python-json-logger` and thus care should be taken to not to pass this format to other
+          logging Formatter implementations.
         """
         ## logging.Formatter compatibility
         ## ---------------------------------------------------------------------
-        # Note: validate added in 3.8, defaults added in 3.10
+        # Note: validate added in python 3.8, defaults added in 3.10
         if style in logging._STYLES:
             _style = logging._STYLES[style][0](fmt)  # type: ignore[operator]
             if validate:
@@ -186,12 +192,14 @@ class BaseJsonFormatter(logging.Formatter):
             self._style = _style
             self._fmt = _style._fmt
 
-        elif not validate:
+        elif style == "," or not validate:
             self._style = style
             self._fmt = fmt
 
+            # TODO: Validate comma format
+
         else:
-            raise ValueError(f"Style must be one of: {','.join(logging._STYLES.keys())}")
+            raise ValueError("Style must be one of: '%{$,'")
 
         self.datefmt = datefmt
 
@@ -271,6 +279,12 @@ class BaseJsonFormatter(logging.Formatter):
         Returns:
             list of fields to be extracted and serialized
         """
+        if self._fmt is None:
+            return []
+
+        if isinstance(self._style, str) and self._style == ",":
+            return [field.strip() for field in self._fmt.split(",") if field.strip()]
+
         if isinstance(self._style, logging.StringTemplateStyle):
             formatter_style_pattern = STYLE_STRING_TEMPLATE_REGEX
 
@@ -285,10 +299,7 @@ class BaseJsonFormatter(logging.Formatter):
         else:
             raise ValueError(f"Style {self._style!r} is not supported")
 
-        if self._fmt:
-            return formatter_style_pattern.findall(self._fmt)
-
-        return []
+        return formatter_style_pattern.findall(self._fmt)
 
     def serialize_log_record(self, log_data: LogData) -> str:
         """Returns the final representation of the data to be logged
