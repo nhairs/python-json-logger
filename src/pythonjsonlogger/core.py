@@ -184,7 +184,7 @@ class BaseJsonFormatter(logging.Formatter):
         """
         ## logging.Formatter compatibility
         ## ---------------------------------------------------------------------
-        # Note: validate added in 3.8, defaults added in 3.10
+        # Note: validate added in python 3.8, defaults added in 3.10
         if style in logging._STYLES:
             _style = logging._STYLES[style][0](fmt)  # type: ignore[operator]
             if validate:
@@ -195,6 +195,8 @@ class BaseJsonFormatter(logging.Formatter):
         elif style == "," or not validate:
             self._style = style
             self._fmt = fmt
+
+            # TODO: Validate comma format
 
         else:
             raise ValueError(f"Style must be one of: {','.join(logging._STYLES.keys())}")
@@ -278,15 +280,9 @@ class BaseJsonFormatter(logging.Formatter):
             list of fields to be extracted and serialized
         """
         if self._fmt is None:
-            # TODO: does it matter that we do this before checking if the style is valid?
-            # (we already (mostly) check for valid style names in __init__
             return []
 
         if isinstance(self._style, str) and self._style == ",":
-            # TODO: should we check that there are no empty fields?
-            # If yes we should do this in __init__ where we validate other styles?
-            # Do we drop empty fields?
-            # etc
             return [field.strip() for field in self._fmt.split(",") if field.strip()]
 
         if isinstance(self._style, logging.StringTemplateStyle):

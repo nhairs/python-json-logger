@@ -158,7 +158,7 @@ def test_default_format(env: LoggingEnvironment, class_: type[BaseJsonFormatter]
 
 @pytest.mark.parametrize("class_", ALL_FORMATTERS)
 def test_percentage_format(env: LoggingEnvironment, class_: type[BaseJsonFormatter]):
-    # Note: All kind of different %s styles to check the regex
+    # Note: We use different %s styles in the format to check the regex correctly collects them
     env.set_formatter(class_("[%(levelname)8s] %(message)s %(filename)s:%(lineno)d %(asctime)"))
 
     msg = "testing logging format"
