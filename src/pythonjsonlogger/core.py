@@ -199,7 +199,7 @@ class BaseJsonFormatter(logging.Formatter):
             # TODO: Validate comma format
 
         else:
-            raise ValueError(f"Style must be one of: {','.join(logging._STYLES.keys())}")
+            raise ValueError("Style must be one of: '%{$,'")
 
         self.datefmt = datefmt
 
