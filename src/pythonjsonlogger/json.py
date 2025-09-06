@@ -96,10 +96,10 @@ class JsonFormatter(core.BaseJsonFormatter):
             self.json_encoder = JsonEncoder
         return
 
-    def jsonify_log_record(self, log_record: core.LogRecord) -> str:
-        """Returns a json string of the log record."""
+    def jsonify_log_record(self, log_data: core.LogData) -> str:
+        """Returns a json string of the log data."""
         return self.json_serializer(
-            log_record,
+            log_data,
             default=self.json_default,
             cls=self.json_encoder,
             indent=self.json_indent,

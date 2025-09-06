@@ -32,8 +32,8 @@ You can modify the `dict` of data that will be logged by overriding the `process
 
 ```python
 class SillyFormatter(JsonFormatter):
-    def process_log_record(self, log_record):
-        new_record = {k[::-1]: v for k, v in log_record.items()}
+    def process_log_record(log_data):
+        new_record = {k[::-1]: v for k, v in log_data.items()}
         return new_record
 ```
 
@@ -119,9 +119,9 @@ Another method would be to create a custom formatter class and override the `pro
 ## -----------------------------------------------------------------------------
 # Reuse REQUEST_ID stuff from solution 2
 class MyFormatter(JsonFormatter):
-    def process_log_record(self, log_record):
-        log_record["request_id"] = get_request_id()
-        return log_record
+    def process_log_record(self, log_data):
+        log_data["request_id"] = get_request_id()
+        return log_data
 
 handler.setFormatter(MyFormatter())
 
