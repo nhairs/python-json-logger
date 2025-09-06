@@ -128,7 +128,7 @@ class BaseJsonFormatter(logging.Formatter):
     # pylint: disable=too-many-arguments,super-init-not-called
     def __init__(
         self,
-        fmt: Optional[str] = None,
+        fmt: Optional[Union[str, Sequence[str]]] = None,
         datefmt: Optional[str] = None,
         style: str = "%",
         validate: bool = True,
@@ -145,11 +145,11 @@ class BaseJsonFormatter(logging.Formatter):
     ) -> None:
         """
         Args:
-            fmt: string representing fields to log
+            fmt: String format or `Sequence` of field names of fields to log.
             datefmt: format to use when formatting `asctime` field
-            style: how to extract log fields from `fmt`
+            style: how to extract log fields from `fmt`. Ignored if `fmt` is a `Sequence[str]`.
             validate: validate `fmt` against style, if implementing a custom `style` you
-                must set this to `False`.
+                must set this to `False`. Ignored if `fmt` is a `Sequence[str]`.
             defaults: a dictionary containing default fields that are added before all other fields and
                 may be overridden. The supplied fields are still subject to `rename_fields`.
             prefix: an optional string prefix added at the beginning of
@@ -181,25 +181,34 @@ class BaseJsonFormatter(logging.Formatter):
         - `fmt` now supports comma seperated lists (`style=","`). Note that this style is specific
           to `python-json-logger` and thus care should be taken to not to pass this format to other
           logging Formatter implementations.
+        - `fmt` now supports sequences of strings (e.g. lists and tuples) of field names.
         """
         ## logging.Formatter compatibility
         ## ---------------------------------------------------------------------
         # Note: validate added in python 3.8, defaults added in 3.10
-        if style in logging._STYLES:
-            _style = logging._STYLES[style][0](fmt)  # type: ignore[operator]
-            if validate:
-                _style.validate()
-            self._style = _style
-            self._fmt = _style._fmt
+        if fmt is None or isinstance(fmt, str):
+            if style in logging._STYLES:
+                _style = logging._STYLES[style][0](fmt)  # type: ignore[operator]
+                if validate:
+                    _style.validate()
+                self._style = _style
+                self._fmt = _style._fmt
 
-        elif style == "," or not validate:
-            self._style = style
-            self._fmt = fmt
+            elif style == "," or not validate:
+                self._style = style
+                self._fmt = fmt
+                # TODO: Validate comma format
 
-            # TODO: Validate comma format
+            else:
+                raise ValueError("Style must be one of: '%{$,'")
 
-        else:
-            raise ValueError("Style must be one of: '%{$,'")
+            self._required_fields = self.parse()
+
+        # Note: we do this check second as string is still a Sequence[str]
+        elif isinstance(fmt, Sequence):
+            self._style = "__sequence__"
+            self._fmt = str(fmt)
+            self._required_fields = list(fmt)
 
         self.datefmt = datefmt
 
@@ -221,7 +230,6 @@ class BaseJsonFormatter(logging.Formatter):
         self.reserved_attrs = set(reserved_attrs if reserved_attrs is not None else RESERVED_ATTRS)
         self.timestamp = timestamp
 
-        self._required_fields = self.parse()
         self._skip_fields = set(self._required_fields)
         self._skip_fields.update(self.reserved_attrs)
         self.defaults = defaults if defaults is not None else {}
@@ -282,8 +290,14 @@ class BaseJsonFormatter(logging.Formatter):
         if self._fmt is None:
             return []
 
-        if isinstance(self._style, str) and self._style == ",":
-            return [field.strip() for field in self._fmt.split(",") if field.strip()]
+        if isinstance(self._style, str):
+            if self._style == "__sequence__":
+                raise RuntimeError("Must not call parse when fmt is a sequence of strings")
+
+            if self._style == ",":
+                return [field.strip() for field in self._fmt.split(",") if field.strip()]
+
+            raise ValueError(f"Style {self._style!r} is not supported")
 
         if isinstance(self._style, logging.StringTemplateStyle):
             formatter_style_pattern = STYLE_STRING_TEMPLATE_REGEX
