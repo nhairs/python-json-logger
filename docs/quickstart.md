@@ -45,10 +45,23 @@ logger.addHandler(logHandler)
 ### Output fields
 
 #### Required Fields
-You can control the logged fields by setting the `fmt` argument when creating the formatter. By default formatters will follow the same `style` of `fmt` as the `logging` module: `%`, `$`, and `{`. All [`LogRecord` attributes](https://docs.python.org/3/library/logging.html#logrecord-attributes) can be output using their name.
+You can control the logged fields by setting the `fmt` argument when creating the formatter. A variety of different formats are supported including:
+
+- Standard library formats: where `style` is one of `%`, `$`, or `{`. This allows using Python JSON Logger Formatters with your existing config.
+- Comma format: where `style` is `,` which simplifies the writing of formats where you can't use more complex formats.
+- A sequence of string: e.g. lists or tuples.
+
+All [`LogRecord` attributes](https://docs.python.org/3/library/logging.html#logrecord-attributes) can be output using their name.
 
 ```python
+# Standard library format
 formatter = JsonFormatter("{message}{asctime}{exc_info}", style="{")
+
+# Comma format
+formatter = JsonFormatter("message,asctime,exc_info", style=",")
+
+# Sequence of strings format
+formatter = JsonFormatter(["message", "asctime", "exc_info"])
 ```
 
 #### Message Fields
