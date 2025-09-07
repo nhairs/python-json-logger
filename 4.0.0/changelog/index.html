@@ -1798,20 +1798,26 @@ and this project adheres to <a href="https://semver.org/spec/v2.0.0.html">Semant
 </ul>
 <h3 id="changed">Changed<a class="headerlink" href="#changed" title="Permanent link">🔗</a></h3>
 <ul>
-<li>Rename <code>pythonjsonlogger.core.LogRecord</code> and <code>log_record</code> arguments to avoid confusion / overlapping with <code>logging.LogRecord</code>. <a href="https://github.com/nhairs/python-json-logger/issues/38">#38</a>
-    - Affects arguments to <code>pythonjsonlogger.core.BaseJsonFormatter</code> (and any child classes).
-        - <code>serialize_log_record</code>
-        - <code>add_fields</code>
-        - <code>jsonify_log_record</code>
-        - <code>process_log_record</code>
-    - Note: functions referring to <code>log_record</code> have <strong>not</strong> had their function name changed.</li>
+<li>Rename <code>pythonjsonlogger.core.LogRecord</code> and <code>log_record</code> arguments to avoid confusion / overlapping with <code>logging.LogRecord</code>. <a href="https://github.com/nhairs/python-json-logger/issues/38">#38</a><ul>
+<li>Affects arguments to <code>pythonjsonlogger.core.BaseJsonFormatter</code> (and any child classes).<ul>
+<li><code>serialize_log_record</code></li>
+<li><code>add_fields</code></li>
+<li><code>jsonify_log_record</code></li>
+<li><code>process_log_record</code></li>
+</ul>
+</li>
+<li>Note: functions referring to <code>log_record</code> have <strong>not</strong> had their function name changed.</li>
+</ul>
+</li>
 </ul>
 <h3 id="removed">Removed<a class="headerlink" href="#removed" title="Permanent link">🔗</a></h3>
 <ul>
-<li>Remove support for providing strings instead of objects when instantiating formatters. Instead use the <code>DictConfigurator</code> <code>ext://</code> prefix format when using <code>fileConfig</code>/<code>dictConfig</code>. <a href="https://github.com/nhairs/python-json-logger/issues/47">#47</a>
-    - Affects <code>pythonjsonlogger.json.JsonFormatter</code>: <code>json_default</code>, <code>json_encoder</code>, <code>json_serializer</code>.
-    - Affects <code>pythonjsonlogger.orjson.OrjsonFormatter</code>: <code>json_default</code>.
-    - Affects <code>pythonjsonlogger.msgspec.MsgspecFormatter</code>: <code>json_default</code>.</li>
+<li>Remove support for providing strings instead of objects when instantiating formatters. Instead use the <code>DictConfigurator</code> <code>ext://</code> prefix format when using <code>fileConfig</code>/<code>dictConfig</code>. <a href="https://github.com/nhairs/python-json-logger/issues/47">#47</a><ul>
+<li>Affects <code>pythonjsonlogger.json.JsonFormatter</code>: <code>json_default</code>, <code>json_encoder</code>, <code>json_serializer</code>.</li>
+<li>Affects <code>pythonjsonlogger.orjson.OrjsonFormatter</code>: <code>json_default</code>.</li>
+<li>Affects <code>pythonjsonlogger.msgspec.MsgspecFormatter</code>: <code>json_default</code>.</li>
+</ul>
+</li>
 </ul>
 <p>Thanks @rubensa</p>
 <h2 id="330-2025-03-06"><a href="https://github.com/nhairs/python-json-logger/compare/v3.2.1...v3.3.0">3.3.0</a> - 2025-03-06<a class="headerlink" href="#330-2025-03-06" title="Permanent link">🔗</a></h2>
