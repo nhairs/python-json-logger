@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.1.0](https://github.com/nhairs/python-json-logger/compare/v4.0.0...v4.1.0) - UNRELEASED
+
+### Added
+- Add support for Python 3.14, PyPy 3.11
+
 ## [4.0.0](https://github.com/nhairs/python-json-logger/compare/v3.3.3...v4.0.0) - 2025-10-06
 
 ### Added
