@@ -32,7 +32,7 @@ You can modify the `dict` of data that will be logged by overriding the `process
 
 ```python
 class SillyFormatter(JsonFormatter):
-    def process_log_record(log_data):
+    def process_log_record(self, log_data):
         new_record = {k[::-1]: v for k, v in log_data.items()}
         return new_record
 ```
