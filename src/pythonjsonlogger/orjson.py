@@ -15,7 +15,7 @@ from . import core
 from . import defaults as d
 from .utils import package_is_available
 
-# We import msgspec after checking it is available
+# We import orjson after checking it is available
 package_is_available("orjson", throw_error=True)
 import orjson  # pylint: disable=wrong-import-position,wrong-import-order
 
