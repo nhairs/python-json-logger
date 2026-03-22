@@ -51,7 +51,7 @@ dev = [
     "orjson;implementation_name!='pypy'",
     "simplejson",
     "types-simplejson",
-    "ujson",
+    "ujson;implementation_name!='pypy'",
     ## Lint
     "validate-pyproject[all]",
     "black",
