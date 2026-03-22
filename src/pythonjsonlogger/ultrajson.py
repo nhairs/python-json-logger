@@ -58,7 +58,7 @@ class UltraJsonFormatter(core.BaseJsonFormatter):
 
         `bytes` can only be encoded if they are valid `utf-8`.
 
-
+    New in `4.1`
     """
 
     def __init__(
