@@ -111,6 +111,14 @@ You must open an issue before creating a pull request.
 
 For examples of how to support a third-party encoder see `orjson.py` and `msgspec.py`.
 
+The following encoders have been considered and rejected:
+
+- [python-rapidjson](https://github.com/python-rapidjson/python-rapidjson) - As of 2026-03-22 is ranked ~1800 with ~4.5M downloads / month.
+- [pysimdjson](https://github.com/TkTech/pysimdjson) - as of 2026-03-22 is ranked ~4200 with >1M downloads / month.
+- [yapic.json](https://github.com/zozzz/yapic.json) - as of 2026-03-22 is not in top 15K packages.
+- [cysimdjson](https://github.com/TeskaLabs/cysimdjson) - as of 2026-03-22 is not in top 15K packages.
+- [yapic.json](https://github.com/zozzz/yapic.json) - as of 2026-03-22 is not in top 15K packages.
+
 ### Versioning and breaking compatability
 
 This project uses semantic versioning.
