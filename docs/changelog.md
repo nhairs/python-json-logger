@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Add support for Python 3.14, PyPy 3.11
+- Add support for [simplejson](https://github.com/simplejson/simplejson)
+- Add support for [ultrajson](https://github.com/ultrajson/ultrajson/tree/main?tab=readme-ov-file#project-status) (`ujson`)
 
 ## [4.0.0](https://github.com/nhairs/python-json-logger/compare/v3.3.3...v4.0.0) - 2025-10-06
 

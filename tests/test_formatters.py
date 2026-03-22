@@ -31,19 +31,33 @@ import pythonjsonlogger.defaults
 from pythonjsonlogger.core import RESERVED_ATTRS, BaseJsonFormatter, merge_record_extra
 from pythonjsonlogger.json import JsonFormatter
 
+if pythonjsonlogger.MSGSPEC_AVAILABLE:
+    from pythonjsonlogger.msgspec import MsgspecFormatter
+
 if pythonjsonlogger.ORJSON_AVAILABLE:
     from pythonjsonlogger.orjson import OrjsonFormatter
 
-if pythonjsonlogger.MSGSPEC_AVAILABLE:
-    from pythonjsonlogger.msgspec import MsgspecFormatter
+if pythonjsonlogger.SIMPLEJSON_AVAILABLE:
+    from pythonjsonlogger.simplejson import SimpleJsonFormatter
+
+if pythonjsonlogger.ULTRAJSON_AVAILABLE:
+    from pythonjsonlogger.ultrajson import UltraJsonFormatter
 
 ### SETUP
 ### ============================================================================
 ALL_FORMATTERS: list[type[BaseJsonFormatter]] = [JsonFormatter]
-if pythonjsonlogger.ORJSON_AVAILABLE:
-    ALL_FORMATTERS.append(OrjsonFormatter)
+
 if pythonjsonlogger.MSGSPEC_AVAILABLE:
     ALL_FORMATTERS.append(MsgspecFormatter)
+
+if pythonjsonlogger.ORJSON_AVAILABLE:
+    ALL_FORMATTERS.append(OrjsonFormatter)
+
+if pythonjsonlogger.SIMPLEJSON_AVAILABLE:
+    ALL_FORMATTERS.append(SimpleJsonFormatter)
+
+if pythonjsonlogger.ULTRAJSON_AVAILABLE:
+    ALL_FORMATTERS.append(UltraJsonFormatter)
 
 _LOGGER_COUNT = 0
 
@@ -543,7 +557,15 @@ def test_default_encoder_with_timestamp(env: LoggingEnvironment, class_: type[Ba
     env.logger.info("Hello")
     log_json = env.load_json()
 
-    assert log_json["timestamp"] == "2017-07-14T02:40:00+00:00"
+    expected = "2017-07-14T02:40:00+00:00"
+
+    if (pythonjsonlogger.SIMPLEJSON_AVAILABLE and class_ is SimpleJsonFormatter) or (
+        pythonjsonlogger.ULTRAJSON_AVAILABLE and class_ is UltraJsonFormatter
+    ):
+        # simplejson and ujson do not use sep=T
+        expected = expected.replace("T", " ")
+
+    assert log_json["timestamp"] == expected
     return
 
 
@@ -615,6 +637,29 @@ def test_common_types_encoded(
             )
         ):
             pytest.xfail()
+
+    if (pythonjsonlogger.SIMPLEJSON_AVAILABLE and class_ is SimpleJsonFormatter) or (
+        pythonjsonlogger.ULTRAJSON_AVAILABLE and class_ is UltraJsonFormatter
+    ):
+        if obj == b"fancy-bytes-\xf0\xf1":
+            # simplejson attempts to encode using `utf-8` and thus does not support arbitrary bytes
+            # ultrajson prevents bytes or errors when receiving non `utf-8` bytes
+            pytest.xfail()
+
+    ## Overrides
+    if (pythonjsonlogger.SIMPLEJSON_AVAILABLE and class_ is SimpleJsonFormatter) or (
+        pythonjsonlogger.ULTRAJSON_AVAILABLE and class_ is UltraJsonFormatter
+    ):
+        if isinstance(obj, datetime.datetime):
+            # simplejson and ujson do not use sep=T
+            expected = expected.replace("T", " ")
+
+        elif obj is MultiEnum.BYTES or obj == b"some-bytes":
+            expected = "some-bytes"
+
+        elif obj is MultiEnum:
+            expected = list(expected)
+            expected[4] = "some-bytes"
 
     ## Test
     env.set_formatter(class_())

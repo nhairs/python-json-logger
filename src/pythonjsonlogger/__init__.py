@@ -13,5 +13,7 @@ from . import utils
 
 ### CONSTANTS
 ### ============================================================================
-ORJSON_AVAILABLE = utils.package_is_available("orjson")
 MSGSPEC_AVAILABLE = utils.package_is_available("msgspec")
+ORJSON_AVAILABLE = utils.package_is_available("orjson")
+SIMPLEJSON_AVAILABLE = utils.package_is_available("simplejson")
+ULTRAJSON_AVAILABLE = utils.package_is_available("ujson")

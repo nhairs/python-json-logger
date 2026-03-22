@@ -47,8 +47,11 @@ GitHub = "https://github.com/nhairs/python-json-logger"
 [project.optional-dependencies]
 dev = [
     ## Optional but required for dev
-    "orjson;implementation_name!='pypy'",
     "msgspec;implementation_name!='pypy'",
+    "orjson;implementation_name!='pypy'",
+    "simplejson",
+    "types-simplejson",
+    "ujson",
     ## Lint
     "validate-pyproject[all]",
     "black",
