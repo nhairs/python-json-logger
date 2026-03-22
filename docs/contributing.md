@@ -105,7 +105,11 @@ If you're not familiar with code review start by reading [this guide](https://go
 
 ### Adding a new encoder
 
-New encoders may be added, however how popular / common a library is will be taken into consideration before being added. You should open an issue before creating a pull request.
+New encoders may be added depending on their popularity. Only encoders [in the top 1000 packages](https://hugovk.github.io/top-pypi-packages/) or with monthly downloads exceeding 10M/month will be considered.
+
+You must open an issue before creating a pull request.
+
+For examples of how to support a third-party encoder see `orjson.py` and `msgspec.py`.
 
 ### Versioning and breaking compatability
 
