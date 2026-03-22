@@ -558,6 +558,7 @@ def test_default_encoder_with_timestamp(env: LoggingEnvironment, class_: type[Ba
         (False, bool, False),
         (None, type(None), None),
         (b"some-bytes", str, "c29tZS1ieXRlcw=="),
+        (b"fancy-bytes-\xf0\xf1", str, "ZmFuY3ktYnl0ZXMt8PE="),
         (datetime.time(16, 45, 30, 100), str, "16:45:30.000100"),
         (datetime.date(2024, 5, 5), str, "2024-05-05"),
         (datetime.datetime(2024, 5, 5, 16, 45, 30, 100), str, "2024-05-05T16:45:30.000100"),
