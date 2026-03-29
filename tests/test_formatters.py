@@ -13,13 +13,10 @@ import logging
 import sys
 import traceback
 from types import TracebackType
-from typing import Any, Generator
+from typing import Any
+from collections.abc import Generator
 import uuid
-
-if sys.version_info >= (3, 9):
-    import zoneinfo
-else:
-    from backports import zoneinfo
+import zoneinfo
 
 ## Installed
 import freezegun
@@ -63,7 +60,7 @@ class LoggingEnvironment:
 
 
 @pytest.fixture
-def env() -> Generator[LoggingEnvironment, None, None]:
+def env() -> Generator[LoggingEnvironment]:
     global _LOGGER_COUNT  # pylint: disable=global-statement
     _LOGGER_COUNT += 1
     logger = logging.getLogger(f"pythonjsonlogger.tests.{_LOGGER_COUNT}")

@@ -6,7 +6,8 @@
 from __future__ import annotations
 
 ## Standard Library
-from typing import Any, Optional, Callable
+from typing import Any
+from collections.abc import Callable
 
 ## Installed
 
@@ -43,7 +44,7 @@ class MsgspecFormatter(core.BaseJsonFormatter):
     def __init__(
         self,
         *args,
-        json_default: Optional[Callable] = msgspec_default,
+        json_default: Callable | None = msgspec_default,
         **kwargs,
     ) -> None:
         """

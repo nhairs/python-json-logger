@@ -9,7 +9,8 @@ import io
 import json
 import logging
 import logging.config
-from typing import Any, Generator
+from typing import Any
+from collections.abc import Generator
 
 ## Installed
 import pytest
@@ -64,7 +65,7 @@ class LoggingEnvironment:
 
 
 @pytest.fixture
-def env() -> Generator[LoggingEnvironment, None, None]:
+def env() -> Generator[LoggingEnvironment]:
     global _LOGGER_COUNT  # pylint: disable=global-statement
     _LOGGER_COUNT += 1
     logging.config.dictConfig(LOGGING_CONFIG)

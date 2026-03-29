@@ -10,12 +10,8 @@ from datetime import datetime, timezone
 import logging
 import re
 import sys
-from typing import Optional, Union, List, Dict, Container, Any, Sequence
-
-if sys.version_info >= (3, 10):
-    from typing import TypeAlias
-else:
-    from typing_extensions import TypeAlias
+from typing import TypeAlias, Any
+from collections.abc import Container, Sequence
 
 ## Installed
 
@@ -24,7 +20,7 @@ else:
 
 ### CONSTANTS
 ### ============================================================================
-RESERVED_ATTRS: List[str] = [
+RESERVED_ATTRS: list[str] = [
     "args",
     "asctime",
     "created",
@@ -71,7 +67,7 @@ STYLE_PERCENT_REGEX = re.compile(r"%\((.+?)\)", re.IGNORECASE)  # % style
 
 ## Type Aliases
 ## -----------------------------------------------------------------------------
-LogData: TypeAlias = Dict[str, Any]
+LogData: TypeAlias = dict[str, Any]
 """Type alias
 
 *Changed in 4.0*: renamed from `LogRecord` to `LogData`
@@ -82,10 +78,10 @@ LogData: TypeAlias = Dict[str, Any]
 ### ============================================================================
 def merge_record_extra(
     record: logging.LogRecord,
-    target: Dict,
+    target: dict[Any, Any],
     reserved: Container[str],
-    rename_fields: Optional[Dict[str, str]] = None,
-) -> Dict:
+    rename_fields: dict[str, str] | None = None,
+) -> dict[Any, Any]:
     """
     Merges extra attributes from LogRecord object into target dictionary
 
@@ -121,25 +117,25 @@ class BaseJsonFormatter(logging.Formatter):
     *Added in 3.3*: `exc_info_as_array` and `stack_info_as_array` options are added.
     """
 
-    _style: Union[logging.PercentStyle, str]  # type: ignore[assignment]
+    _style: logging.PercentStyle | str  # type: ignore[assignment]
 
     ## Parent Methods
     ## -------------------------------------------------------------------------
     # pylint: disable=too-many-arguments,super-init-not-called
     def __init__(
         self,
-        fmt: Optional[Union[str, Sequence[str]]] = None,
-        datefmt: Optional[str] = None,
+        fmt: str | Sequence[str] | None = None,
+        datefmt: str | None = None,
         style: str = "%",
         validate: bool = True,
         *,
         prefix: str = "",
-        rename_fields: Optional[Dict[str, str]] = None,
+        rename_fields: dict[str, str] | None = None,
         rename_fields_keep_missing: bool = False,
-        static_fields: Optional[Dict[str, Any]] = None,
-        reserved_attrs: Optional[Sequence[str]] = None,
-        timestamp: Union[bool, str] = False,
-        defaults: Optional[Dict[str, Any]] = None,
+        static_fields: dict[str, Any] | None = None,
+        reserved_attrs: Sequence[str] | None = None,
+        timestamp: bool | str = False,
+        defaults: dict[str, Any] | None = None,
         exc_info_as_array: bool = False,
         stack_info_as_array: bool = False,
     ) -> None:
@@ -243,7 +239,7 @@ class BaseJsonFormatter(logging.Formatter):
         Args:
             record: the record to format
         """
-        message_dict: Dict[str, Any] = {}
+        message_dict: dict[str, Any] = {}
         # TODO: logging.LogRecord.msg and logging.LogRecord.message in typeshed
         #        are always type of str. We shouldn't need to override that.
         if isinstance(record.msg, dict):
@@ -276,7 +272,7 @@ class BaseJsonFormatter(logging.Formatter):
 
     ## JSON Formatter Specific Methods
     ## -------------------------------------------------------------------------
-    def parse(self) -> List[str]:
+    def parse(self) -> list[str]:
         """Parses format string looking for substitutions
 
         This method is responsible for returning a list of fields (as strings)
@@ -327,9 +323,9 @@ class BaseJsonFormatter(logging.Formatter):
 
     def add_fields(
         self,
-        log_data: Dict[str, Any],
+        log_data: dict[str, Any],
         record: logging.LogRecord,
-        message_dict: Dict[str, Any],
+        message_dict: dict[str, Any],
     ) -> None:
         """Extract fields from a LogRecord for logging
 
@@ -402,7 +398,7 @@ class BaseJsonFormatter(logging.Formatter):
         """
         return log_data
 
-    def formatException(self, ei) -> Union[str, list[str]]:  # type: ignore
+    def formatException(self, ei) -> str | list[str]:  # type: ignore[override]
         """Format and return the specified exception information.
 
         If exc_info_as_array is set to True, This method returns an array of strings.
@@ -410,7 +406,7 @@ class BaseJsonFormatter(logging.Formatter):
         exception_info_str = super().formatException(ei)
         return exception_info_str.splitlines() if self.exc_info_as_array else exception_info_str
 
-    def formatStack(self, stack_info) -> Union[str, list[str]]:  # type: ignore
+    def formatStack(self, stack_info) -> str | list[str]:  # type: ignore[override]
         """Format and return the specified stack information.
 
         If stack_info_as_array is set to True, This method returns an array of strings.

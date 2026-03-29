@@ -12,7 +12,8 @@ from __future__ import annotations
 ## Standard Library
 import datetime
 import json
-from typing import Any, Callable, Optional, Union
+from typing import Any
+from collections.abc import Callable
 import warnings
 
 ## Application
@@ -67,10 +68,10 @@ class JsonFormatter(core.BaseJsonFormatter):
     def __init__(
         self,
         *args,
-        json_default: Optional[Callable] = None,
-        json_encoder: Optional[Callable] = None,
+        json_default: Callable | None = None,
+        json_encoder: Callable | None = None,
         json_serializer: Callable = json.dumps,
-        json_indent: Optional[Union[int, str]] = None,
+        json_indent: int | str | None = None,
         json_ensure_ascii: bool = True,
         **kwargs,
     ) -> None:

@@ -16,16 +16,10 @@ import base64
 import dataclasses
 import datetime
 import enum
-import sys
 from types import TracebackType
-from typing import Any
+from typing import Any, TypeGuard
 import traceback
 import uuid
-
-if sys.version_info >= (3, 10):
-    from typing import TypeGuard
-else:
-    from typing_extensions import TypeGuard
 
 ## Installed
 

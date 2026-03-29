@@ -16,9 +16,6 @@ maintainers  = [
 
 # Dependency Information
 requires-python = ">=3.10"
-dependencies = [
-    "typing_extensions;python_version<'3.10'",
-]
 
 # Extra information
 readme = "README.md"
@@ -55,7 +52,6 @@ dev = [
     ## Test
     "pytest",
     "freezegun",
-    "backports.zoneinfo;python_version<'3.9'",
     "tzdata",
     ## Build
     "build",
