@@ -243,7 +243,7 @@ class BaseJsonFormatter(logging.Formatter):
         # TODO: logging.LogRecord.msg and logging.LogRecord.message in typeshed
         #        are always type of str. We shouldn't need to override that.
         if isinstance(record.msg, dict):
-            message_dict = record.msg
+            message_dict = record.msg.copy()
             record.message = ""
         else:
             record.message = record.getMessage()
