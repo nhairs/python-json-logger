@@ -394,6 +394,23 @@ def test_log_dict_defaults(env: LoggingEnvironment, class_: type[BaseJsonFormatt
 
 
 @pytest.mark.parametrize("class_", ALL_FORMATTERS)
+def test_log_dict_not_modified(env: LoggingEnvironment, class_: type[BaseJsonFormatter]):
+    env.set_formatter(class_())
+
+    msg = {"text": "testing logging", "nested": {"more": "data"}}
+    try:
+        raise ValueError("test")
+    except ValueError:
+        env.logger.exception(msg, stack_info=True)
+    log_json = env.load_json()
+
+    assert log_json["exc_info"]
+    assert log_json["stack_info"]
+    assert msg == {"text": "testing logging", "nested": {"more": "data"}}
+    return
+
+
+@pytest.mark.parametrize("class_", ALL_FORMATTERS)
 def test_log_extra(env: LoggingEnvironment, class_: type[BaseJsonFormatter]):
     env.set_formatter(class_())
 
