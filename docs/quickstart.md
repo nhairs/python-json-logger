@@ -79,6 +79,9 @@ logger.info({
 !!! warning
     Be aware that if you log using a `dict`, other formatters may not be able to handle it.
 
+!!! note
+    Your `dict` is not modified when the formatter adds fields such as `exc_info`.
+
 You can also add additional message fields using the `extra` argument.
 
 ```python

@@ -236,14 +236,20 @@ class BaseJsonFormatter(logging.Formatter):
     def format(self, record: logging.LogRecord) -> str:
         """Formats a log record and serializes to json
 
+        When `record.msg` is a `dict`, adding `exc_info` and `stack_info` does not
+        modify the caller's dict.
+
         Args:
             record: the record to format
+
+        *Changed in 4.2.0*: a `dict` `record.msg` is copied instead of modified
+        in place.
         """
         message_dict: dict[str, Any] = {}
         # TODO: logging.LogRecord.msg and logging.LogRecord.message in typeshed
         #        are always type of str. We shouldn't need to override that.
         if isinstance(record.msg, dict):
-            message_dict = record.msg
+            message_dict = record.msg.copy()
             record.message = ""
         else:
             record.message = record.getMessage()
