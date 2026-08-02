@@ -168,6 +168,22 @@ def test_percentage_format(env: LoggingEnvironment, class_: type[BaseJsonFormatt
 
 
 @pytest.mark.parametrize("class_", ALL_FORMATTERS)
+def test_string_template_format(env: LoggingEnvironment, class_: type[BaseJsonFormatter]):
+    # Note: string templates support both $name and ${name}, and $$ is an escaped literal $
+    env.set_formatter(
+        class_("$$literal $levelname ${message} $filename ${lineno} $asctime", style="$")
+    )
+
+    msg = "testing logging format"
+    env.logger.info(msg)
+    log_json = env.load_json()
+
+    assert log_json["message"] == msg
+    assert log_json.keys() == {"levelname", "message", "filename", "lineno", "asctime"}
+    return
+
+
+@pytest.mark.parametrize("class_", ALL_FORMATTERS)
 def test_comma_format(env: LoggingEnvironment, class_: type[BaseJsonFormatter]):
     # Note: we have double comma `,,` to test handling "empty" names
     env.set_formatter(class_("levelname,,message,filename,lineno,asctime,", style=","))
