@@ -61,7 +61,9 @@ if sys.version_info >= (3, 12):
     RESERVED_ATTRS.sort()
 
 
-STYLE_STRING_TEMPLATE_REGEX = re.compile(r"\$\{(.+?)\}", re.IGNORECASE)  # $ style
+STYLE_STRING_TEMPLATE_REGEX = re.compile(
+    r"\$(?:\$|\{(?P<braced>.+?)\}|(?P<named>[_a-z][_a-z0-9]*))", re.IGNORECASE
+)  # $ style
 STYLE_STRING_FORMAT_REGEX = re.compile(r"\{(.+?)\}", re.IGNORECASE)  # { style
 STYLE_PERCENT_REGEX = re.compile(r"%\((.+?)\)", re.IGNORECASE)  # % style
 
@@ -302,7 +304,12 @@ class BaseJsonFormatter(logging.Formatter):
             raise ValueError(f"Style {self._style!r} is not supported")
 
         if isinstance(self._style, logging.StringTemplateStyle):
-            formatter_style_pattern = STYLE_STRING_TEMPLATE_REGEX
+            # String templates support both ${name} and $name, and $$ is an escaped literal
+            return [
+                match.group("braced") or match.group("named")
+                for match in STYLE_STRING_TEMPLATE_REGEX.finditer(self._fmt)
+                if match.group("braced") or match.group("named")
+            ]
 
         elif isinstance(self._style, logging.StrFormatStyle):
             formatter_style_pattern = STYLE_STRING_FORMAT_REGEX
