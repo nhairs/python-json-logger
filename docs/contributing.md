@@ -33,10 +33,10 @@ While the style guide covers detailed conventions, always try to match the style
 
 #### Development Setup
 
-All devlopment tooling can be installed (usually into a virtual environment), using the `dev` optional dependency:
+All development tooling can be installed (usually into a virtual environment) using `uv` with the `dev` dependency group:
 
 ```shell
-pip install -e '.[dev]'`
+uv sync --group dev
 ```
 
 Before creating your pull request you'll want to format your code and run the linters and tests:
