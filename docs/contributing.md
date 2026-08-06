@@ -114,17 +114,17 @@ For examples of how to support a third-party encoder see `orjson.py` and `msgspe
 The following encoders have been considered and rejected:
 
 - [simplejson](https://github.com/simplejson/simplejson) - as of 2026-03-29 is ranked ~370 with ~55M downloads / month. Due to errors when handling `bytes` objects and lack of interest from the community ([see comment for more details](https://github.com/nhairs/python-json-logger/pull/64#issuecomment-4149326316)).
-- [ultrajson](https://github.com/ultrajson/ultrajson) (`usjon`) - as of 2026-03-29 is ranked ~630 with ~27 downloads / month. Due to errors when handling `bytes` objects and lack of interest from the community ([see comment for more details](https://github.com/nhairs/python-json-logger/pull/64#issuecomment-4149326316)). Additionally it is in maintence mode.
+- [ultrajson](https://github.com/ultrajson/ultrajson) (`usjon`) - as of 2026-03-29 is ranked ~630 with ~27 downloads / month. Due to errors when handling `bytes` objects and lack of interest from the community ([see comment for more details](https://github.com/nhairs/python-json-logger/pull/64#issuecomment-4149326316)). Additionally it is in maintenance mode.
 - [python-rapidjson](https://github.com/python-rapidjson/python-rapidjson) - as of 2026-03-22 is ranked ~1800 with ~4.5M downloads / month.
 - [pysimdjson](https://github.com/TkTech/pysimdjson) - as of 2026-03-22 is ranked ~4200 with >1M downloads / month.
 - [yapic.json](https://github.com/zozzz/yapic.json) - as of 2026-03-22 is not in top 15K packages.
 - [cysimdjson](https://github.com/TeskaLabs/cysimdjson) - as of 2026-03-22 is not in top 15K packages.
 
-### Versioning and breaking compatability
+### Versioning and breaking compatibility
 
 This project uses semantic versioning.
 
-In general backwards compatability is always preferred. This library is widely used and not particularly sophisticated and as such there must be a good reason for breaking changes.
+In general backwards compatibility is always preferred. This library is widely used and not particularly sophisticated and as such there must be a good reason for breaking changes.
 
 Feature changes MUST be compatible with all [security supported versions of Python](https://endoflife.date/python) and SHOULD be compatible with all unsupported versions of Python where [recent downloads over the last 90 days exceeds 5% of all downloads](https://pypistats.org/packages/python-json-logger).
 

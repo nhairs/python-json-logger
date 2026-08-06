@@ -174,7 +174,7 @@ class BaseJsonFormatter(logging.Formatter):
 
         *Added in 4.0*:
 
-        - `fmt` now supports comma seperated lists (`style=","`). Note that this style is specific
+        - `fmt` now supports comma separated lists (`style=","`). Note that this style is specific
           to `python-json-logger` and thus care should be taken to not to pass this format to other
           logging Formatter implementations.
         - `fmt` now supports sequences of strings (e.g. lists and tuples) of field names.

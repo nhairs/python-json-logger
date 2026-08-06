@@ -27,7 +27,7 @@ Thanks @gaoflow, @prateek-dagar
 ### Added
 - Support `DictConfigurator` prefixes for `rename_fields` and `static_fields`. [#45](https://github.com/nhairs/python-json-logger/pull/45)
   - Allows using values like `ext://sys.stderr` in `fileConfig`/`dictConfig` value fields.
-- Support comma seperated lists for Formatter `fmt` (`style=","`) e.g. `"asctime,message,levelname"` [#15](https://github.com/nhairs/python-json-logger/issues/15)
+- Support comma separated lists for Formatter `fmt` (`style=","`) e.g. `"asctime,message,levelname"` [#15](https://github.com/nhairs/python-json-logger/issues/15)
   - Note that this style is specific to `python-json-logger` and thus care should be taken not to pass this format to other logging Formatter implementations.
 - Supports sequences of strings (e.g. lists and tuples) of field names for Formatter `fmt`. [#16](https://github.com/nhairs/python-json-logger/issues/16)
 
