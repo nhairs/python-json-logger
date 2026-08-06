@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Logging a `dict` no longer modifies it. `exc_info` and `stack_info` were previously added to the caller's `dict`. [#66](https://github.com/nhairs/python-json-logger/pull/66)
 
-Thanks @gaoflow
+Thanks @gaoflow, @prateek-dagar
 
 ## [4.1.0](https://github.com/nhairs/python-json-logger/compare/v4.0.0...v4.1.0) - 2026-03-29
 
