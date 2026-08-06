@@ -39,7 +39,7 @@ classifiers = [
 Homepage = "https://nhairs.github.io/python-json-logger"
 GitHub = "https://github.com/nhairs/python-json-logger"
 
-[project.optional-dependencies]
+[dependency-groups]
 dev = [
     ## Optional but required for dev
     "orjson;implementation_name!='pypy'",
