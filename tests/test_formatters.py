@@ -698,6 +698,148 @@ def test_exc_info_as_array_no_exc_info(env: LoggingEnvironment, class_: type[Bas
     return
 
 
+@pytest.mark.skipif(
+    sys.version_info < (3, 11), reason="Exception notes require Python 3.11 or higher"
+)
+@pytest.mark.parametrize("class_", ALL_FORMATTERS)
+def test_exception_notes(env: LoggingEnvironment, class_: type[BaseJsonFormatter]):
+    env.set_formatter(class_())
+
+    try:
+        err = ValueError("my error")
+        err.add_note("this is a note")
+        raise err
+    except ValueError:
+        env.logger.exception("oops")
+
+    log_json = env.load_json()
+    assert "ValueError: my error" in log_json["exc_info"]
+    assert "this is a note" in log_json["exc_info"]
+    return
+
+
+@pytest.mark.skipif(
+    sys.version_info < (3, 11), reason="Exception notes require Python 3.11 or higher"
+)
+@pytest.mark.parametrize("class_", ALL_FORMATTERS)
+def test_exception_notes_as_array(env: LoggingEnvironment, class_: type[BaseJsonFormatter]):
+    env.set_formatter(class_(exc_info_as_array=True))
+
+    try:
+        err = ValueError("my error")
+        err.add_note("this is a note")
+        raise err
+    except ValueError:
+        env.logger.exception("oops")
+
+    log_json = env.load_json()
+    assert isinstance(log_json["exc_info"], list)
+    full_traceback = "\n".join(log_json["exc_info"])
+    assert "ValueError: my error" in full_traceback
+    assert "this is a note" in full_traceback
+    return
+
+
+@pytest.mark.skipif(
+    sys.version_info < (3, 11), reason="Exception groups require Python 3.11 or higher"
+)
+@pytest.mark.parametrize("class_", ALL_FORMATTERS)
+def test_exception_groups(env: LoggingEnvironment, class_: type[BaseJsonFormatter]):
+    env.set_formatter(class_())
+
+    try:
+        raise ExceptionGroup("my group", [ValueError("err 1"), TypeError("err 2")])
+    except ExceptionGroup:
+        env.logger.exception("oops")
+
+    log_json = env.load_json()
+    assert "ExceptionGroup: my group" in log_json["exc_info"]
+    assert "ValueError: err 1" in log_json["exc_info"]
+    assert "TypeError: err 2" in log_json["exc_info"]
+    return
+
+
+@pytest.mark.skipif(
+    sys.version_info < (3, 11), reason="Exception groups require Python 3.11 or higher"
+)
+@pytest.mark.parametrize("class_", ALL_FORMATTERS)
+def test_exception_groups_as_array(env: LoggingEnvironment, class_: type[BaseJsonFormatter]):
+    env.set_formatter(class_(exc_info_as_array=True))
+
+    try:
+        raise ExceptionGroup("my group", [ValueError("err 1"), TypeError("err 2")])
+    except ExceptionGroup:
+        env.logger.exception("oops")
+
+    log_json = env.load_json()
+    assert isinstance(log_json["exc_info"], list)
+    full_traceback = "\n".join(log_json["exc_info"])
+    assert "ExceptionGroup: my group" in full_traceback
+    assert "ValueError: err 1" in full_traceback
+    assert "TypeError: err 2" in full_traceback
+    return
+
+
+@pytest.mark.skipif(
+    sys.version_info < (3, 11), reason="Exception groups and notes require Python 3.11 or higher"
+)
+@pytest.mark.parametrize("class_", ALL_FORMATTERS)
+def test_exception_groups_with_notes(env: LoggingEnvironment, class_: type[BaseJsonFormatter]):
+    env.set_formatter(class_())
+
+    try:
+        err1 = ValueError("err 1")
+        err1.add_note("note 1")
+        err2 = TypeError("err 2")
+        err2.add_note("note 2")
+        eg = ExceptionGroup("my group", [err1, err2])
+        eg.add_note("group note")
+        raise eg
+    except ExceptionGroup:
+        env.logger.exception("oops")
+
+    log_json = env.load_json()
+    assert "ExceptionGroup: my group" in log_json["exc_info"]
+    assert "group note" in log_json["exc_info"]
+    assert "ValueError: err 1" in log_json["exc_info"]
+    assert "note 1" in log_json["exc_info"]
+    assert "TypeError: err 2" in log_json["exc_info"]
+    assert "note 2" in log_json["exc_info"]
+    return
+
+
+@pytest.mark.skipif(
+    sys.version_info < (3, 11), reason="Exception groups and notes require Python 3.11 or higher"
+)
+@pytest.mark.parametrize("class_", ALL_FORMATTERS)
+def test_exception_groups_with_notes_as_array(
+    env: LoggingEnvironment, class_: type[BaseJsonFormatter]
+):
+    env.set_formatter(class_(exc_info_as_array=True))
+
+    try:
+        err1 = ValueError("err 1")
+        err1.add_note("note 1")
+        err2 = TypeError("err 2")
+        err2.add_note("note 2")
+        eg = ExceptionGroup("my group", [err1, err2])
+        eg.add_note("group note")
+        raise eg
+    except ExceptionGroup:
+        env.logger.exception("oops")
+
+    log_json = env.load_json()
+    assert isinstance(log_json["exc_info"], list)
+    full_traceback = "\n".join(log_json["exc_info"])
+    assert "ExceptionGroup: my group" in full_traceback
+    assert "group note" in full_traceback
+    assert "ValueError: err 1" in full_traceback
+    assert "note 1" in full_traceback
+    assert "TypeError: err 2" in full_traceback
+    assert "note 2" in full_traceback
+    return
+
+
 @pytest.mark.parametrize("class_", ALL_FORMATTERS)
 def test_stack_info_as_array(env: LoggingEnvironment, class_: type[BaseJsonFormatter]):
     env.set_formatter(class_(stack_info_as_array=True))
