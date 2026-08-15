@@ -113,10 +113,6 @@ class BaseJsonFormatter(logging.Formatter):
     Must not be used directly.
 
     *New in 3.1*
-
-    *Changed in 3.2*: `defaults` argument is no longer ignored.
-
-    *Added in 3.3*: `exc_info_as_array` and `stack_info_as_array` options are added.
     """
 
     _style: logging.PercentStyle | str  # type: ignore[assignment]
@@ -174,6 +170,10 @@ class BaseJsonFormatter(logging.Formatter):
           missing fields. The original behaviour, missing fields have a value of `None`, is still
           available by setting `rename_fields_keep_missing` to `True`.
 
+        *Changed in 3.2*: `defaults` argument is no longer ignored.
+
+        *Added in 3.3*: `exc_info_as_array` and `stack_info_as_array` options are added.
+
         *Added in 4.0*:
 
         - `fmt` now supports comma separated lists (`style=","`). Note that this style is specific
@@ -183,7 +183,6 @@ class BaseJsonFormatter(logging.Formatter):
         """
         ## logging.Formatter compatibility
         ## ---------------------------------------------------------------------
-        # Note: validate added in python 3.8, defaults added in 3.10
         if fmt is None or isinstance(fmt, str):
             if style in logging._STYLES:
                 _style = logging._STYLES[style][0](fmt)  # type: ignore[operator]
