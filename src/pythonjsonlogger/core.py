@@ -311,18 +311,15 @@ class BaseJsonFormatter(logging.Formatter):
                 if match.group("braced") or match.group("named")
             ]
 
-        elif isinstance(self._style, logging.StrFormatStyle):
-            formatter_style_pattern = STYLE_STRING_FORMAT_REGEX
+        if isinstance(self._style, logging.StrFormatStyle):
+            return STYLE_STRING_FORMAT_REGEX.findall(self._fmt)
 
-        elif isinstance(self._style, logging.PercentStyle):
+        if isinstance(self._style, logging.PercentStyle):
             # PercentStyle is parent class of StringTemplateStyle and StrFormatStyle
             # so it must be checked last.
-            formatter_style_pattern = STYLE_PERCENT_REGEX
+            return STYLE_PERCENT_REGEX.findall(self._fmt)
 
-        else:
-            raise ValueError(f"Style {self._style!r} is not supported")
-
-        return formatter_style_pattern.findall(self._fmt)
+        raise ValueError(f"Style {self._style!r} is not supported")
 
     def serialize_log_record(self, log_data: LogData) -> str:
         """Returns the final representation of the data to be logged
