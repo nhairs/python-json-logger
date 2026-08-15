@@ -61,7 +61,9 @@ if sys.version_info >= (3, 12):
     RESERVED_ATTRS.sort()
 
 
-STYLE_STRING_TEMPLATE_REGEX = re.compile(r"\$\{(.+?)\}", re.IGNORECASE)  # $ style
+STYLE_STRING_TEMPLATE_REGEX = re.compile(
+    r"\$(?:\$|\{(?P<braced>.+?)\}|(?P<named>[_a-z][_a-z0-9]*))", re.IGNORECASE
+)  # $ style
 STYLE_STRING_FORMAT_REGEX = re.compile(r"\{(.+?)\}", re.IGNORECASE)  # { style
 STYLE_PERCENT_REGEX = re.compile(r"%\((.+?)\)", re.IGNORECASE)  # % style
 
@@ -302,20 +304,22 @@ class BaseJsonFormatter(logging.Formatter):
             raise ValueError(f"Style {self._style!r} is not supported")
 
         if isinstance(self._style, logging.StringTemplateStyle):
-            formatter_style_pattern = STYLE_STRING_TEMPLATE_REGEX
+            # String templates support both ${name} and $name, and $$ is an escaped literal
+            return [
+                match.group("braced") or match.group("named")
+                for match in STYLE_STRING_TEMPLATE_REGEX.finditer(self._fmt)
+                if match.group("braced") or match.group("named")
+            ]
 
-        elif isinstance(self._style, logging.StrFormatStyle):
-            formatter_style_pattern = STYLE_STRING_FORMAT_REGEX
+        if isinstance(self._style, logging.StrFormatStyle):
+            return STYLE_STRING_FORMAT_REGEX.findall(self._fmt)
 
-        elif isinstance(self._style, logging.PercentStyle):
+        if isinstance(self._style, logging.PercentStyle):
             # PercentStyle is parent class of StringTemplateStyle and StrFormatStyle
             # so it must be checked last.
-            formatter_style_pattern = STYLE_PERCENT_REGEX
+            return STYLE_PERCENT_REGEX.findall(self._fmt)
 
-        else:
-            raise ValueError(f"Style {self._style!r} is not supported")
-
-        return formatter_style_pattern.findall(self._fmt)
+        raise ValueError(f"Style {self._style!r} is not supported")
 
     def serialize_log_record(self, log_data: LogData) -> str:
         """Returns the final representation of the data to be logged
