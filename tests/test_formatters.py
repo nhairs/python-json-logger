@@ -201,9 +201,12 @@ def test_percentage_format_escaped_percent(
 
 @pytest.mark.parametrize("class_", ALL_FORMATTERS)
 def test_str_format_format(env: LoggingEnvironment, class_: type[BaseJsonFormatter]):
-    # Note: {{ }} is an escaped literal brace, and !r / :>8 are not part of a field name
+    # Note: {{ }} is an escaped literal brace, and !r / :>{width} are not part of a field name
     env.set_formatter(
-        class_("{{literal}} {levelname:>8} {message!r} {filename} {lineno} {asctime}", style="{")
+        class_(
+            "{{literal}} {levelname:>{width}} {message!r} {filename} {lineno} {asctime}",
+            style="{",
+        )
     )
 
     msg = "testing logging format"
