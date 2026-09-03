@@ -184,6 +184,38 @@ def test_string_template_format(env: LoggingEnvironment, class_: type[BaseJsonFo
 
 
 @pytest.mark.parametrize("class_", ALL_FORMATTERS)
+def test_percentage_format_escaped_percent(
+    env: LoggingEnvironment, class_: type[BaseJsonFormatter]
+):
+    # Note: %% is an escaped literal percent, so %%(notafield)s is not a field
+    env.set_formatter(class_("%(levelname)s %(message)s 100%% %%(notafield)s"))
+
+    msg = "testing logging format"
+    env.logger.info(msg)
+    log_json = env.load_json()
+
+    assert log_json["message"] == msg
+    assert log_json.keys() == {"levelname", "message"}
+    return
+
+
+@pytest.mark.parametrize("class_", ALL_FORMATTERS)
+def test_str_format_format(env: LoggingEnvironment, class_: type[BaseJsonFormatter]):
+    # Note: {{ }} is an escaped literal brace, and !r / :>8 are not part of a field name
+    env.set_formatter(
+        class_("{{literal}} {levelname:>8} {message!r} {filename} {lineno} {asctime}", style="{")
+    )
+
+    msg = "testing logging format"
+    env.logger.info(msg)
+    log_json = env.load_json()
+
+    assert log_json["message"] == msg
+    assert log_json.keys() == {"levelname", "message", "filename", "lineno", "asctime"}
+    return
+
+
+@pytest.mark.parametrize("class_", ALL_FORMATTERS)
 def test_comma_format(env: LoggingEnvironment, class_: type[BaseJsonFormatter]):
     # Note: we have double comma `,,` to test handling "empty" names
     env.set_formatter(class_("levelname,,message,filename,lineno,asctime,", style=","))

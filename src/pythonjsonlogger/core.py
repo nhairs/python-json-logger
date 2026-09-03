@@ -9,6 +9,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 import logging
 import re
+import string
 import sys
 from typing import TypeAlias, Any
 from collections.abc import Container, Sequence
@@ -65,7 +66,8 @@ STYLE_STRING_TEMPLATE_REGEX = re.compile(
     r"\$(?:\$|\{(?P<braced>.+?)\}|(?P<named>[_a-z][_a-z0-9]*))", re.IGNORECASE
 )  # $ style
 STYLE_STRING_FORMAT_REGEX = re.compile(r"\{(.+?)\}", re.IGNORECASE)  # { style
-STYLE_PERCENT_REGEX = re.compile(r"%\((.+?)\)", re.IGNORECASE)  # % style
+# Deprecated: no longer used by `parse`, which uses `string.Formatter` instead.
+STYLE_PERCENT_REGEX = re.compile(r"%(?:%|\((?P<named>.+?)\))", re.IGNORECASE)  # % style
 
 ## Type Aliases
 ## -----------------------------------------------------------------------------
@@ -311,12 +313,24 @@ class BaseJsonFormatter(logging.Formatter):
             ]
 
         if isinstance(self._style, logging.StrFormatStyle):
-            return STYLE_STRING_FORMAT_REGEX.findall(self._fmt)
+            # str.format escapes literal braces as {{ and }}, and a replacement field may
+            # carry a conversion (!r) or a format spec (:>10) that is not part of its name.
+            # string.Formatter is what logging.StrFormatStyle.validate itself parses with.
+            return [
+                field_name
+                for _, field_name, _, _ in string.Formatter().parse(self._fmt)
+                if field_name
+            ]
 
         if isinstance(self._style, logging.PercentStyle):
             # PercentStyle is parent class of StringTemplateStyle and StrFormatStyle
             # so it must be checked last.
-            return STYLE_PERCENT_REGEX.findall(self._fmt)
+            # %% is an escaped literal percent, so %%(name)s is not a field.
+            return [
+                match.group("named")
+                for match in STYLE_PERCENT_REGEX.finditer(self._fmt)
+                if match.group("named")
+            ]
 
         raise ValueError(f"Style {self._style!r} is not supported")
 
