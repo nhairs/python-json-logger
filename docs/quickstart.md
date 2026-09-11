@@ -35,6 +35,7 @@ import logging
 from pythonjsonlogger.json import JsonFormatter
 
 logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 logHandler = logging.StreamHandler()
 formatter = JsonFormatter()
@@ -98,15 +99,22 @@ Finally, any non-standard attributes added to a `LogRecord` will also be include
 
 #### Default Fields
 
-Default fields that are added to every log record prior to any other field can be set using the `default` argument.
+Default fields that are added to every log record prior to any other field can be set using the `defaults` argument.
 
 ```python
 formatter = JsonFormatter(
     defaults={"environment": "dev"}
 )
-# ...
+logHandler.setFormatter(formatter)
 logger.info("this message will have environment=dev by default")
 logger.info("this overwrites the environment field", extra={"environment": "prod"})
+```
+
+Output:
+
+```json
+{"environment": "dev", "message": "this message will have environment=dev by default"}
+{"environment": "prod", "message": "this overwrites the environment field"}
 ```
 
 #### Static Fields
@@ -115,8 +123,55 @@ Static fields that are added to every log record can be set using the `static_fi
 
 ```python
 formatter = JsonFormatter(
-    static_fields={"True gets logged on every record?": True}
+    static_fields={"service": "billing"}
 )
+logHandler.setFormatter(formatter)
+logger.info("processing a request")
+```
+
+Output:
+
+```json
+{"message": "processing a request", "service": "billing"}
+```
+
+Despite the name, static fields can be overridden by message fields and `extra` fields, as described below.
+
+#### Field Precedence
+
+These field sources are added in the following order. A later source replaces an earlier value for the same output key:
+
+1. `defaults`
+2. Fields selected by `fmt`
+3. `static_fields`
+4. Fields from a dictionary message
+5. Non-reserved `LogRecord` attributes, including those supplied through `extra`
+
+Fields selected by `fmt` are handled in step 2 and are not merged again in step 5. This is why `static_fields` can override a field selected by `fmt`, even when that field was supplied through `extra`. All five sources are subject to `rename_fields`.
+
+The following example shows a static value overriding both a default and the record's `levelname`, while dictionary messages and `extra` can override the static `environment`:
+
+```python
+formatter = JsonFormatter(
+    ["message", "levelname"],
+    defaults={"environment": "dev", "levelname": "DEFAULT"},
+    static_fields={"environment": "test", "levelname": "STATIC"},
+)
+logHandler.setFormatter(formatter)
+logger.info("static fields win over defaults and fmt")
+logger.info({"message": "dictionary message wins", "environment": "staging"})
+logger.info(
+    {"message": "extra wins", "environment": "staging"},
+    extra={"environment": "prod"},
+)
+```
+
+Output:
+
+```json
+{"environment": "test", "levelname": "STATIC", "message": "static fields win over defaults and fmt"}
+{"environment": "staging", "levelname": "STATIC", "message": "dictionary message wins"}
+{"environment": "prod", "levelname": "STATIC", "message": "extra wins"}
 ```
 
 ### Excluding fields
