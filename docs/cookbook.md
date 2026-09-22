@@ -137,6 +137,97 @@ def main_3():
 main_3()
 ```
 
+## Sending JSON to a syslog receiver
+
+Python JSON Logger formats log records; a handler transports them. Attach a
+`JsonFormatter` to the standard library's
+[`SysLogHandler`](https://docs.python.org/3/library/logging.handlers.html#sysloghandler)
+to send JSON messages over syslog.
+
+The following example includes a local UDP receiver, so it can be run without a
+syslog daemon or a log collection service. It binds to an available port on the
+loopback interface before sending a log record.
+
+```python
+import json
+import logging
+from logging.handlers import SysLogHandler
+import socket
+
+from pythonjsonlogger.json import JsonFormatter
+
+with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as receiver:
+    receiver.bind(("127.0.0.1", 0))
+    receiver.settimeout(5)
+
+    handler = SysLogHandler(
+        address=receiver.getsockname(),
+        facility=SysLogHandler.LOG_USER,
+        socktype=socket.SOCK_DGRAM,
+    )
+    handler.append_nul = False
+    handler.setFormatter(
+        JsonFormatter(
+            "%(levelname)s %(name)s %(message)s",
+            json_ensure_ascii=False,
+        )
+    )
+
+    logger = logging.getLogger("myapp")
+    logger.setLevel(logging.INFO)
+    logger.propagate = False
+    logger.addHandler(handler)
+    try:
+        logger.info("Hello from café", extra={"request_id": "req-123"})
+        datagram, _ = receiver.recvfrom(65535)
+    finally:
+        logger.removeHandler(handler)
+        handler.close()
+
+message = datagram.decode("utf-8")
+print(message)
+
+# This example uses the default empty handler.ident and no NUL terminator.
+# Remove the syslog priority prefix before decoding the JSON message.
+payload = message.partition(">")[2]
+record = json.loads(payload)
+print(record["request_id"])
+```
+
+Output:
+
+```text
+<14>{"levelname": "INFO", "name": "myapp", "message": "Hello from café", "request_id": "req-123"}
+req-123
+```
+
+The `<14>` prefix encodes the `LOG_USER` facility and `INFO` severity; it is not
+part of the JSON. `SysLogHandler` encodes the formatted message as UTF-8.
+Setting `json_ensure_ascii=False` keeps characters such as `é` readable on the
+wire; the default escaped representation also preserves their values.
+
+For a collection service, replace `receiver.getsockname()` with its configured
+UDP address, for example `("127.0.0.1", 1514)`, and omit the demonstration
+receiver. Configure the collector to remove the syslog framing and decode the
+message as JSON. `append_nul=False` omits the handler's default trailing NUL
+byte, and leaving `ident` empty avoids adding another prefix to the JSON.
+If your receiver requires a NUL terminator or an identifier, configure both
+ends accordingly.
+
+This example sends `<PRI>` followed by JSON, not a complete RFC 5424 header.
+Check the input format required by your collector; Python's
+[syslog cookbook](https://docs.python.org/3/howto/logging-cookbook.html#logging-to-syslog-with-rfc5424-support)
+discusses RFC 5424 formatting. UDP does not guarantee delivery, so use a
+transport or forwarding agent that meets your delivery requirements.
+
+!!! note "Sending JSON over HTTP"
+    The standard library's
+    [`HTTPHandler`](https://docs.python.org/3/library/logging.handlers.html#httphandler)
+    does not use its formatter: it URL-encodes the result of `mapLogRecord()`.
+    Calling `setFormatter(JsonFormatter())` therefore does not produce a JSON
+    POST body. Use a handler or forwarding agent that supports the destination's
+    JSON ingestion API, including its payload format and authentication.
+
 ## Using `fileConfig`
 
 To use the module with a yaml config file using the [`fileConfig` function](https://docs.python.org/3/library/logging.config.html#logging.config.fileConfig), use the class `pythonjsonlogger.json.JsonFormatter`. Here is a sample config file:
