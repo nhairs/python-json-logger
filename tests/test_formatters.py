@@ -155,8 +155,14 @@ def test_default_format(env: LoggingEnvironment, class_: type[BaseJsonFormatter]
 
 @pytest.mark.parametrize("class_", ALL_FORMATTERS)
 def test_percentage_format(env: LoggingEnvironment, class_: type[BaseJsonFormatter]):
-    # Note: We use different %s styles in the format to check the regex correctly collects them
-    env.set_formatter(class_("[%(levelname)8s] %(message)s %(filename)s:%(lineno)d %(asctime)"))
+    # Note: We use different %s styles in the format to check the regex correctly collects them,
+    # and %% is an escaped literal percent so %%(notafield)s is not a field
+    env.set_formatter(
+        class_(
+            "[%(levelname)8s] %(message)s %(filename)s:%(lineno)d"
+            " 100%% %%(notafield)s %(asctime)"
+        )
+    )
 
     msg = "testing logging format"
     env.logger.info(msg)
@@ -172,6 +178,25 @@ def test_string_template_format(env: LoggingEnvironment, class_: type[BaseJsonFo
     # Note: string templates support both $name and ${name}, and $$ is an escaped literal $
     env.set_formatter(
         class_("$$literal $levelname ${message} $filename ${lineno} $asctime", style="$")
+    )
+
+    msg = "testing logging format"
+    env.logger.info(msg)
+    log_json = env.load_json()
+
+    assert log_json["message"] == msg
+    assert log_json.keys() == {"levelname", "message", "filename", "lineno", "asctime"}
+    return
+
+
+@pytest.mark.parametrize("class_", ALL_FORMATTERS)
+def test_str_format_format(env: LoggingEnvironment, class_: type[BaseJsonFormatter]):
+    # Note: {{ }} is an escaped literal brace, and !r / :>{width} are not part of a field name
+    env.set_formatter(
+        class_(
+            "{{literal}} {levelname:>{width}} {message!r} {filename} {lineno} {asctime}",
+            style="{",
+        )
     )
 
     msg = "testing logging format"
