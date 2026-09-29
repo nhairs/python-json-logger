@@ -261,6 +261,35 @@ def test_defaults_field(env: LoggingEnvironment, class_: type[BaseJsonFormatter]
 
 
 @pytest.mark.parametrize("class_", ALL_FORMATTERS)
+def test_defaults_not_shared_with_caller(env: LoggingEnvironment, class_: type[BaseJsonFormatter]):
+    defaults = {"environment": "dev"}
+    formatter = class_(defaults=defaults)
+    assert formatter.defaults is not defaults
+    defaults["environment"] = "prod"
+    env.set_formatter(formatter)
+
+    env.logger.info("testing defaults isolation")
+    log_json = env.load_json()
+
+    assert log_json["environment"] == "dev"
+    return
+
+
+@pytest.mark.parametrize("class_", ALL_FORMATTERS)
+def test_reserved_attrs_string(env: LoggingEnvironment, class_: type[BaseJsonFormatter]):
+    env.set_formatter(class_(reserved_attrs="filename"))
+
+    env.logger.info("hello", extra={"user": "x"})
+    log_json = env.load_json()
+
+    assert log_json["message"] == "hello"
+    assert log_json["user"] == "x"
+    assert "filename" not in log_json
+    assert "levelname" in log_json
+    return
+
+
+@pytest.mark.parametrize("class_", ALL_FORMATTERS)
 def test_rename_base_field(env: LoggingEnvironment, class_: type[BaseJsonFormatter]):
     env.set_formatter(class_(rename_fields={"message": "@message"}))
 

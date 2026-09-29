@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - `%` style formats no longer treat the escaped literal `%%` as the start of a field, so `"%%(notafield)s"` is correctly read as literal text. [#75](https://github.com/nhairs/python-json-logger/pull/75)
 - `{` style formats now use `string.Formatter` (as `logging.StrFormatStyle.validate` does) to find fields, so escaped literal braces (`{{`/`}}`) are skipped and a conversion (`{message!r}`) or format spec (`{levelname:>8}`) is no longer treated as part of the field name. [#75](https://github.com/nhairs/python-json-logger/pull/75)
+- `defaults` is copied on construction like `rename_fields` and `static_fields`, so DictConfigurator `ext://` prefixes are converted and mutating the caller's dict cannot change formatter state.
+- A string passed as `reserved_attrs` is treated as a single field name instead of being iterated as characters.
 
 Thanks @dylanpulver
 
