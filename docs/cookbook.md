@@ -38,6 +38,90 @@ class SillyFormatter(JsonFormatter):
 ```
 
 
+## Terminal colors
+
+For local development, a custom formatter can wrap each JSON line in an ANSI color
+chosen by the record's log level. Apply the color **after** `JsonFormatter.format`
+serializes the record. Adding escape sequences to `levelname` or other fields in
+`process_log_record` instead puts JSON-escaped strings into the payload, not terminal
+formatting around it.
+
+The following standalone example is intended for ANSI-capable terminals. It enables
+color when standard error is a terminal, with plain output when redirected or when
+`NO_COLOR` is set to a non-empty value. `isatty()` does not detect ANSI support.
+Configure these handlers once at application startup.
+
+```python title="terminal_color.py"
+import logging
+import os
+import sys
+
+from pythonjsonlogger.json import JsonFormatter
+
+
+class TerminalColorFormatter(JsonFormatter):
+    """Wrap serialized JSON in terminal colors without coloring record fields."""
+
+    COLORS = {
+        logging.DEBUG: "\x1b[36m",
+        logging.INFO: "\x1b[32m",
+        logging.WARNING: "\x1b[33m",
+        logging.ERROR: "\x1b[31m",
+        logging.CRITICAL: "\x1b[1;31m",
+    }
+
+    def __init__(self, fmt: str, *, use_color: bool = False) -> None:
+        """Enable color only when the destination supports ANSI escapes."""
+        super().__init__(fmt)
+        self.use_color = use_color
+        return
+
+    def format(self, record: logging.LogRecord) -> str:
+        """Format normally, then color known levels when enabled."""
+        formatted = super().format(record)
+        color = self.COLORS.get(record.levelno, "") if self.use_color else ""
+        if color:
+            return f"{color}{formatted}\x1b[0m"
+        return formatted
+
+
+fmt = "%(levelname)s %(message)s"
+console = logging.StreamHandler(sys.stderr)
+console.setFormatter(
+    TerminalColorFormatter(fmt, use_color=sys.stderr.isatty() and not os.environ.get("NO_COLOR"))
+)
+
+# Keep a separate, uncolored destination for log ingestion.
+machine = logging.StreamHandler(sys.stdout)
+machine.setFormatter(JsonFormatter(fmt))
+
+logger = logging.getLogger("terminal-color-example")
+logger.setLevel(logging.DEBUG)
+logger.propagate = False
+logger.addHandler(console)
+logger.addHandler(machine)
+logger.warning("Hello %s", "world", extra={"request_id": "abc"})
+```
+
+The machine handler emits the following JSON, while the console handler wraps the
+same line in yellow when color is enabled:
+
+```json
+{"levelname": "WARNING", "message": "Hello world", "request_id": "abc"}
+```
+
+This recipe colors the whole line, not just the `levelname` value. Unknown/custom
+levels remain uncolored unless added to `COLORS`. Set `use_color=False` to disable
+color explicitly, including on terminals without ANSI support. The terminal check
+is made when configuring the handler; recalculate it if you change its stream.
+
+!!! warning
+    Colored console output is **not raw JSON**. Send the machine handler's output
+    to your log collector instead, and do not merge the colored standard error
+    stream into it. The wrapper leaves serialization to `JsonFormatter`, so message
+    interpolation, dictionary messages, extra fields and exception escaping still
+    work normally. It does not add color to the shared `LogRecord` or caller's data.
+
 ## Request / Trace IDs
 
 There are many ways to add consistent request IDs to your logging. The exact method will depend on your needs and application.
