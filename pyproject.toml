@@ -49,8 +49,7 @@ dev = [
     "validate-pyproject[all]",
     "black",
     "pylint",
-    "mypy<2; implementation_name == 'pypy' and python_version < '3.11'",
-    "mypy; implementation_name != 'pypy' or python_version >= '3.11'",
+    "pyrefly",
     ## Test
     "pytest",
     "freezegun",
