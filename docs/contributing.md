@@ -6,6 +6,18 @@ Contributions are welcome!
 
 In general we follow the [Python Software Foundation Code of Conduct](https://policies.python.org/python.org/code-of-conduct/). Please note that we are not affiliated with the PSF.
 
+
+### AI Policy
+
+The use of AI tools is allowed with the following conditions:
+
+- The use of AI tools **must** be declared. For example in the PR description, or through dedicated users / commiters.
+- The specific AI tool / provider should be declared.
+- AI tools must be under supervision of a real human who is responsible for all contributions made.
+- The use of AI tools does **not** lower the expectations of any contribution.
+- [Don't be a meat-proxy](https://gruhn.me/blog/2026-08-03/).
+- Respect the time of the maintainers by ensuring that generated contributions are genuinely valuable.
+
 ## Pull Request Process
 
 **0. Before you begin**
