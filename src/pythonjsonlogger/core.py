@@ -153,7 +153,8 @@ class BaseJsonFormatter(logging.Formatter):
             rename_fields_keep_missing: When renaming fields, include missing fields in the output.
             static_fields: an optional dict, used to add fields with static values to all logs
             reserved_attrs: an optional list of fields that will be skipped when
-                outputting json log record. Defaults to [all log record attributes][pythonjsonlogger.core.RESERVED_ATTRS].
+                outputting json log record. A single field name may be passed as a
+                string. Defaults to [all log record attributes][pythonjsonlogger.core.RESERVED_ATTRS].
             timestamp: an optional string/boolean field to add a timestamp when
                 outputting the json log record. If string is passed, timestamp will be added
                 to log record using string as key. If True boolean is passed, timestamp key
@@ -180,6 +181,11 @@ class BaseJsonFormatter(logging.Formatter):
           to `python-json-logger` and thus care should be taken to not to pass this format to other
           logging Formatter implementations.
         - `fmt` now supports sequences of strings (e.g. lists and tuples) of field names.
+
+        *Changed in 4.2.1*:
+
+        - `defaults` is copied on construction, matching `rename_fields` and `static_fields`.
+        - A string `reserved_attrs` value is treated as a single field name.
         """
         ## logging.Formatter compatibility
         ## ---------------------------------------------------------------------
@@ -213,8 +219,9 @@ class BaseJsonFormatter(logging.Formatter):
         ## ---------------------------------------------------------------------
         self.prefix = prefix
 
-        # We recreate the dict in rename_fields and static_fields to support internal/external
-        # references which require getting the item to do the conversion.
+        # Recreate these dicts so DictConfigurator `ext://` / `cfg://` prefixes
+        # are converted (ConvertingDict only converts on `__getitem__`) and so
+        # later mutation of the caller's dict cannot change formatter state.
         # For more details see: https://github.com/nhairs/python-json-logger/pull/45
         self.rename_fields = (
             {key: rename_fields[key] for key in rename_fields} if rename_fields is not None else {}
@@ -222,14 +229,19 @@ class BaseJsonFormatter(logging.Formatter):
         self.static_fields = (
             {key: static_fields[key] for key in static_fields} if static_fields is not None else {}
         )
+        self.defaults = {key: defaults[key] for key in defaults} if defaults is not None else {}
 
         self.rename_fields_keep_missing = rename_fields_keep_missing
-        self.reserved_attrs = set(reserved_attrs if reserved_attrs is not None else RESERVED_ATTRS)
+        # `str` is a Sequence[str] of characters; treat a string as one field name.
+        if reserved_attrs is None:
+            reserved_attrs = RESERVED_ATTRS
+        elif isinstance(reserved_attrs, str):
+            reserved_attrs = (reserved_attrs,)
+        self.reserved_attrs = set(reserved_attrs)
         self.timestamp = timestamp
 
         self._skip_fields = set(self._required_fields)
         self._skip_fields.update(self.reserved_attrs)
-        self.defaults = defaults if defaults is not None else {}
         self.exc_info_as_array = exc_info_as_array
         self.stack_info_as_array = stack_info_as_array
         return
