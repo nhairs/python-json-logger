@@ -153,8 +153,8 @@ class BaseJsonFormatter(logging.Formatter):
             rename_fields_keep_missing: When renaming fields, include missing fields in the output.
             static_fields: an optional dict, used to add fields with static values to all logs
             reserved_attrs: an optional list of fields that will be skipped when
-                outputting json log record. A single field name may be passed as a
-                string. Defaults to [all log record attributes][pythonjsonlogger.core.RESERVED_ATTRS].
+                outputting json log record. Pass a list or tuple, not a string.
+                Defaults to [all log record attributes][pythonjsonlogger.core.RESERVED_ATTRS].
             timestamp: an optional string/boolean field to add a timestamp when
                 outputting the json log record. If string is passed, timestamp will be added
                 to log record using string as key. If True boolean is passed, timestamp key
@@ -185,7 +185,7 @@ class BaseJsonFormatter(logging.Formatter):
         *Changed in 4.2.1*:
 
         - `defaults` is copied on construction, matching `rename_fields` and `static_fields`.
-        - A string `reserved_attrs` value is treated as a single field name.
+        - A string `reserved_attrs` value raises `TypeError`.
         """
         ## logging.Formatter compatibility
         ## ---------------------------------------------------------------------
@@ -232,11 +232,10 @@ class BaseJsonFormatter(logging.Formatter):
         self.defaults = {key: defaults[key] for key in defaults} if defaults is not None else {}
 
         self.rename_fields_keep_missing = rename_fields_keep_missing
-        # `str` is a Sequence[str] of characters; treat a string as one field name.
         if reserved_attrs is None:
             reserved_attrs = RESERVED_ATTRS
         elif isinstance(reserved_attrs, str):
-            reserved_attrs = (reserved_attrs,)
+            raise TypeError("reserved_attrs must be a sequence of field names, not a string")
         self.reserved_attrs = set(reserved_attrs)
         self.timestamp = timestamp
 

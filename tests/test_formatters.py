@@ -276,8 +276,23 @@ def test_defaults_not_shared_with_caller(env: LoggingEnvironment, class_: type[B
 
 
 @pytest.mark.parametrize("class_", ALL_FORMATTERS)
-def test_reserved_attrs_string(env: LoggingEnvironment, class_: type[BaseJsonFormatter]):
-    env.set_formatter(class_(reserved_attrs="filename"))
+@pytest.mark.parametrize("reserved_attrs", ["filename", ""])
+def test_reserved_attrs_string(class_: type[BaseJsonFormatter], reserved_attrs: str) -> None:
+    with pytest.raises(
+        TypeError, match="reserved_attrs must be a sequence of field names, not a string"
+    ):
+        class_(reserved_attrs=reserved_attrs)
+    return
+
+
+@pytest.mark.parametrize("class_", ALL_FORMATTERS)
+@pytest.mark.parametrize("reserved_attrs", [["filename"], ("filename",)])
+def test_reserved_attrs_sequence(
+    env: LoggingEnvironment,
+    class_: type[BaseJsonFormatter],
+    reserved_attrs: list[str] | tuple[str, ...],
+) -> None:
+    env.set_formatter(class_(reserved_attrs=reserved_attrs))
 
     env.logger.info("hello", extra={"user": "x"})
     log_json = env.load_json()
