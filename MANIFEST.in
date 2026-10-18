@@ -2,3 +2,4 @@ include LICENSE
 include README.md
 recursive-include tests *.py
 include scripts/benchmark_report.py
+include scripts/benchmark_plots.py

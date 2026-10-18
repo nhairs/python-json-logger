@@ -27,7 +27,16 @@ def result_file(tmp_path: Path) -> Path:
         "benchmarks": [
             {
                 "extra_info": {"layer": layer, "workload": workload, "backend": backend},
-                "stats": {"median": 0.000002 if backend == "json" else 0.000001},
+                "stats": {
+                    "median": 0.000002 if backend == "json" else 0.000001,
+                    "mean": 0.0000021 if backend == "json" else 0.00000105,
+                    "stddev": 0.0000003 if backend == "json" else 0.00000015,
+                    "q1": 0.0000019 if backend == "json" else 0.00000095,
+                    "q3": 0.0000021 if backend == "json" else 0.00000105,
+                    "iqr": 0.0000002 if backend == "json" else 0.0000001,
+                    "rounds": 20,
+                    "iterations": 5,
+                },
             }
             for layer, workload, backend in product(
                 ("serialization", "formatting"),
@@ -48,10 +57,22 @@ def test_report_update(result_file: Path, tmp_path: Path) -> None:
         "Introduction\n<!-- benchmark-results:start -->\nold\n"
         "<!-- benchmark-results:end -->\nAfterword\n"
     )
-    command = [sys.executable, str(REPORT), str(result_file), "--update", str(page)]
+    command = [
+        sys.executable,
+        str(REPORT),
+        str(result_file),
+        "--update",
+        str(page),
+        "--plots",
+        "assets/benchmarking",
+    ]
     subprocess.run(command, check=True, capture_output=True)
     first = page.read_text(encoding="utf-8")
-    assert "| serialization | simple | 2.000 | 1.000; 2.00× | 1.000; 2.00× |" in first
+    assert "| serialization | simple | json | 2 | 0.2 | 2.1 ± 0.3 | 20 × 5 |" in first
+    assert "| serialization | simple | 1× | 2× | 2× |" in first
+    assert first.index("#### Times and variation") < first.index("#### Speedup")
+    assert "assets/benchmarking/cpython-3.15.0-times.svg" in first
+    assert "assets/benchmarking/cpython-3.15.0-speedup.svg" in first
     assert first.startswith("Introduction\n")
     assert first.endswith("Afterword\n")
     subprocess.run(command, check=True, capture_output=True)
@@ -124,5 +145,5 @@ def test_report_stdlib_only_pypy(result_file: Path, monkeypatch: pytest.MonkeyPa
     assert text == reversed_text
     assert "### CPython 3.15.0" in text
     assert "### PyPy 3.15.0" in text
-    assert "| serialization | simple | 2.000 | — | — |" in text
+    assert "| serialization | simple | 1× | — | — |" in text
     return

@@ -41,6 +41,7 @@ Homepage = "https://nhairs.github.io/python-json-logger"
 GitHub = "https://github.com/nhairs/python-json-logger"
 
 [dependency-groups]
+benchmark-report = ["matplotlib>=3.8,<4"]
 benchmark = [
     "pytest",
     "pytest-benchmark>=5.1,<6",

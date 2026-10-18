@@ -15,8 +15,8 @@ LAYERS = ("serialization", "formatting")
 WORKLOADS = ("simple", "structured", "nested", "unicode", "rich", "exception")
 
 
-def render(paths: list[Path]) -> str:
-    """Render complete per-runtime matrices in deterministic order."""
+def load_results(paths: list[Path]) -> list[dict]:
+    """Load summary statistics in deterministic runtime order."""
     results = []
     for path in paths:
         result = json.loads(path.read_text(encoding="utf-8"))
@@ -30,6 +30,12 @@ def render(paths: list[Path]) -> str:
             result["environment"].get("implementation", "CPython"),
         )
     )
+    return results
+
+
+def render(paths: list[Path], plots: str | None = None) -> str:
+    """Render separate timing, variation, and speedup tables."""
+    results = load_results(paths)
     sections = []
     runtimes = set()
     for result in results:
@@ -52,7 +58,17 @@ def render(paths: list[Path]) -> str:
             median = benchmark["stats"]["median"]
             if not math.isfinite(median) or median <= 0:
                 raise ValueError(f"Invalid median: {key}")
-            cases[key] = median
+            stats = benchmark["stats"]
+            for name in ("mean", "stddev", "iqr", "q1", "q3"):
+                if not math.isfinite(stats[name]) or stats[name] < 0:
+                    raise ValueError(f"Invalid {name}: {key}")
+            if stats["mean"] <= 0:
+                raise ValueError(f"Invalid mean: {key}")
+            if not 0 < stats["q1"] <= median <= stats["q3"]:
+                raise ValueError(f"Invalid quartiles: {key}")
+            if stats["rounds"] < 1 or stats["iterations"] < 1:
+                raise ValueError(f"Invalid repetition counts: {key}")
+            cases[key] = stats
         required = {
             (layer, workload, backend)
             for layer in LAYERS
@@ -79,23 +95,76 @@ def render(paths: list[Path]) -> str:
                 )
                 + ".",
                 "",
-                "| Layer | Workload | json (µs) | orjson (µs; speedup) | msgspec (µs; speedup) |",
+                "#### Times and variation",
+                "",
+            ]
+        )
+        slug = f"{implementation.lower()}-{python}"
+        if plots:
+            sections.extend(
+                [
+                    f"![Median times and interquartile ranges for {implementation} {python}]({plots}/{slug}-times.svg)",
+                    "",
+                ]
+            )
+        sections.extend(
+            [
+                "| Layer | Workload | Encoder | Median (µs) | IQR (µs) | Mean ± SD (µs) | Rounds × iterations |",
+                "| --- | --- | --- | ---: | ---: | ---: | ---: |",
+            ]
+        )
+        for layer in LAYERS:
+            for workload in WORKLOADS:
+                for backend in BACKENDS:
+                    if backend not in backends:
+                        continue
+                    stats = cases[layer, workload, backend]
+                    sections.append(
+                        f"| {layer} | {workload} | {backend} | "
+                        f"{stats['median'] * 1e6:.3g} | {stats['iqr'] * 1e6:.2g} | "
+                        f"{stats['mean'] * 1e6:.3g} ± {stats['stddev'] * 1e6:.2g} | "
+                        f"{stats['rounds']:,} × {stats['iterations']:,} |"
+                    )
+        sections.extend(["", "#### Speedup", ""])
+        if plots:
+            sections.extend(
+                [
+                    f"![Median speedups relative to stdlib JSON for {implementation} {python}]({plots}/{slug}-speedup.svg)",
+                    "",
+                ]
+            )
+        sections.extend(
+            [
+                "| Layer | Workload | json | orjson | msgspec |",
                 "| --- | --- | ---: | ---: | ---: |",
             ]
         )
         for layer in LAYERS:
             for workload in WORKLOADS:
-                baseline = cases[layer, workload, "json"]
-                cells = [f"{baseline * 1e6:.3f}"]
-                for backend in BACKENDS[1:]:
+                baseline = cases[layer, workload, "json"]["median"]
+                cells = []
+                for backend in BACKENDS:
                     if backend in backends:
-                        timing = cases[layer, workload, backend]
-                        cells.append(f"{timing * 1e6:.3f}; {baseline / timing:.2f}×")
+                        timing = cases[layer, workload, backend]["median"]
+                        cells.append(f"{baseline / timing:.2g}×")
                     else:
                         cells.append("—")
                 sections.append(f"| {layer} | {workload} | " + " | ".join(cells) + " |")
         sections.append("")
-    return "\n".join(sections)
+    statistics = [benchmark["stats"] for result in results for benchmark in result["benchmarks"]]
+    rounds = [stats["rounds"] for stats in statistics]
+    iterations = [stats["iterations"] for stats in statistics]
+    variation = [stats["stddev"] / stats["mean"] * 100 for stats in statistics]
+    summary = [
+        f"Observed repetitions: {min(rounds):,}–{max(rounds):,} rounds per case, "
+        f"with {min(iterations):,}–{max(iterations):,} iterations per round. "
+        "Warmup and calibration calls are additional.",
+        "",
+        f"Within-run SD/mean: {min(variation):.2g}%–{max(variation):.2g}% across cases, "
+        "including outliers. This does not measure between-run variation.",
+        "",
+    ]
+    return "\n".join(summary + sections)
 
 
 def main() -> None:
@@ -105,8 +174,9 @@ def main() -> None:
     output = parser.add_mutually_exclusive_group()
     output.add_argument("--update", type=Path, help="Replace the generated section in this page")
     output.add_argument("--curate", type=Path, help="Save JSON without individual timing samples")
+    parser.add_argument("--plots", help="Relative URL prefix for generated SVG plots")
     args = parser.parse_args()
-    report = render(args.results)
+    report = render(args.results, plots=args.plots)
     if args.curate:
         names = [path.name for path in args.results]
         if len(set(names)) != len(names):
