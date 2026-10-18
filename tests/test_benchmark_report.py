@@ -103,8 +103,10 @@ def test_report_curates_without_changing_statistics(result_file: Path, tmp_path:
     return
 
 
-def test_report_stdlib_only_pypy(result_file: Path) -> None:
+def test_report_stdlib_only_pypy(result_file: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     """PyPy reports retain stdlib timings and clearly mark unavailable encoders."""
+    # Tox can set UTF-8 stdout independently of Windows' preferred locale.
+    monkeypatch.setenv("PYTHONIOENCODING", "utf-8")
     cpython_file = result_file.with_name("cpython.json")
     cpython_file.write_bytes(result_file.read_bytes())
     result = json.loads(result_file.read_text())
@@ -114,10 +116,10 @@ def test_report_stdlib_only_pypy(result_file: Path) -> None:
     ]
     result_file.write_text(json.dumps(result))
     text = subprocess.check_output(
-        [sys.executable, str(REPORT), str(result_file), str(cpython_file)], text=True
+        [sys.executable, str(REPORT), str(result_file), str(cpython_file)], encoding="utf-8"
     )
     reversed_text = subprocess.check_output(
-        [sys.executable, str(REPORT), str(cpython_file), str(result_file)], text=True
+        [sys.executable, str(REPORT), str(cpython_file), str(result_file)], encoding="utf-8"
     )
     assert text == reversed_text
     assert "### CPython 3.15.0" in text
