@@ -729,6 +729,42 @@ def test_exc_info_as_array(env: LoggingEnvironment, class_: type[BaseJsonFormatt
 
 
 @pytest.mark.parametrize("class_", ALL_FORMATTERS)
+@pytest.mark.parametrize("exc_info_as_array", [False, True])
+@pytest.mark.parametrize(
+    "message", ["hello", {"exc_info": "caller text"}, {"exc_info": ["caller", "text"]}]
+)
+def test_cached_exc_text(
+    env: LoggingEnvironment,
+    class_: type[BaseJsonFormatter],
+    exc_info_as_array: bool,
+    message: str | dict[str, Any],
+) -> None:
+    env.set_formatter(class_(exc_info_as_array=exc_info_as_array))
+    original_message = message.copy() if isinstance(message, dict) else message
+    try:
+        raise ValueError("first line\nsecond line")
+    except ValueError:
+        record = env.logger.makeRecord(
+            env.logger.name, logging.ERROR, __file__, 0, message, (), sys.exc_info()
+        )
+
+    # SocketHandler formats the exception before transport and clears exc_info.
+    logging.Formatter().format(record)
+    cached_text = record.exc_text
+    assert cached_text is not None
+    received = logging.makeLogRecord({**record.__dict__, "exc_info": None})
+    env.logger.handle(received)
+
+    expected: str | list[str] = cached_text.splitlines() if exc_info_as_array else cached_text
+    if isinstance(message, dict):
+        expected = message["exc_info"]
+    assert env.load_json()["exc_info"] == expected
+    assert received.exc_text == cached_text
+    assert message == original_message
+    return
+
+
+@pytest.mark.parametrize("class_", ALL_FORMATTERS)
 def test_exc_info_as_array_no_exc_info(env: LoggingEnvironment, class_: type[BaseJsonFormatter]):
     env.set_formatter(class_(exc_info_as_array=True))
 

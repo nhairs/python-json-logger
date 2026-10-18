@@ -158,7 +158,8 @@ class BaseJsonFormatter(logging.Formatter):
                 outputting the json log record. If string is passed, timestamp will be added
                 to log record using string as key. If True boolean is passed, timestamp key
                 will be "timestamp". Defaults to False/off.
-            exc_info_as_array: break the exc_info into a list of lines based on line breaks.
+            exc_info_as_array: break the exc_info into a list of lines based on line breaks,
+                including cached exception text in records received over a transport.
             stack_info_as_array: break the stack_info into a list of lines based on line breaks.
 
         *Changed in 3.1*:
@@ -264,7 +265,9 @@ class BaseJsonFormatter(logging.Formatter):
         if record.exc_info and not message_dict.get("exc_info"):
             message_dict["exc_info"] = self.formatException(record.exc_info)
         if not message_dict.get("exc_info") and record.exc_text:
-            message_dict["exc_info"] = record.exc_text
+            message_dict["exc_info"] = (
+                record.exc_text.splitlines() if self.exc_info_as_array else record.exc_text
+            )
 
         # Display formatted record of stack frames
         # default format is a string returned from :func:`traceback.print_stack`
