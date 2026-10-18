@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `STYLE_STRING_FORMAT_REGEX`, which is no longer used to find `{` style fields. [#75](https://github.com/nhairs/python-json-logger/pull/75)
 
 ### Changed
+- Constrain the documentation dependency to `mkdocs<2`. [#80](https://github.com/nhairs/python-json-logger/issues/80)
 - Replaced MyPy with Pyrefly for type checking
 
 ### Fixed
