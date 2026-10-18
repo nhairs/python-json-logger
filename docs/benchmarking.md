@@ -10,7 +10,7 @@ predict application throughput or handler I/O performance.
 From a repository checkout, install the benchmark dependencies:
 
 ```shell
-uv sync --python 3.15 --only-group benchmark
+uv sync --python 3.15 --no-default-groups --group benchmark
 ```
 
 All three backends are required. An unavailable dependency fails installation or

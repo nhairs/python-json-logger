@@ -10,6 +10,7 @@ jobs:
   benchmark:
     name: CPython ${{ matrix.python }}
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     strategy:
       fail-fast: false
       matrix:
@@ -18,7 +19,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v3
       - name: Install benchmark dependencies
-        run: uv sync --python '${{ matrix.python }}' --only-group benchmark
+        run: uv sync --python '${{ matrix.python }}' --no-default-groups --group benchmark
       - name: Measure formatters
         run: |
           mkdir -p benchmark-results
