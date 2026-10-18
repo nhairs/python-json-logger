@@ -50,12 +50,12 @@ def test_report_update(result_file: Path, tmp_path: Path) -> None:
     )
     command = [sys.executable, str(REPORT), str(result_file), "--update", str(page)]
     subprocess.run(command, check=True, capture_output=True)
-    first = page.read_text()
+    first = page.read_text(encoding="utf-8")
     assert "| serialization | simple | 2.000 | 1.000; 2.00× | 1.000; 2.00× |" in first
     assert first.startswith("Introduction\n")
     assert first.endswith("Afterword\n")
     subprocess.run(command, check=True, capture_output=True)
-    assert page.read_text() == first
+    assert page.read_text(encoding="utf-8") == first
     return
 
 

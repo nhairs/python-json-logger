@@ -96,7 +96,7 @@ have variable contention, so cross-version numbers do not isolate interpreter
 performance.
 
 The curated baseline consists of one JSON file per Python version under
-`benchmarks/results/`, collected from one manual workflow invocation. Later
+`benchmarks/results/`, collected from one workflow invocation. Later
 workflow runs remain artifacts until explicitly selected as a replacement.
 Download all six artifacts from the chosen invocation into
 `benchmark-results/downloaded/`. Keep each JSON file under its original name.

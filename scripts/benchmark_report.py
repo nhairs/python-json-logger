@@ -19,7 +19,7 @@ def render(paths: list[Path]) -> str:
     """Render complete per-runtime matrices in deterministic order."""
     results = []
     for path in paths:
-        result = json.loads(path.read_text())
+        result = json.loads(path.read_text(encoding="utf-8"))
         # Raw exports can contain millions of samples; retain only table inputs.
         for benchmark in result["benchmarks"]:
             benchmark["stats"].pop("data", None)
@@ -108,12 +108,16 @@ def main() -> None:
                 "source_sha256": hashlib.sha256(raw).hexdigest(),
                 "omitted": ["benchmarks[].stats.data"],
             }
-            (args.curate / path.name).write_text(json.dumps(result, indent=2) + "\n")
+            (args.curate / path.name).write_text(
+                json.dumps(result, indent=2) + "\n", encoding="utf-8"
+            )
     elif args.update:
-        text = args.update.read_text()
+        text = args.update.read_text(encoding="utf-8")
         before, rest = text.split(START, 1)
         _, after = rest.split(END, 1)
-        args.update.write_text(before + START + "\n\n" + report + "\n" + END + after)
+        args.update.write_text(
+            before + START + "\n\n" + report + "\n" + END + after, encoding="utf-8"
+        )
     else:
         print(report)
     return
