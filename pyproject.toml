@@ -57,7 +57,7 @@ dev = [
     ## Build
     "build",
     ## Docs
-    "mkdocs",
+    "mkdocs<2",
     "mkdocs-material>=8.5",
     "mkdocs-awesome-pages-plugin",
     "mdx_truly_sane_lists",
