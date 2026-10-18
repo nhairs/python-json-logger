@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import math
 from pathlib import Path
@@ -16,7 +17,13 @@ WORKLOADS = ("simple", "structured", "nested", "unicode", "rich", "exception")
 
 def render(paths: list[Path]) -> str:
     """Render complete per-runtime matrices in deterministic order."""
-    results = [json.loads(path.read_text()) for path in paths]
+    results = []
+    for path in paths:
+        result = json.loads(path.read_text())
+        # Raw exports can contain millions of samples; retain only table inputs.
+        for benchmark in result["benchmarks"]:
+            benchmark["stats"].pop("data", None)
+        results.append(result)
     results.sort(key=lambda result: tuple(map(int, result["environment"]["python"].split("."))))
     sections = []
     runtimes = set()
@@ -82,10 +89,27 @@ def main() -> None:
     """Print a summary or replace the generated section of a documentation page."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("results", nargs="+", type=Path)
-    parser.add_argument("--update", type=Path, help="Replace the generated section in this page")
+    output = parser.add_mutually_exclusive_group()
+    output.add_argument("--update", type=Path, help="Replace the generated section in this page")
+    output.add_argument("--curate", type=Path, help="Save JSON without individual timing samples")
     args = parser.parse_args()
     report = render(args.results)
-    if args.update:
+    if args.curate:
+        names = [path.name for path in args.results]
+        if len(set(names)) != len(names):
+            raise ValueError("Curated result filenames must be unique")
+        args.curate.mkdir(parents=True, exist_ok=True)
+        for path in args.results:
+            raw = path.read_bytes()
+            result = json.loads(raw)
+            for benchmark in result["benchmarks"]:
+                benchmark["stats"].pop("data", None)
+            result["curation"] = {
+                "source_sha256": hashlib.sha256(raw).hexdigest(),
+                "omitted": ["benchmarks[].stats.data"],
+            }
+            (args.curate / path.name).write_text(json.dumps(result, indent=2) + "\n")
+    elif args.update:
         text = args.update.read_text()
         before, rest = text.split(START, 1)
         _, after = rest.split(END, 1)

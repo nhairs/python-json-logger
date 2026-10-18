@@ -98,13 +98,20 @@ performance.
 The curated baseline consists of one JSON file per Python version under
 `benchmarks/results/`, collected from one manual workflow invocation. Later
 workflow runs remain artifacts until explicitly selected as a replacement.
-Download all six artifacts from the chosen invocation, copy their JSON files to
-that directory, and regenerate the tables:
+Download all six artifacts from the chosen invocation into
+`benchmark-results/downloaded/`. Keep each JSON file under its original name.
+Curate the files and regenerate the tables:
 
 ```shell
+python scripts/benchmark_report.py benchmark-results/downloaded/*.json \
+  --curate benchmarks/results
 python scripts/benchmark_report.py benchmarks/results/*.json \
   --update docs/benchmarking.md
 ```
+
+Curation removes individual timing sample arrays to keep repository files small.
+It preserves every summary statistic and records the original file’s SHA-256
+hash. Workflow artifacts retain the full samples.
 
 The generator rejects incomplete or duplicate case matrices. Review the source
 revision, dependency versions, measurement settings, and variability before

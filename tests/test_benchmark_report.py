@@ -1,6 +1,7 @@
 """Verify the standalone report's interpretation of benchmark result files."""
 
 from itertools import product
+import hashlib
 import json
 from pathlib import Path
 import subprocess
@@ -74,4 +75,29 @@ def test_report_rejects_invalid_matrix(result_file: Path, problem: str) -> None:
     )
     assert completed.returncode != 0
     assert not completed.stdout
+    return
+
+
+def test_report_curates_without_changing_statistics(result_file: Path, tmp_path: Path) -> None:
+    """Curated JSON preserves summaries and provenance without large sample arrays."""
+    result = json.loads(result_file.read_text())
+    result["benchmarks"][0]["stats"]["data"] = [0.000002] * 10
+    result_file.write_text(json.dumps(result))
+    original = result_file.read_bytes()
+    target = tmp_path / "curated"
+    subprocess.run(
+        [sys.executable, str(REPORT), str(result_file), "--curate", str(target)],
+        check=True,
+        capture_output=True,
+    )
+    curated = json.loads((target / result_file.name).read_text())
+    assert "data" not in curated["benchmarks"][0]["stats"]
+    assert curated["benchmarks"][0]["stats"]["median"] == 0.000002
+    assert curated["curation"]["source_sha256"] == hashlib.sha256(original).hexdigest()
+    assert result_file.read_bytes() == original
+    original_report = subprocess.check_output([sys.executable, str(REPORT), str(result_file)])
+    curated_report = subprocess.check_output(
+        [sys.executable, str(REPORT), str(target / result_file.name)]
+    )
+    assert original_report == curated_report
     return
