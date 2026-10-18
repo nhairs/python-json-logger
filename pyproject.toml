@@ -41,7 +41,12 @@ Homepage = "https://nhairs.github.io/python-json-logger"
 GitHub = "https://github.com/nhairs/python-json-logger"
 
 [dependency-groups]
-benchmark = ["pytest", "pytest-benchmark>=5.1,<6", "orjson", "msgspec"]
+benchmark = [
+    "pytest",
+    "pytest-benchmark>=5.1,<6",
+    "orjson;implementation_name!='pypy'",
+    "msgspec;implementation_name!='pypy'",
+]
 dev = [
     ## Optional but required for dev
     "orjson;implementation_name!='pypy'",

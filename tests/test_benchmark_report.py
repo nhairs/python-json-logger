@@ -101,3 +101,17 @@ def test_report_curates_without_changing_statistics(result_file: Path, tmp_path:
     )
     assert original_report == curated_report
     return
+
+
+def test_report_stdlib_only_pypy(result_file: Path) -> None:
+    """PyPy reports retain stdlib timings and clearly mark unavailable encoders."""
+    result = json.loads(result_file.read_text())
+    result["environment"].update(implementation="PyPy", backends=["json"])
+    result["benchmarks"] = [
+        item for item in result["benchmarks"] if item["extra_info"]["backend"] == "json"
+    ]
+    result_file.write_text(json.dumps(result))
+    text = subprocess.check_output([sys.executable, str(REPORT), str(result_file)], text=True)
+    assert "### PyPy 3.15.0" in text
+    assert "| serialization | simple | 2.000 | — | — |" in text
+    return

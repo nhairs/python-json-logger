@@ -30,9 +30,13 @@ def render(paths: list[Path]) -> str:
     for result in results:
         environment = result["environment"]
         python = environment["python"]
-        if python in runtimes:
-            raise ValueError(f"Duplicate runtime: {python}")
-        runtimes.add(python)
+        runtime = (environment.get("implementation", "CPython"), python)
+        if runtime in runtimes:
+            raise ValueError(f"Duplicate runtime: {runtime}")
+        runtimes.add(runtime)
+        backends = tuple(environment.get("backends", BACKENDS))
+        if "json" not in backends or not set(backends).issubset(BACKENDS):
+            raise ValueError(f"Invalid backend list for Python {python}")
         cases = {}
         for benchmark in result["benchmarks"]:
             info = benchmark["extra_info"]
@@ -47,7 +51,7 @@ def render(paths: list[Path]) -> str:
             (layer, workload, backend)
             for layer in LAYERS
             for workload in WORKLOADS
-            for backend in BACKENDS
+            for backend in backends
         }
         if set(cases) != required:
             raise ValueError(f"Incomplete or unexpected matrix for Python {python}")
@@ -55,7 +59,7 @@ def render(paths: list[Path]) -> str:
         cpu = machine.get("cpu", {}).get("brand_raw", machine.get("processor", "unknown"))
         sections.extend(
             [
-                f"### CPython {python}",
+                f"### {environment.get("implementation", "CPython")} {python}",
                 "",
                 f"Measured: {result['datetime']}. Revision: `{environment['revision']}`"
                 + (" (working tree modified)." if environment["dirty"] else "."),
@@ -78,8 +82,11 @@ def render(paths: list[Path]) -> str:
                 baseline = cases[layer, workload, "json"]
                 cells = [f"{baseline * 1e6:.3f}"]
                 for backend in BACKENDS[1:]:
-                    timing = cases[layer, workload, backend]
-                    cells.append(f"{timing * 1e6:.3f}; {baseline / timing:.2f}×")
+                    if backend in backends:
+                        timing = cases[layer, workload, backend]
+                        cells.append(f"{timing * 1e6:.3f}; {baseline / timing:.2f}×")
+                    else:
+                        cells.append("—")
                 sections.append(f"| {layer} | {workload} | " + " | ".join(cells) + " |")
         sections.append("")
     return "\n".join(sections)
