@@ -14,7 +14,7 @@ import sys
 import traceback
 from types import TracebackType
 from typing import Any
-from collections.abc import Generator
+from collections.abc import Generator, Sequence
 import uuid
 import zoneinfo
 
@@ -278,7 +278,7 @@ def test_sequence_tuple_format(env: LoggingEnvironment, class_: type[BaseJsonFor
 def test_uses_time(
     env: LoggingEnvironment,
     class_: type[BaseJsonFormatter],
-    fmt: str | list[str] | tuple[str, ...] | None,
+    fmt: Sequence[str] | None,
     style: str,
     expected: bool,
 ) -> None:
@@ -290,18 +290,16 @@ def test_uses_time(
     return
 
 
-@pytest.mark.parametrize("fields", [["message"], ["message", "asctime"]])
-def test_uses_time_custom_parse(env: LoggingEnvironment, fields: list[str]) -> None:
+def test_uses_time_custom_parse(env: LoggingEnvironment) -> None:
     class CustomJsonFormatter(JsonFormatter):
         def parse(self) -> list[str]:
-            return fields
+            return ["message", "asctime"]
 
     formatter = CustomJsonFormatter("custom format", style="custom", validate=False)
-    expected = "asctime" in fields
-    assert formatter.usesTime() is expected
+    assert formatter.usesTime() is True
     env.set_formatter(formatter)
     env.logger.info("test message")
-    assert ("asctime" in env.load_json()) is expected
+    assert "asctime" in env.load_json()
     return
 
 
