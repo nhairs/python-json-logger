@@ -24,13 +24,19 @@ def render(paths: list[Path]) -> str:
         for benchmark in result["benchmarks"]:
             benchmark["stats"].pop("data", None)
         results.append(result)
-    results.sort(key=lambda result: tuple(map(int, result["environment"]["python"].split("."))))
+    results.sort(
+        key=lambda result: (
+            tuple(map(int, result["environment"]["python"].split("."))),
+            result["environment"].get("implementation", "CPython"),
+        )
+    )
     sections = []
     runtimes = set()
     for result in results:
         environment = result["environment"]
         python = environment["python"]
-        runtime = (environment.get("implementation", "CPython"), python)
+        implementation = environment.get("implementation", "CPython")
+        runtime = (implementation, python)
         if runtime in runtimes:
             raise ValueError(f"Duplicate runtime: {runtime}")
         runtimes.add(runtime)
@@ -59,7 +65,7 @@ def render(paths: list[Path]) -> str:
         cpu = machine.get("cpu", {}).get("brand_raw", machine.get("processor", "unknown"))
         sections.extend(
             [
-                f"### {environment.get("implementation", "CPython")} {python}",
+                f"### {implementation} {python}",
                 "",
                 f"Measured: {result['datetime']}. Revision: `{environment['revision']}`"
                 + (" (working tree modified)." if environment["dirty"] else "."),

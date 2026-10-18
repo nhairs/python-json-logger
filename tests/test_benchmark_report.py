@@ -105,13 +105,22 @@ def test_report_curates_without_changing_statistics(result_file: Path, tmp_path:
 
 def test_report_stdlib_only_pypy(result_file: Path) -> None:
     """PyPy reports retain stdlib timings and clearly mark unavailable encoders."""
+    cpython_file = result_file.with_name("cpython.json")
+    cpython_file.write_bytes(result_file.read_bytes())
     result = json.loads(result_file.read_text())
     result["environment"].update(implementation="PyPy", backends=["json"])
     result["benchmarks"] = [
         item for item in result["benchmarks"] if item["extra_info"]["backend"] == "json"
     ]
     result_file.write_text(json.dumps(result))
-    text = subprocess.check_output([sys.executable, str(REPORT), str(result_file)], text=True)
+    text = subprocess.check_output(
+        [sys.executable, str(REPORT), str(result_file), str(cpython_file)], text=True
+    )
+    reversed_text = subprocess.check_output(
+        [sys.executable, str(REPORT), str(cpython_file), str(result_file)], text=True
+    )
+    assert text == reversed_text
+    assert "### CPython 3.15.0" in text
     assert "### PyPy 3.15.0" in text
     assert "| serialization | simple | 2.000 | — | — |" in text
     return
