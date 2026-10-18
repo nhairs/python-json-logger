@@ -14,6 +14,7 @@ nav:
   - quickstart.md
   - time.md
   - cookbook.md
+  - benchmarking.md
   - changelog.md
   - security.md
   - contributing.md
