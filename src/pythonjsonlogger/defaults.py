@@ -161,9 +161,8 @@ def exception_default(obj: BaseException) -> str:
     *Changed in 4.2.1*: Include exception notes.
     """
     result = f"{obj.__class__.__name__}: {obj}"
-    notes = getattr(obj, "__notes__", None)
-    if isinstance(notes, list):
-        return "\n".join([result, *(note for note in notes if isinstance(note, str))])
+    if hasattr(obj, "__notes__"):
+        return "\n".join([result, *obj.__notes__])
     return result
 
 
