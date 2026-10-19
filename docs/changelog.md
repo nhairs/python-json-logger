@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [4.2.1](https://github.com/nhairs/python-json-logger/compare/v4.2.0...v4.2.1) - UNRELEASED
 
 ### Added
+- Documentation: Quickstart examples are tested to ensure the sample output matches reality.
 - Add support for Python 3.15, PyPy 3.12
 
 ### Removed
@@ -20,7 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `%` style formats no longer treat the escaped literal `%%` as the start of a field, so `"%%(notafield)s"` is correctly read as literal text. [#75](https://github.com/nhairs/python-json-logger/pull/75)
 - `{` style formats now use `string.Formatter` (as `logging.StrFormatStyle.validate` does) to find fields, so escaped literal braces (`{{`/`}}`) are skipped and a conversion (`{message!r}`) or format spec (`{levelname:>8}`) is no longer treated as part of the field name. [#75](https://github.com/nhairs/python-json-logger/pull/75)
 
-Thanks @dylanpulver
+Thanks @dylanpulver, @Gonghan-Princess
 
 ## [4.2.0](https://github.com/nhairs/python-json-logger/compare/v4.1.0...v4.2.0) - 2026-08-15
 
