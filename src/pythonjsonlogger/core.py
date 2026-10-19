@@ -235,11 +235,7 @@ class BaseJsonFormatter(logging.Formatter):
         return
 
     def usesTime(self) -> bool:
-        """Return whether the parsed format fields include `asctime`.
-
-        *Changed in 4.2.1*: supports comma-separated, sequence, and custom formats,
-        and ignores escaped literal field names.
-        """
+        """Return whether the parsed format fields include `asctime`."""
         return "asctime" in self._required_fields
 
     def format(self, record: logging.LogRecord) -> str:
