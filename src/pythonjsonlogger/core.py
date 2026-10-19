@@ -181,7 +181,6 @@ class BaseJsonFormatter(logging.Formatter):
           to `python-json-logger` and thus care should be taken to not to pass this format to other
           logging Formatter implementations.
         - `fmt` now supports sequences of strings (e.g. lists and tuples) of field names.
-
         """
         ## logging.Formatter compatibility
         ## ---------------------------------------------------------------------

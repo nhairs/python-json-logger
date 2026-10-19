@@ -6,8 +6,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [4.2.1](https://github.com/nhairs/python-json-logger/compare/v4.2.0...v4.2.1) - UNRELEASED
 
+### Added
+- Documentation: Quickstart examples are tested to ensure the sample output matches reality.
+- Add support for Python 3.15, PyPy 3.12
+
 ### Removed
 - `STYLE_STRING_FORMAT_REGEX`, which is no longer used to find `{` style fields. [#75](https://github.com/nhairs/python-json-logger/pull/75)
+
+### Changed
+- Constrain the documentation dependency to `mkdocs<2`. [#80](https://github.com/nhairs/python-json-logger/issues/80)
+- Replaced MyPy with Pyrefly for type checking
 
 ### Fixed
 - `%` style formats no longer treat the escaped literal `%%` as the start of a field, so `"%%(notafield)s"` is correctly read as literal text. [#75](https://github.com/nhairs/python-json-logger/pull/75)
@@ -15,7 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `defaults` is copied on construction like `rename_fields` and `static_fields`, so DictConfigurator `ext://` prefixes are converted and mutating the caller's dict cannot change formatter state.
 - A string passed as `reserved_attrs` raises `TypeError` instead of being iterated as characters; use a list or tuple of field names.
 
-Thanks @dylanpulver, @00200200
+Thanks @dylanpulver, @Gonghan-Princess, @00200200
 
 ## [4.2.0](https://github.com/nhairs/python-json-logger/compare/v4.1.0...v4.2.0) - 2026-08-15
 
