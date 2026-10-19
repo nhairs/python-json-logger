@@ -7,15 +7,15 @@ Contributions are welcome!
 In general we follow the [Python Software Foundation Code of Conduct](https://policies.python.org/python.org/code-of-conduct/). Please note that we are not affiliated with the PSF.
 
 
-### Generative AI Tools
+## Generative AI Tools
 
-#### Foreword
+### Foreword
 
 Although a fairly simple package, `python-json-logger` is a well trusted and popular package that is downloaded from PyPI over 80 million times a month. The continued quality, stability, and stewardship of the package is a responsibility that the maintainers take seriously.
 
 **Low effort submissions actively work against the maintainers**. Every issue and pull request is considered and reviewed by the maintainers, taking a non-trivial amount of time and effort.
 
-#### Policy
+### Policy
 
 The use of AI tools is allowed with the following conditions:
 
