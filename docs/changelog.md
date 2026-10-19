@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `defaults` is copied on construction like `rename_fields` and `static_fields`, so DictConfigurator `ext://` prefixes are converted and mutating the caller's dict cannot change formatter state.
 - A string passed as `reserved_attrs` raises `TypeError` instead of being iterated as characters; use a list or tuple of field names.
 
-Thanks @dylanpulver
+Thanks @dylanpulver, @00200200
 
 ## [4.2.0](https://github.com/nhairs/python-json-logger/compare/v4.1.0...v4.2.0) - 2026-08-15
 

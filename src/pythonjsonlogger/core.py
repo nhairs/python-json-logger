@@ -182,10 +182,6 @@ class BaseJsonFormatter(logging.Formatter):
           logging Formatter implementations.
         - `fmt` now supports sequences of strings (e.g. lists and tuples) of field names.
 
-        *Changed in 4.2.1*:
-
-        - `defaults` is copied on construction, matching `rename_fields` and `static_fields`.
-        - A string `reserved_attrs` value raises `TypeError`.
         """
         ## logging.Formatter compatibility
         ## ---------------------------------------------------------------------
