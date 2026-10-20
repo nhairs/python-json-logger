@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Documentation: Quickstart examples are tested to ensure the sample output matches reality.
 - Add support for Python 3.15, PyPy 3.12
 
+### Changed
+- Preserve an exception's own notes when encoding exception instances, including exception group summaries. Related to [#67](https://github.com/nhairs/python-json-logger/issues/67).
+
 ### Removed
 - `STYLE_STRING_FORMAT_REGEX`, which is no longer used to find `{` style fields. [#75](https://github.com/nhairs/python-json-logger/pull/75)
 
@@ -24,7 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `defaults` is copied on construction like `rename_fields` and `static_fields`, so DictConfigurator `ext://` prefixes are converted and mutating the caller's dict cannot change formatter state.
 - A string passed as `reserved_attrs` raises `TypeError` instead of being iterated as characters; use a list or tuple of field names.
 
-Thanks @dylanpulver, @Gonghan-Princess, @JackyHsu-X, @00200200
+Thanks @dylanpulver, @Gonghan-Princess, @JackyHsu-X, @00200200, @SAY-5
 
 ## [4.2.0](https://github.com/nhairs/python-json-logger/compare/v4.1.0...v4.2.0) - 2026-08-15
 

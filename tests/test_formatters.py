@@ -812,6 +812,100 @@ def test_common_types_encoded(
     return
 
 
+@pytest.mark.skipif(
+    sys.version_info < (3, 11), reason="Exception notes require Python 3.11 or higher"
+)
+@pytest.mark.parametrize("class_", ALL_FORMATTERS)
+@pytest.mark.parametrize(
+    ["notes", "expected"],
+    [
+        ([], "ValueError: my error"),
+        (["context"], "ValueError: my error\ncontext"),
+        ([""], "ValueError: my error\n"),
+        (["first", "second"], "ValueError: my error\nfirst\nsecond"),
+        (["line 1\nline 2", "Привет"], "ValueError: my error\nline 1\nline 2\nПривет"),
+    ],
+)
+def test_dict_exception_notes(
+    env: LoggingEnvironment,
+    class_: type[BaseJsonFormatter],
+    notes: list[str],
+    expected: str,
+) -> None:
+    env.set_formatter(class_())
+    err = ValueError("my error")
+    for note in notes:
+        err.add_note(note)
+
+    env.logger.info({"error": err, "nested": {"error": err}, "errors": [err]})
+    log_json = env.load_json()
+
+    assert log_json["error"] == expected
+    assert log_json["nested"]["error"] == expected
+    assert log_json["errors"] == [expected]
+    return
+
+
+@pytest.mark.skipif(
+    sys.version_info < (3, 11), reason="Exception notes require Python 3.11 or higher"
+)
+@pytest.mark.parametrize("class_", ALL_FORMATTERS)
+def test_dict_exception_note_subclass(
+    env: LoggingEnvironment, class_: type[BaseJsonFormatter]
+) -> None:
+    class Note(str):
+        """A string subclass accepted by add_note."""
+
+    err = ValueError("my error")
+    err.add_note(Note("context"))
+    env.set_formatter(class_())
+    env.logger.info({"error": err})
+
+    assert env.load_json()["error"] == "ValueError: my error\ncontext"
+    return
+
+
+@pytest.mark.parametrize("class_", ALL_FORMATTERS)
+def test_dict_exception_message_compatibility(
+    env: LoggingEnvironment, class_: type[BaseJsonFormatter]
+) -> None:
+    class CustomError(Exception):
+        """An exception with a custom formatted message."""
+
+        def __format__(self, format_spec: str) -> str:
+            return "custom message"
+
+    env.set_formatter(class_())
+    env.logger.info({"empty": ValueError(), "custom": CustomError("original message")})
+    log_json = env.load_json()
+
+    assert log_json["empty"] == "ValueError: "
+    assert log_json["custom"] == "CustomError: custom message"
+    return
+
+
+@pytest.mark.skipif(
+    sys.version_info < (3, 11), reason="Exception groups and notes require Python 3.11 or higher"
+)
+@pytest.mark.parametrize("class_", ALL_FORMATTERS)
+@pytest.mark.parametrize("with_group_note", [False, True])
+def test_dict_exception_group_notes(
+    env: LoggingEnvironment, class_: type[BaseJsonFormatter], with_group_note: bool
+) -> None:
+    child = ValueError("child error")
+    child.add_note("child note")
+    group = ExceptionGroup("my group", [child])
+    expected = "ExceptionGroup: my group (1 sub-exception)"
+    if with_group_note:
+        group.add_note("group note")
+        expected += "\ngroup note"
+    env.set_formatter(class_())
+    env.logger.info({"error": group})
+
+    assert env.load_json()["error"] == expected
+    return
+
+
 @pytest.mark.parametrize("class_", ALL_FORMATTERS)
 def test_custom_default(env: LoggingEnvironment, class_: type[BaseJsonFormatter]):
     def custom_default(obj):
