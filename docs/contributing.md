@@ -25,7 +25,7 @@ This means no fully autonomous systems.
 
 AI tools are cheap, if the maintainers want to talk to an AI tool they will use their own.
 
-The only exceptions to this is when a human is interacting with their own AI tools on their own pull requests, and the AI tools of the maintainers. Abuse of this exception will lead to banning.
+The only exceptions to this is when a human is interacting with their own AI tools on their own pull requests, or the AI tools of the maintainers. Abuse of this exception will lead to banning.
 
 **AI Disclosure**: The use of AI tools **must** be declared.
 
@@ -34,7 +34,7 @@ For issues and pull requests you should append a disclosure similar to the follo
 ```md
 ## AI Disclosure
 
-This <issue,pull-request> was created using: <list of tools and models>.
+This <issue,pull-request> was created using: <list of tools and models e.g. 'Hermes, OpenAI models, Calude models, and Deepseek models.>.
 ```
 
 **Violations**: Low quality submissions may be closed without discussion. Repeat offenders will be blocked from the project.
