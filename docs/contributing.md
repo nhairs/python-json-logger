@@ -107,7 +107,7 @@ Before pushing and creating your pull request, you should make sure you've done 
 - Formatted your code and run the linters and tests.
 - Updated the version number in `pyproject.toml`. In general using a `.devN` suffix is acceptable.
   This is not required for changes that do no affect the code such as documentation.
-- Add details of the changes to the change log (`docs/change-log.md`), creating a new section if needed.
+- Add details of the changes to the change log (`docs/change-log.md`), creating a new section if needed, and adding youself to the "thanks" section. Changes to documention content should not be added (but changes to documentation tooling should).
 - Add notes for new / changed features in the relevant docstring.
 
 **4. Create your pull request**
