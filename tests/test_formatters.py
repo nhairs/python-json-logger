@@ -130,7 +130,8 @@ NO_TEST = object()  # Sentinal
 ### ============================================================================
 def test_reserved_attrs_cover_logrecord_defaults():
     record = logging.makeLogRecord({})
-    # message and asctime are added by formatters rather than LogRecord itself.
+    # Use a subset check because RESERVED_ATTRS also includes message and asctime,
+    # which formatters add later and are absent from a newly created LogRecord.
     assert set(vars(record)) <= set(RESERVED_ATTRS)
 
 
