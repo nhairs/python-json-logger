@@ -14,7 +14,7 @@ import sys
 import traceback
 from types import TracebackType
 from typing import Any
-from collections.abc import Generator
+from collections.abc import Generator, Sequence
 import uuid
 import zoneinfo
 
@@ -38,9 +38,9 @@ if pythonjsonlogger.MSGSPEC_AVAILABLE:
 ### ============================================================================
 ALL_FORMATTERS: list[type[BaseJsonFormatter]] = [JsonFormatter]
 if pythonjsonlogger.ORJSON_AVAILABLE:
-    ALL_FORMATTERS.append(OrjsonFormatter)
+    ALL_FORMATTERS.append(OrjsonFormatter)  # type: ignore[unbound-name]
 if pythonjsonlogger.MSGSPEC_AVAILABLE:
-    ALL_FORMATTERS.append(MsgspecFormatter)
+    ALL_FORMATTERS.append(MsgspecFormatter)  # type: ignore[unbound-name]
 
 _LOGGER_COUNT = 0
 
@@ -128,6 +128,13 @@ NO_TEST = object()  # Sentinal
 
 ### TESTS
 ### ============================================================================
+def test_reserved_attrs_cover_logrecord_defaults():
+    record = logging.makeLogRecord({})
+    # Use a subset check because RESERVED_ATTRS also includes message and asctime,
+    # which formatters add later and are absent from a newly created LogRecord.
+    assert set(vars(record)) <= set(RESERVED_ATTRS)
+
+
 def test_merge_record_extra():
     record = logging.LogRecord(
         "name", level=1, pathname="", lineno=1, msg="Some message", args=None, exc_info=None
@@ -249,6 +256,75 @@ def test_sequence_tuple_format(env: LoggingEnvironment, class_: type[BaseJsonFor
 
 
 @pytest.mark.parametrize("class_", ALL_FORMATTERS)
+@pytest.mark.parametrize(
+    "fmt,style,expected",
+    [
+        pytest.param(None, "%", False, id="default"),
+        pytest.param("%(message)s", "%", False, id="percent-message"),
+        pytest.param("%(asctime)s %(message)s", "%", True, id="percent-time"),
+        pytest.param("%%(asctime)s %(message)s", "%", False, id="percent-literal"),
+        pytest.param("{message}", "{", False, id="braces-message"),
+        pytest.param("{asctime!s} {message}", "{", True, id="braces-time"),
+        pytest.param("{{asctime}} {message}", "{", False, id="braces-literal"),
+        pytest.param("$message", "$", False, id="template-message"),
+        pytest.param("$asctime $message", "$", True, id="template-time"),
+        pytest.param("${asctime} $message", "$", True, id="braced-template-time"),
+        pytest.param("$${asctime} $message", "$", False, id="template-literal"),
+        pytest.param("message", ",", False, id="comma-message"),
+        pytest.param("message, asctime,", ",", True, id="comma-time"),
+        pytest.param("message,not_asctime", ",", False, id="comma-other-field"),
+        pytest.param(["message"], "%", False, id="list-message"),
+        pytest.param(["message", "asctime"], "%", True, id="list-time"),
+        pytest.param(["message", "asctime_suffix"], "%", False, id="list-other-field"),
+        pytest.param([], "%", False, id="empty-list"),
+        pytest.param(("message",), "%", False, id="tuple-message"),
+        pytest.param(("asctime", "message"), "%", True, id="tuple-time"),
+        pytest.param((), "%", False, id="empty-tuple"),
+    ],
+)
+def test_uses_time(
+    env: LoggingEnvironment,
+    class_: type[BaseJsonFormatter],
+    fmt: Sequence[str] | None,
+    style: str,
+    expected: bool,
+) -> None:
+    formatter = class_(fmt, style=style, rename_fields={"asctime": "time"})
+    assert formatter.usesTime() is expected
+    env.set_formatter(formatter)
+    env.logger.info("test message")
+    assert ("time" in env.load_json()) is expected
+    return
+
+
+def test_uses_time_custom_parse(env: LoggingEnvironment) -> None:
+    class CustomJsonFormatter(JsonFormatter):
+        def parse(self) -> list[str]:
+            return ["message", "asctime"]
+
+    formatter = CustomJsonFormatter("custom format", style="custom", validate=False)
+    assert formatter.usesTime() is True
+    env.set_formatter(formatter)
+    env.logger.info("test message")
+    assert "asctime" in env.load_json()
+    return
+
+
+@pytest.mark.parametrize("class_", ALL_FORMATTERS)
+def test_uses_time_timestamp_option(
+    env: LoggingEnvironment, class_: type[BaseJsonFormatter]
+) -> None:
+    formatter = class_(timestamp=True)
+    assert formatter.usesTime() is False
+    env.set_formatter(formatter)
+    env.logger.info("test message")
+    log_json = env.load_json()
+    assert "timestamp" in log_json
+    assert "asctime" not in log_json
+    return
+
+
+@pytest.mark.parametrize("class_", ALL_FORMATTERS)
 def test_defaults_field(env: LoggingEnvironment, class_: type[BaseJsonFormatter]):
     env.set_formatter(class_(defaults={"first": 1, "second": 2}))
 
@@ -257,6 +333,50 @@ def test_defaults_field(env: LoggingEnvironment, class_: type[BaseJsonFormatter]
 
     assert log_json["first"] == 1234
     assert log_json["second"] == 2
+    return
+
+
+@pytest.mark.parametrize("class_", ALL_FORMATTERS)
+def test_defaults_not_shared_with_caller(env: LoggingEnvironment, class_: type[BaseJsonFormatter]):
+    defaults = {"environment": "dev"}
+    formatter = class_(defaults=defaults)
+    assert formatter.defaults is not defaults
+    defaults["environment"] = "prod"
+    env.set_formatter(formatter)
+
+    env.logger.info("testing defaults isolation")
+    log_json = env.load_json()
+
+    assert log_json["environment"] == "dev"
+    return
+
+
+@pytest.mark.parametrize("class_", ALL_FORMATTERS)
+@pytest.mark.parametrize("reserved_attrs", ["filename", ""])
+def test_reserved_attrs_string(class_: type[BaseJsonFormatter], reserved_attrs: str) -> None:
+    with pytest.raises(
+        TypeError, match="reserved_attrs must be a sequence of field names, not a string"
+    ):
+        class_(reserved_attrs=reserved_attrs)
+    return
+
+
+@pytest.mark.parametrize("class_", ALL_FORMATTERS)
+@pytest.mark.parametrize("reserved_attrs", [["filename"], ("filename",)])
+def test_reserved_attrs_sequence(
+    env: LoggingEnvironment,
+    class_: type[BaseJsonFormatter],
+    reserved_attrs: list[str] | tuple[str, ...],
+) -> None:
+    env.set_formatter(class_(reserved_attrs=reserved_attrs))
+
+    env.logger.info("hello", extra={"user": "x"})
+    log_json = env.load_json()
+
+    assert log_json["message"] == "hello"
+    assert log_json["user"] == "x"
+    assert "filename" not in log_json
+    assert "levelname" in log_json
     return
 
 
@@ -699,6 +819,100 @@ def test_common_types_encoded(
     return
 
 
+@pytest.mark.skipif(
+    sys.version_info < (3, 11), reason="Exception notes require Python 3.11 or higher"
+)
+@pytest.mark.parametrize("class_", ALL_FORMATTERS)
+@pytest.mark.parametrize(
+    ["notes", "expected"],
+    [
+        ([], "ValueError: my error"),
+        (["context"], "ValueError: my error\ncontext"),
+        ([""], "ValueError: my error\n"),
+        (["first", "second"], "ValueError: my error\nfirst\nsecond"),
+        (["line 1\nline 2", "Привет"], "ValueError: my error\nline 1\nline 2\nПривет"),
+    ],
+)
+def test_dict_exception_notes(
+    env: LoggingEnvironment,
+    class_: type[BaseJsonFormatter],
+    notes: list[str],
+    expected: str,
+) -> None:
+    env.set_formatter(class_())
+    err = ValueError("my error")
+    for note in notes:
+        err.add_note(note)
+
+    env.logger.info({"error": err, "nested": {"error": err}, "errors": [err]})
+    log_json = env.load_json()
+
+    assert log_json["error"] == expected
+    assert log_json["nested"]["error"] == expected
+    assert log_json["errors"] == [expected]
+    return
+
+
+@pytest.mark.skipif(
+    sys.version_info < (3, 11), reason="Exception notes require Python 3.11 or higher"
+)
+@pytest.mark.parametrize("class_", ALL_FORMATTERS)
+def test_dict_exception_note_subclass(
+    env: LoggingEnvironment, class_: type[BaseJsonFormatter]
+) -> None:
+    class Note(str):
+        """A string subclass accepted by add_note."""
+
+    err = ValueError("my error")
+    err.add_note(Note("context"))
+    env.set_formatter(class_())
+    env.logger.info({"error": err})
+
+    assert env.load_json()["error"] == "ValueError: my error\ncontext"
+    return
+
+
+@pytest.mark.parametrize("class_", ALL_FORMATTERS)
+def test_dict_exception_message_compatibility(
+    env: LoggingEnvironment, class_: type[BaseJsonFormatter]
+) -> None:
+    class CustomError(Exception):
+        """An exception with a custom formatted message."""
+
+        def __format__(self, format_spec: str) -> str:
+            return "custom message"
+
+    env.set_formatter(class_())
+    env.logger.info({"empty": ValueError(), "custom": CustomError("original message")})
+    log_json = env.load_json()
+
+    assert log_json["empty"] == "ValueError: "
+    assert log_json["custom"] == "CustomError: custom message"
+    return
+
+
+@pytest.mark.skipif(
+    sys.version_info < (3, 11), reason="Exception groups and notes require Python 3.11 or higher"
+)
+@pytest.mark.parametrize("class_", ALL_FORMATTERS)
+@pytest.mark.parametrize("with_group_note", [False, True])
+def test_dict_exception_group_notes(
+    env: LoggingEnvironment, class_: type[BaseJsonFormatter], with_group_note: bool
+) -> None:
+    child = ValueError("child error")
+    child.add_note("child note")
+    group = ExceptionGroup("my group", [child])
+    expected = "ExceptionGroup: my group (1 sub-exception)"
+    if with_group_note:
+        group.add_note("group note")
+        expected += "\ngroup note"
+    env.set_formatter(class_())
+    env.logger.info({"error": group})
+
+    assert env.load_json()["error"] == expected
+    return
+
+
 @pytest.mark.parametrize("class_", ALL_FORMATTERS)
 def test_custom_default(env: LoggingEnvironment, class_: type[BaseJsonFormatter]):
     def custom_default(obj):
@@ -725,6 +939,51 @@ def test_exc_info_as_array(env: LoggingEnvironment, class_: type[BaseJsonFormatt
     log_json = env.load_json()
 
     assert isinstance(log_json["exc_info"], list)
+    return
+
+
+@pytest.mark.parametrize("class_", ALL_FORMATTERS)
+@pytest.mark.parametrize("exc_info_as_array", [False, True])
+@pytest.mark.parametrize(
+    "message",
+    [
+        pytest.param("hello", id="cached-text"),
+        pytest.param({"exc_info": "caller text"}, id="string-override"),
+        pytest.param({"exc_info": ["caller", "text"]}, id="list-override"),
+    ],
+)
+def test_cached_exc_text(
+    env: LoggingEnvironment,
+    class_: type[BaseJsonFormatter],
+    exc_info_as_array: bool,
+    message: str | dict[str, Any],
+) -> None:
+    """Honor the array option for cached exceptions without replacing caller overrides."""
+    env.set_formatter(class_(exc_info_as_array=exc_info_as_array))
+    original_message = message.copy() if isinstance(message, dict) else message
+    # Start with a real exception so the cached text includes its multiline traceback.
+    try:
+        raise ValueError("first line\nsecond line")
+    except ValueError:
+        record = env.logger.makeRecord(
+            env.logger.name, logging.ERROR, __file__, 0, message, (), sys.exc_info()
+        )
+
+    # Mirror SocketHandler's receiver state: formatted exception text survives,
+    # but the original exc_info tuple is cleared before the record is transported.
+    logging.Formatter().format(record)
+    cached_text = record.exc_text
+    assert cached_text is not None
+    received = logging.makeLogRecord({**record.__dict__, "exc_info": None})
+    env.logger.handle(received)
+
+    # The option controls the cached fallback, not a caller-supplied exc_info value.
+    expected: str | list[str] = cached_text.splitlines() if exc_info_as_array else cached_text
+    if isinstance(message, dict):
+        expected = message["exc_info"]
+    assert env.load_json()["exc_info"] == expected
+    assert received.exc_text == cached_text
+    assert message == original_message
     return
 
 

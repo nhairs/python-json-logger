@@ -152,10 +152,18 @@ def use_exception_default(obj: Any) -> TypeGuard[BaseException]:
 def exception_default(obj: BaseException) -> str:
     """Default function for exception instances
 
+    Includes the exception's own notes, if present. Exception groups retain
+    their summary without recursively formatting their children.
+
     Args:
         obj: object to handle
+
+    *Changed in 4.2.1*: Include exception notes.
     """
-    return f"{obj.__class__.__name__}: {obj}"
+    result = f"{obj.__class__.__name__}: {obj}"
+    if hasattr(obj, "__notes__"):
+        return "\n".join([result, *obj.__notes__])
+    return result
 
 
 def use_traceback_default(obj: Any) -> TypeGuard[TracebackType]:

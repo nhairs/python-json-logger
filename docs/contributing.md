@@ -80,13 +80,13 @@ black src tests
 
 # Lint
 pylint --output-format=colorized src
-mypy src tests
+pyrefly check src tests
 
 # Tests
 pytest
 ```
 
-The above commands (`black`, `pylint`, `mypy`, `pytest`) should all be run before submitting a pull request.
+The above commands (`black`, `pylint`, `pyrefly `, `pytest`) should all be run before submitting a pull request.
 
 If making changes to the documentation you can preview the changes locally using `mkdocs`. Changes to the `README.md` can be previewed using a tool like [`grip`](https://github.com/joeyespo/grip) (installable via `pip install grip`).
 
