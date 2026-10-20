@@ -6,6 +6,39 @@ Contributions are welcome!
 
 In general we follow the [Python Software Foundation Code of Conduct](https://policies.python.org/python.org/code-of-conduct/). Please note that we are not affiliated with the PSF.
 
+
+## Generative AI Policy
+
+`python-json-logger` is a well trusted and popular package. The continued quality, stability, and stewardship of the package is a responsibility that the maintainers take seriously.
+
+Low effort submissions actively work against the maintainers. Every issue and pull request is considered and reviewed by the maintainers, taking a non-trivial amount of time and effort.
+
+The use of AI tools is allowed with the following conditions:
+
+**Human Supervision and Responsibility**: AI tools must be under supervision of a real human who takes legal and technical responsibility for all contributions made.
+
+This means no fully autonomous systems.
+
+**Quality**: Ensure that your submission is actually valuable to the project and meets quality expectations. If you cannot explain and defend the changes you submit, do not submit them.
+
+**Human Communication**: Interactions with the maintainers must be by humans. [Don't be a meat-proxy](https://gruhn.me/blog/2026-08-03/).
+
+AI tools are cheap, if the maintainers want to talk to an AI tool they will use their own.
+
+The only exceptions to this is when a human is interacting with their own AI tools on their own pull requests, or the AI tools of the maintainers. Abuse of this exception will lead to banning.
+
+**AI Disclosure**: The use of AI tools **must** be declared.
+
+For issues and pull requests you should append a disclosure similar to the following template:
+
+```md
+## AI Disclosure
+
+This <issue,pull-request> was created using: <list of tools and models e.g. 'Hermes, OpenAI models, Calude models, and Deepseek models.>.
+```
+
+**Violations**: Low quality submissions may be closed without discussion. Repeat offenders will be blocked from the project.
+
 ## Pull Request Process
 
 **0. Before you begin**
