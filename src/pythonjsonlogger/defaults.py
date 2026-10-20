@@ -158,7 +158,7 @@ def exception_default(obj: BaseException) -> str:
     Args:
         obj: object to handle
 
-    *Changed in 4.2.1*: Include exception notes.
+    *Changed in 4.3*: Includes exception notes if available.
     """
     result = f"{obj.__class__.__name__}: {obj}"
     if hasattr(obj, "__notes__"):
