@@ -128,6 +128,12 @@ NO_TEST = object()  # Sentinal
 
 ### TESTS
 ### ============================================================================
+def test_reserved_attrs_cover_logrecord_defaults():
+    record = logging.makeLogRecord({})
+    # message and asctime are added by formatters rather than LogRecord itself.
+    assert set(vars(record)) <= set(RESERVED_ATTRS)
+
+
 def test_merge_record_extra():
     record = logging.LogRecord(
         "name", level=1, pathname="", lineno=1, msg="Some message", args=None, exc_info=None
