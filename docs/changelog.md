@@ -6,18 +6,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [4.2.1](https://github.com/nhairs/python-json-logger/compare/v4.2.0...v4.2.1) - UNRELEASED
 
+### Added
+- Documentation: Quickstart examples are tested to ensure the sample output matches reality.
+- Add support for Python 3.15, PyPy 3.12
+
 ### Changed
 - Preserve an exception's own notes when encoding exception instances, including exception group summaries. Related to [#67](https://github.com/nhairs/python-json-logger/issues/67).
 
 ### Removed
 - `STYLE_STRING_FORMAT_REGEX`, which is no longer used to find `{` style fields. [#75](https://github.com/nhairs/python-json-logger/pull/75)
 
-### Fixed
+### Changed
+- Constrain the documentation dependency to `mkdocs<2`. [#80](https://github.com/nhairs/python-json-logger/issues/80)
+- Replaced MyPy with Pyrefly for type checking
 
+### Fixed
 - `%` style formats no longer treat the escaped literal `%%` as the start of a field, so `"%%(notafield)s"` is correctly read as literal text. [#75](https://github.com/nhairs/python-json-logger/pull/75)
 - `{` style formats now use `string.Formatter` (as `logging.StrFormatStyle.validate` does) to find fields, so escaped literal braces (`{{`/`}}`) are skipped and a conversion (`{message!r}`) or format spec (`{levelname:>8}`) is no longer treated as part of the field name. [#75](https://github.com/nhairs/python-json-logger/pull/75)
 
-Thanks @dylanpulver, @SAY-5
+Thanks @dylanpulver, @Gonghan-Princess, @SAY-5
 
 ## [4.2.0](https://github.com/nhairs/python-json-logger/compare/v4.1.0...v4.2.0) - 2026-08-15
 

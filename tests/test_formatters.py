@@ -38,9 +38,9 @@ if pythonjsonlogger.MSGSPEC_AVAILABLE:
 ### ============================================================================
 ALL_FORMATTERS: list[type[BaseJsonFormatter]] = [JsonFormatter]
 if pythonjsonlogger.ORJSON_AVAILABLE:
-    ALL_FORMATTERS.append(OrjsonFormatter)
+    ALL_FORMATTERS.append(OrjsonFormatter)  # type: ignore[unbound-name]
 if pythonjsonlogger.MSGSPEC_AVAILABLE:
-    ALL_FORMATTERS.append(MsgspecFormatter)
+    ALL_FORMATTERS.append(MsgspecFormatter)  # type: ignore[unbound-name]
 
 _LOGGER_COUNT = 0
 

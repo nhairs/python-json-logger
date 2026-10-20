@@ -12,6 +12,7 @@ watch:
 nav:
   - "Home": index.md
   - quickstart.md
+  - time.md
   - cookbook.md
   - changelog.md
   - security.md
