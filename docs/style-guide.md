@@ -15,9 +15,9 @@ We use automated tools to enforce a consistent code style and catch potential er
 
 *   **Black:** For opinionated code formatting.
 *   **Pylint:** For static code analysis and error detection.
-*   **MyPy:** For static type checking.
+*   **Pyrefly:** For static type checking.
 
-Ensure these tools are run before committing code. Configuration for these tools can be found in `pyproject.toml`, `pylintrc`, and `mypy.ini` respectively. This guide primarily focuses on conventions not automatically verifiable by these tools.
+Ensure these tools are run before committing code. Configuration for these tools can be found in `pyproject.toml`, `pylintrc`, and `pyrefly.toml` respectively. This guide primarily focuses on conventions not automatically verifiable by these tools.
 
 ## Imports
 

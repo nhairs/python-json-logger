@@ -31,6 +31,7 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: 3.15",
     "Topic :: System :: Logging",
     "Typing :: Typed",
 ]
@@ -48,8 +49,7 @@ dev = [
     "validate-pyproject[all]",
     "black",
     "pylint",
-    "mypy<2; implementation_name == 'pypy' and python_version < '3.11'",
-    "mypy; implementation_name != 'pypy' or python_version >= '3.11'",
+    "pyrefly",
     ## Test
     "pytest",
     "freezegun",
@@ -57,7 +57,7 @@ dev = [
     ## Build
     "build",
     ## Docs
-    "mkdocs",
+    "mkdocs<2",
     "mkdocs-material>=8.5",
     "mkdocs-awesome-pages-plugin",
     "mdx_truly_sane_lists",
