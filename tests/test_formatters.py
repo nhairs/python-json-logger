@@ -130,9 +130,10 @@ NO_TEST = object()  # Sentinal
 ### ============================================================================
 def test_reserved_attrs_cover_logrecord_defaults():
     record = logging.makeLogRecord({})
-    # Use a subset check because RESERVED_ATTRS also includes message and asctime,
-    # which formatters add later and are absent from a newly created LogRecord.
-    assert set(vars(record)) <= set(RESERVED_ATTRS)
+    unreserved_attrs = set(vars(record)) - set(RESERVED_ATTRS)
+    assert (
+        not unreserved_attrs
+    ), f"Add default LogRecord attributes to RESERVED_ATTRS: {unreserved_attrs}"
 
 
 def test_merge_record_extra():
