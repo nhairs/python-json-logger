@@ -942,6 +942,51 @@ def test_exc_info_as_array(env: LoggingEnvironment, class_: type[BaseJsonFormatt
 
 
 @pytest.mark.parametrize("class_", ALL_FORMATTERS)
+@pytest.mark.parametrize("exc_info_as_array", [False, True])
+@pytest.mark.parametrize(
+    "message",
+    [
+        pytest.param("hello", id="cached-text"),
+        pytest.param({"exc_info": "caller text"}, id="string-override"),
+        pytest.param({"exc_info": ["caller", "text"]}, id="list-override"),
+    ],
+)
+def test_cached_exc_text(
+    env: LoggingEnvironment,
+    class_: type[BaseJsonFormatter],
+    exc_info_as_array: bool,
+    message: str | dict[str, Any],
+) -> None:
+    """Honor the array option for cached exceptions without replacing caller overrides."""
+    env.set_formatter(class_(exc_info_as_array=exc_info_as_array))
+    original_message = message.copy() if isinstance(message, dict) else message
+    # Start with a real exception so the cached text includes its multiline traceback.
+    try:
+        raise ValueError("first line\nsecond line")
+    except ValueError:
+        record = env.logger.makeRecord(
+            env.logger.name, logging.ERROR, __file__, 0, message, (), sys.exc_info()
+        )
+
+    # Mirror SocketHandler's receiver state: formatted exception text survives,
+    # but the original exc_info tuple is cleared before the record is transported.
+    logging.Formatter().format(record)
+    cached_text = record.exc_text
+    assert cached_text is not None
+    received = logging.makeLogRecord({**record.__dict__, "exc_info": None})
+    env.logger.handle(received)
+
+    # The option controls the cached fallback, not a caller-supplied exc_info value.
+    expected: str | list[str] = cached_text.splitlines() if exc_info_as_array else cached_text
+    if isinstance(message, dict):
+        expected = message["exc_info"]
+    assert env.load_json()["exc_info"] == expected
+    assert received.exc_text == cached_text
+    assert message == original_message
+    return
+
+
+@pytest.mark.parametrize("class_", ALL_FORMATTERS)
 def test_exc_info_as_array_no_exc_info(env: LoggingEnvironment, class_: type[BaseJsonFormatter]):
     env.set_formatter(class_(exc_info_as_array=True))
 
