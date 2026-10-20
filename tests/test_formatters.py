@@ -14,7 +14,7 @@ import sys
 import traceback
 from types import TracebackType
 from typing import Any
-from collections.abc import Generator
+from collections.abc import Generator, Sequence
 import uuid
 import zoneinfo
 
@@ -245,6 +245,75 @@ def test_sequence_tuple_format(env: LoggingEnvironment, class_: type[BaseJsonFor
 
     assert log_json["message"] == msg
     assert log_json.keys() == {"levelname", "message", "filename", "lineno", "asctime"}
+    return
+
+
+@pytest.mark.parametrize("class_", ALL_FORMATTERS)
+@pytest.mark.parametrize(
+    "fmt,style,expected",
+    [
+        pytest.param(None, "%", False, id="default"),
+        pytest.param("%(message)s", "%", False, id="percent-message"),
+        pytest.param("%(asctime)s %(message)s", "%", True, id="percent-time"),
+        pytest.param("%%(asctime)s %(message)s", "%", False, id="percent-literal"),
+        pytest.param("{message}", "{", False, id="braces-message"),
+        pytest.param("{asctime!s} {message}", "{", True, id="braces-time"),
+        pytest.param("{{asctime}} {message}", "{", False, id="braces-literal"),
+        pytest.param("$message", "$", False, id="template-message"),
+        pytest.param("$asctime $message", "$", True, id="template-time"),
+        pytest.param("${asctime} $message", "$", True, id="braced-template-time"),
+        pytest.param("$${asctime} $message", "$", False, id="template-literal"),
+        pytest.param("message", ",", False, id="comma-message"),
+        pytest.param("message, asctime,", ",", True, id="comma-time"),
+        pytest.param("message,not_asctime", ",", False, id="comma-other-field"),
+        pytest.param(["message"], "%", False, id="list-message"),
+        pytest.param(["message", "asctime"], "%", True, id="list-time"),
+        pytest.param(["message", "asctime_suffix"], "%", False, id="list-other-field"),
+        pytest.param([], "%", False, id="empty-list"),
+        pytest.param(("message",), "%", False, id="tuple-message"),
+        pytest.param(("asctime", "message"), "%", True, id="tuple-time"),
+        pytest.param((), "%", False, id="empty-tuple"),
+    ],
+)
+def test_uses_time(
+    env: LoggingEnvironment,
+    class_: type[BaseJsonFormatter],
+    fmt: Sequence[str] | None,
+    style: str,
+    expected: bool,
+) -> None:
+    formatter = class_(fmt, style=style, rename_fields={"asctime": "time"})
+    assert formatter.usesTime() is expected
+    env.set_formatter(formatter)
+    env.logger.info("test message")
+    assert ("time" in env.load_json()) is expected
+    return
+
+
+def test_uses_time_custom_parse(env: LoggingEnvironment) -> None:
+    class CustomJsonFormatter(JsonFormatter):
+        def parse(self) -> list[str]:
+            return ["message", "asctime"]
+
+    formatter = CustomJsonFormatter("custom format", style="custom", validate=False)
+    assert formatter.usesTime() is True
+    env.set_formatter(formatter)
+    env.logger.info("test message")
+    assert "asctime" in env.load_json()
+    return
+
+
+@pytest.mark.parametrize("class_", ALL_FORMATTERS)
+def test_uses_time_timestamp_option(
+    env: LoggingEnvironment, class_: type[BaseJsonFormatter]
+) -> None:
+    formatter = class_(timestamp=True)
+    assert formatter.usesTime() is False
+    env.set_formatter(formatter)
+    env.logger.info("test message")
+    log_json = env.load_json()
+    assert "timestamp" in log_json
+    assert "asctime" not in log_json
     return
 
 
