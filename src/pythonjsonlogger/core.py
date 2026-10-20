@@ -234,6 +234,10 @@ class BaseJsonFormatter(logging.Formatter):
         self.stack_info_as_array = stack_info_as_array
         return
 
+    def usesTime(self) -> bool:
+        """Return whether the parsed format fields include `asctime`."""
+        return "asctime" in self._required_fields
+
     def format(self, record: logging.LogRecord) -> str:
         """Formats a log record and serializes to json
 
