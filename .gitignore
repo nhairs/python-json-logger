@@ -20,3 +20,10 @@ env
 
 # generated docs
 site
+
+# Local benchmark output
+.benchmarks/
+benchmark-results/
+
+# Library development resolves dependencies per environment.
+/uv.lock
