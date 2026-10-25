@@ -68,6 +68,8 @@ class OrjsonFormatter(core.BaseJsonFormatter):
         return self._encode_log_data(log_data).decode("utf8")
 
     def _jsonify_log_record_bytes(self, log_data: core.LogData) -> bytes:
+        # Preserve custom jsonify_log_record hooks, including overrides using super().
+        # The unmodified hook can use native bytes without decoding and re-encoding.
         if (
             getattr(self.jsonify_log_record, "__func__", None)
             is not OrjsonFormatter.jsonify_log_record

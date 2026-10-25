@@ -261,13 +261,9 @@ class BaseJsonFormatter(logging.Formatter):
 
         Args:
             record: the record to format
-            _output_type: Internal, non-stable output selector. Normal logging calls
-                return a string; the HTTP handler requests UTF-8 bytes.
 
         *Changed in 4.2.0*: a `dict` `record.msg` is copied instead of modified
         in place.
-
-        *Changed in 4.3.0*: added the internal `_output_type` keyword.
         """
         if _output_type not in ("str", "bytes"):
             raise ValueError("_output_type must be 'str' or 'bytes'")
@@ -306,7 +302,9 @@ class BaseJsonFormatter(logging.Formatter):
         if _output_type == "str":
             return self.serialize_log_record(log_data)
 
-        # Preserve existing serialization overrides, including instance-level hooks.
+        # Only bypass the string serializer when it is still our implementation.
+        # __func__ identifies the function behind an inherited bound method; custom
+        # methods and instance-level callables fall back to their existing output.
         if (
             getattr(self.serialize_log_record, "__func__", None)
             is not BaseJsonFormatter.serialize_log_record

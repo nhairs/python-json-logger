@@ -2,8 +2,6 @@
 
 [`JsonHttpHandler`][pythonjsonlogger.http.JsonHttpHandler] sends each formatted log record as the body of a synchronous HTTP request. It supports `POST` and `PUT` through Requests-compatible sessions.
 
-*New in 4.3.0*
-
 ## Configure a receiver and formatter
 
 Your receiver must accept one JSON document per request at the configured URL. Configure authentication, required fields, and any destination-specific payload structure to match its ingestion API.
@@ -162,7 +160,3 @@ finally:
 ```
 
 Stop the listener before closing the HTTP handler so queued records can finish delivery. This example uses an unbounded in-memory queue; choose a queue capacity and overflow policy appropriate for your application. Standard `QueueHandler` preparation can alter message and exception fields before the JSON formatter receives them.
-
-## Internal byte output
-
-The handler uses the private, non-stable `format(record, _output_type="bytes")` interface on built-in JSON formatters. Normal `format(record)` calls still return strings. Orjson and msgspec can send their native bytes without decoding and re-encoding them. Existing string serialization overrides remain effective through a UTF-8 fallback. A subclass that overrides `format(record)` uses its normal string output.
