@@ -15,8 +15,9 @@ uv sync --python 3.15 --no-default-groups --group benchmark
 
 On CPython, this group installs all three backends. On PyPy, it installs only the
 stdlib backend and benchmark tools. Cases for unavailable optional encoders are
-reported as skipped. Standard GIL-enabled CPython 3.10–3.15 is the published
-comparison matrix; each published CPython result must contain all three backends.
+reported as skipped. The published comparison covers standard
+GIL-enabled CPython 3.10–3.15 and PyPy 3.10–3.12. Each published CPython result
+must contain all three backends; PyPy results contain stdlib JSON only.
 
 Check every case without collecting performance measurements:
 
@@ -40,7 +41,7 @@ uvx --with tox-uv tox -e pypy312-benchmark
 ```
 
 Append `-benchmark` to a supported tox runtime name to benchmark that interpreter.
-The workflow derives its CPython matrix from tox's default environments, so the
+The workflow derives its runtime matrix from tox's default environments, so the
 supported versions are maintained in one place. Use `uvx --with tox-uv tox -e benchmark`
 to use the default interpreter. Results go to the environment's
 `envtmpdir`, such as `.tox/py315-benchmark/tmp/benchmark.json`. Pass pytest options
@@ -49,8 +50,8 @@ after `--` to select cases or change measurement settings. For example, use
 and do not need the benchmark dependencies.
 
 The manual **Benchmark JSON formatters** GitHub Actions workflow runs Linux
-x86-64 jobs for Python 3.10–3.15. Each job measures all backends on the same
-runner and uploads its JSON results as an artifact. Its job summary contains the
+x86-64 jobs for the supported CPython and PyPy versions. Each job measures
+the available backends on the same runner and uploads its JSON results as an artifact. Its job summary contains the
 comparison table. Timing differences never fail CI.
 
 ## Measurement methodology
@@ -125,18 +126,19 @@ Time plots use a logarithmic axis to accommodate the different workload sizes.
 Points show medians; whiskers span Q1–Q3. These whiskers show within-run spread,
 not confidence intervals, and do not measure between-run reproducibility.
 Separate speedup tables and plots divide the stdlib median by each backend's
-median for the same workload, layer, and runtime. Values above 1 mean that the
+median for the same workload, layer, and Python major/minor version. The
+reference is CPython stdlib JSON; a standalone PyPy report uses PyPy stdlib JSON. Values above 1 mean that the
 backend was faster in that measurement. Speedups are descriptive ratios without
-inferred confidence intervals. A dash marks an unavailable encoder, such as on
-PyPy. Hosted jobs can use different hardware, so cross-version comparisons do
-not isolate interpreter performance.
+inferred confidence intervals. Only stdlib JSON is measured on PyPy. Hosted jobs can use different hardware,
+so comparisons between implementations or versions do not isolate interpreter
+performance. Exact patch versions and environments are recorded separately.
 
 ## Update results
 
-The curated baseline consists of one JSON file per Python version under
+The curated baseline consists of one JSON file per Python implementation and version under
 `benchmarks/results/`, collected from one workflow invocation. Later
 workflow runs remain artifacts until explicitly selected as a replacement.
-Download all six artifacts from the chosen invocation into
+Download all runtime artifacts from the chosen invocation into
 `benchmark-results/downloaded/`. Keep each JSON file under its original name.
 Curate the files and regenerate the tables:
 
@@ -166,433 +168,502 @@ JSON preserves the measurements used by this page.
 
 ## Baseline results
 
-These measurements come from [workflow run 39110634914](https://github.com/nhairs-bot/python-json-logger/actions/runs/39110634914).
+These measurements come from [workflow run 40178087913](https://github.com/nhairs-bot/python-json-logger/actions/runs/40178087913).
 Each table records its measured source revision, exact dependency versions, and environment.
+Some PyPy rounds take milliseconds despite microsecond medians; these outliers
+are retained and can make SD exceed the mean. These measurements do not identify
+the cause of the pauses.
 
 <!-- benchmark-results:start -->
 
-Observed repetitions: 10,989–200,000 rounds per case, with 1–100 iterations per round. Warmup and calibration calls are additional.
+Observed repetitions: 7,536–199,641 rounds per case, with 1–100 iterations per round. Warmup and calibration calls are additional.
 
-Within-run SD/mean: 4.3%–44% across cases, including outliers. This does not measure between-run variation.
+Within-run SD/mean: 4.8%–4.8e+02% across cases, including outliers. This does not measure between-run variation.
 
-### CPython 3.10.22
+### Python 3.10
 
-Measured: 2026-10-18T08:15:25.909298+00:00. Revision: `cc23c334a5f68097995128bc3a2b2aaddb20df8f`.
-
-Environment: Linux 6.17.0-1022-azure, x86_64; AMD EPYC 9V74 80-Core Processor.
-
-Dependencies: `msgspec==0.22.0`, `orjson==3.13.0`, `pytest==9.1.1`, `pytest-benchmark==5.3.0`, `python-json-logger==4.2.1.dev1`.
-
-#### Times and variation
-
-![Median times and interquartile ranges for CPython 3.10.22](assets/benchmarking/cpython-3.10.22-times.svg)
-
-| Layer | Workload | Encoder | Median (µs) | IQR (µs) | Mean ± SD (µs) | Rounds × iterations |
-| --- | --- | --- | ---: | ---: | ---: | ---: |
-| serialization | simple | json | 1.9 | 0.035 | 1.94 ± 0.24 | 53,311 × 10 |
-| serialization | simple | orjson | 0.272 | 0.0063 | 0.277 ± 0.039 | 200,000 × 18 |
-| serialization | simple | msgspec | 0.165 | 0.0016 | 0.167 ± 0.014 | 62,446 × 100 |
-| serialization | structured | json | 2.76 | 0.061 | 2.81 ± 0.41 | 190,549 × 2 |
-| serialization | structured | orjson | 0.446 | 0.01 | 0.451 ± 0.062 | 196,156 × 12 |
-| serialization | structured | msgspec | 0.369 | 0.008 | 0.375 ± 0.049 | 186,324 × 15 |
-| serialization | nested | json | 76.1 | 0.92 | 76.9 ± 3.3 | 13,479 × 1 |
-| serialization | nested | orjson | 17.3 | 0.19 | 17.7 ± 1.7 | 60,409 × 1 |
-| serialization | nested | msgspec | 11.2 | 0.15 | 11.5 ± 1.3 | 93,232 × 1 |
-| serialization | unicode | json | 3.15 | 0.05 | 3.2 ± 0.43 | 165,865 × 2 |
-| serialization | unicode | orjson | 0.946 | 0.01 | 0.966 ± 0.12 | 106,000 × 10 |
-| serialization | unicode | msgspec | 0.912 | 0.01 | 0.923 ± 0.087 | 111,446 × 10 |
-| serialization | rich | json | 11 | 0.16 | 11.1 ± 0.95 | 94,207 × 1 |
-| serialization | rich | orjson | 0.618 | 0.014 | 0.625 ± 0.071 | 170,387 × 10 |
-| serialization | rich | msgspec | 0.468 | 0.012 | 0.473 ± 0.052 | 188,395 × 12 |
-| serialization | exception | json | 2.45 | 0.04 | 2.49 ± 0.17 | 42,113 × 10 |
-| serialization | exception | orjson | 0.364 | 0.006 | 0.368 ± 0.041 | 190,913 × 15 |
-| serialization | exception | msgspec | 0.327 | 0.0056 | 0.33 ± 0.038 | 198,099 × 16 |
-| formatting | simple | json | 4.05 | 0.085 | 4.1 ± 0.41 | 133,851 × 2 |
-| formatting | simple | orjson | 2.2 | 0.033 | 2.22 ± 0.14 | 47,777 × 10 |
-| formatting | simple | msgspec | 1.99 | 0.028 | 2.01 ± 0.13 | 51,391 × 10 |
-| formatting | structured | json | 5.78 | 0.12 | 5.86 ± 0.69 | 181,555 × 1 |
-| formatting | structured | orjson | 3.32 | 0.07 | 3.36 ± 0.36 | 158,479 × 2 |
-| formatting | structured | msgspec | 3.19 | 0.065 | 3.22 ± 0.33 | 165,317 × 2 |
-| formatting | nested | json | 77.6 | 0.92 | 78.6 ± 3.8 | 13,049 × 1 |
-| formatting | nested | orjson | 19.6 | 0.24 | 19.8 ± 1.3 | 54,741 × 1 |
-| formatting | nested | msgspec | 13.1 | 0.16 | 13.3 ± 0.98 | 78,933 × 1 |
-| formatting | unicode | json | 5.19 | 0.085 | 5.26 ± 0.57 | 100,655 × 2 |
-| formatting | unicode | orjson | 3.02 | 0.065 | 3.07 ± 0.4 | 174,247 × 2 |
-| formatting | unicode | msgspec | 2.97 | 0.065 | 3.01 ± 0.35 | 176,741 × 2 |
-| formatting | rich | json | 13.3 | 0.19 | 13.7 ± 1.6 | 76,162 × 1 |
-| formatting | rich | orjson | 2.98 | 0.06 | 3.01 ± 0.34 | 175,501 × 2 |
-| formatting | rich | msgspec | 2.8 | 0.06 | 2.83 ± 0.31 | 190,549 × 2 |
-| formatting | exception | json | 20 | 0.25 | 20.3 ± 1.6 | 51,285 × 1 |
-| formatting | exception | orjson | 17.9 | 0.23 | 18.1 ± 1.4 | 57,985 × 1 |
-| formatting | exception | msgspec | 17.6 | 0.23 | 17.8 ± 1.4 | 58,631 × 1 |
-
-#### Speedup
-
-![Median speedups relative to stdlib JSON for CPython 3.10.22](assets/benchmarking/cpython-3.10.22-speedup.svg)
-
-| Layer | Workload | json | orjson | msgspec |
-| --- | --- | ---: | ---: | ---: |
-| serialization | simple | 1× | 7× | 12× |
-| serialization | structured | 1× | 6.2× | 7.5× |
-| serialization | nested | 1× | 4.4× | 6.8× |
-| serialization | unicode | 1× | 3.3× | 3.5× |
-| serialization | rich | 1× | 18× | 23× |
-| serialization | exception | 1× | 6.7× | 7.5× |
-| formatting | simple | 1× | 1.8× | 2× |
-| formatting | structured | 1× | 1.7× | 1.8× |
-| formatting | nested | 1× | 4× | 5.9× |
-| formatting | unicode | 1× | 1.7× | 1.7× |
-| formatting | rich | 1× | 4.5× | 4.8× |
-| formatting | exception | 1× | 1.1× | 1.1× |
-
-### CPython 3.11.17
-
-Measured: 2026-10-18T08:15:31.592684+00:00. Revision: `cc23c334a5f68097995128bc3a2b2aaddb20df8f`.
-
-Environment: Linux 6.17.0-1022-azure, x86_64; INTEL(R) XEON(R) PLATINUM 8573C.
-
-Dependencies: `msgspec==0.22.0`, `orjson==3.13.0`, `pytest==9.1.1`, `pytest-benchmark==5.3.0`, `python-json-logger==4.2.1.dev1`.
-
-#### Times and variation
-
-![Median times and interquartile ranges for CPython 3.11.17](assets/benchmarking/cpython-3.11.17-times.svg)
-
-| Layer | Workload | Encoder | Median (µs) | IQR (µs) | Mean ± SD (µs) | Rounds × iterations |
-| --- | --- | --- | ---: | ---: | ---: | ---: |
-| serialization | simple | json | 1.92 | 0.15 | 1.96 ± 0.21 | 57,807 × 10 |
-| serialization | simple | orjson | 0.262 | 0.011 | 0.267 ± 0.064 | 199,124 × 20 |
-| serialization | simple | msgspec | 0.146 | 0.0045 | 0.149 ± 0.021 | 71,927 × 100 |
-| serialization | structured | json | 2.8 | 0.19 | 2.89 ± 0.42 | 39,997 × 10 |
-| serialization | structured | orjson | 0.411 | 0.024 | 0.422 ± 0.067 | 184,639 × 14 |
-| serialization | structured | msgspec | 0.331 | 0.0082 | 0.337 ± 0.045 | 194,326 × 16 |
-| serialization | nested | json | 93.5 | 4.1 | 95 ± 5 | 11,279 × 1 |
-| serialization | nested | orjson | 17.3 | 0.46 | 17.6 ± 1.3 | 59,745 × 1 |
-| serialization | nested | msgspec | 13.1 | 0.56 | 13.3 ± 1.6 | 83,195 × 1 |
-| serialization | unicode | json | 3.56 | 0.28 | 3.65 ± 0.54 | 160,850 × 2 |
-| serialization | unicode | orjson | 1.11 | 0.019 | 1.13 ± 0.12 | 91,425 × 10 |
-| serialization | unicode | msgspec | 1.15 | 0.014 | 1.17 ± 0.14 | 88,036 × 10 |
-| serialization | rich | json | 11.8 | 0.74 | 11.9 ± 1.4 | 103,864 × 1 |
-| serialization | rich | orjson | 0.573 | 0.025 | 0.584 ± 0.086 | 185,667 × 10 |
-| serialization | rich | msgspec | 0.457 | 0.008 | 0.465 ± 0.07 | 188,041 × 12 |
-| serialization | exception | json | 2.52 | 0.19 | 2.57 ± 0.25 | 43,384 × 10 |
-| serialization | exception | orjson | 0.333 | 0.012 | 0.34 ± 0.046 | 195,351 × 16 |
-| serialization | exception | msgspec | 0.293 | 0.0082 | 0.299 ± 0.043 | 194,062 × 18 |
-| formatting | simple | json | 4.71 | 0.61 | 4.77 ± 0.7 | 139,432 × 2 |
-| formatting | simple | orjson | 2.09 | 0.21 | 2.12 ± 0.23 | 57,674 × 10 |
-| formatting | simple | msgspec | 1.83 | 0.15 | 1.88 ± 0.25 | 63,132 × 10 |
-| formatting | structured | json | 7.17 | 0.78 | 7.25 ± 1 | 184,400 × 1 |
-| formatting | structured | orjson | 3.36 | 0.44 | 3.43 ± 0.51 | 181,885 × 2 |
-| formatting | structured | msgspec | 3.23 | 0.39 | 3.3 ± 0.51 | 180,506 × 2 |
-| formatting | nested | json | 97.4 | 5.3 | 98.6 ± 6.7 | 10,989 × 1 |
-| formatting | nested | orjson | 20.2 | 0.92 | 20.5 ± 1.6 | 52,535 × 1 |
-| formatting | nested | msgspec | 15.5 | 0.86 | 15.6 ± 1.3 | 71,470 × 1 |
-| formatting | unicode | json | 6.43 | 0.61 | 6.5 ± 0.74 | 96,386 × 2 |
-| formatting | unicode | orjson | 3.1 | 0.32 | 3.21 ± 0.52 | 183,756 × 2 |
-| formatting | unicode | msgspec | 3.09 | 0.34 | 3.18 ± 0.48 | 183,925 × 2 |
-| formatting | rich | json | 15.3 | 0.98 | 15.5 ± 1.6 | 78,884 × 1 |
-| formatting | rich | orjson | 2.92 | 0.24 | 2.95 ± 0.27 | 42,741 × 10 |
-| formatting | rich | msgspec | 2.63 | 0.21 | 2.66 ± 0.24 | 44,534 × 10 |
-| formatting | exception | json | 43.2 | 2 | 43.9 ± 3.5 | 26,004 × 1 |
-| formatting | exception | orjson | 36.7 | 2 | 37.3 ± 2.8 | 30,906 × 1 |
-| formatting | exception | msgspec | 36.6 | 2.2 | 37.2 ± 3.1 | 31,486 × 1 |
-
-#### Speedup
-
-![Median speedups relative to stdlib JSON for CPython 3.11.17](assets/benchmarking/cpython-3.11.17-speedup.svg)
-
-| Layer | Workload | json | orjson | msgspec |
-| --- | --- | ---: | ---: | ---: |
-| serialization | simple | 1× | 7.3× | 13× |
-| serialization | structured | 1× | 6.8× | 8.5× |
-| serialization | nested | 1× | 5.4× | 7.2× |
-| serialization | unicode | 1× | 3.2× | 3.1× |
-| serialization | rich | 1× | 21× | 26× |
-| serialization | exception | 1× | 7.6× | 8.6× |
-| formatting | simple | 1× | 2.3× | 2.6× |
-| formatting | structured | 1× | 2.1× | 2.2× |
-| formatting | nested | 1× | 4.8× | 6.3× |
-| formatting | unicode | 1× | 2.1× | 2.1× |
-| formatting | rich | 1× | 5.2× | 5.8× |
-| formatting | exception | 1× | 1.2× | 1.2× |
-
-### CPython 3.12.3
-
-Measured: 2026-10-18T08:15:21.659968+00:00. Revision: `cc23c334a5f68097995128bc3a2b2aaddb20df8f`.
-
-Environment: Linux 6.17.0-1022-azure, x86_64; INTEL(R) XEON(R) PLATINUM 8573C.
-
-Dependencies: `msgspec==0.22.0`, `orjson==3.13.0`, `pytest==9.1.1`, `pytest-benchmark==5.3.0`, `python-json-logger==4.2.1.dev1`.
-
-#### Times and variation
-
-![Median times and interquartile ranges for CPython 3.12.3](assets/benchmarking/cpython-3.12.3-times.svg)
-
-| Layer | Workload | Encoder | Median (µs) | IQR (µs) | Mean ± SD (µs) | Rounds × iterations |
-| --- | --- | --- | ---: | ---: | ---: | ---: |
-| serialization | simple | json | 1.57 | 0.063 | 1.65 ± 0.25 | 66,086 × 10 |
-| serialization | simple | orjson | 0.235 | 0.014 | 0.245 ± 0.023 | 43,294 × 100 |
-| serialization | simple | msgspec | 0.146 | 0.018 | 0.152 ± 0.016 | 71,353 × 100 |
-| serialization | structured | json | 2.28 | 0.13 | 2.37 ± 0.22 | 45,577 × 10 |
-| serialization | structured | orjson | 0.363 | 0.018 | 0.379 ± 0.066 | 168,351 × 15 |
-| serialization | structured | msgspec | 0.301 | 0.012 | 0.319 ± 0.078 | 190,115 × 18 |
-| serialization | nested | json | 61.1 | 3.4 | 63.8 ± 7.9 | 16,872 × 1 |
-| serialization | nested | orjson | 14.7 | 0.85 | 15.4 ± 1.7 | 71,845 × 1 |
-| serialization | nested | msgspec | 10.8 | 0.56 | 11 ± 1.1 | 102,638 × 1 |
-| serialization | unicode | json | 2.83 | 0.21 | 3.03 ± 1.1 | 190,223 × 2 |
-| serialization | unicode | orjson | 0.866 | 0.029 | 0.897 ± 0.13 | 117,330 × 10 |
-| serialization | unicode | msgspec | 0.947 | 0.026 | 0.989 ± 0.17 | 107,262 × 10 |
-| serialization | rich | json | 7.58 | 0.5 | 7.85 ± 1.2 | 144,823 × 1 |
-| serialization | rich | orjson | 0.538 | 0.026 | 0.558 ± 0.088 | 192,197 × 10 |
-| serialization | rich | msgspec | 0.412 | 0.012 | 0.425 ± 0.058 | 194,138 × 13 |
-| serialization | exception | json | 2.06 | 0.07 | 2.12 ± 0.2 | 50,221 × 10 |
-| serialization | exception | orjson | 0.303 | 0.0059 | 0.312 ± 0.039 | 199,204 × 17 |
-| serialization | exception | msgspec | 0.277 | 0.036 | 0.296 ± 0.091 | 197,434 × 19 |
-| formatting | simple | json | 3.15 | 0.33 | 3.26 ± 0.48 | 181,226 × 2 |
-| formatting | simple | orjson | 1.5 | 0.15 | 1.56 ± 0.25 | 73,036 × 10 |
-| formatting | simple | msgspec | 1.34 | 0.058 | 1.38 ± 0.17 | 78,946 × 10 |
-| formatting | structured | json | 4.68 | 0.27 | 4.83 ± 0.65 | 114,864 × 2 |
-| formatting | structured | orjson | 2.47 | 0.097 | 2.54 ± 0.23 | 42,726 × 10 |
-| formatting | structured | msgspec | 2.39 | 0.075 | 2.46 ± 0.22 | 43,818 × 10 |
-| formatting | nested | json | 61.4 | 3.8 | 63.4 ± 4.4 | 16,633 × 1 |
-| formatting | nested | orjson | 16.2 | 0.77 | 16.8 ± 1.6 | 65,100 × 1 |
-| formatting | nested | msgspec | 12.2 | 0.77 | 12.8 ± 2.4 | 88,740 × 1 |
-| formatting | unicode | json | 4.31 | 0.22 | 4.47 ± 1 | 127,098 × 2 |
-| formatting | unicode | orjson | 2.17 | 0.11 | 2.24 ± 0.2 | 48,131 × 10 |
-| formatting | unicode | msgspec | 2.21 | 0.18 | 2.36 ± 0.45 | 46,716 × 10 |
-| formatting | rich | json | 9.68 | 1.5 | 10.3 ± 2.6 | 116,673 × 1 |
-| formatting | rich | orjson | 2.1 | 0.12 | 2.17 ± 0.31 | 51,269 × 10 |
-| formatting | rich | msgspec | 1.91 | 0.092 | 1.99 ± 0.29 | 56,748 × 10 |
-| formatting | exception | json | 31.8 | 3.2 | 33.5 ± 5.9 | 34,570 × 1 |
-| formatting | exception | orjson | 27.8 | 2.7 | 29 ± 3.8 | 39,636 × 1 |
-| formatting | exception | msgspec | 27.6 | 1.6 | 28.4 ± 2.7 | 40,714 × 1 |
-
-#### Speedup
-
-![Median speedups relative to stdlib JSON for CPython 3.12.3](assets/benchmarking/cpython-3.12.3-speedup.svg)
-
-| Layer | Workload | json | orjson | msgspec |
-| --- | --- | ---: | ---: | ---: |
-| serialization | simple | 1× | 6.7× | 11× |
-| serialization | structured | 1× | 6.3× | 7.6× |
-| serialization | nested | 1× | 4.2× | 5.7× |
-| serialization | unicode | 1× | 3.3× | 3× |
-| serialization | rich | 1× | 14× | 18× |
-| serialization | exception | 1× | 6.8× | 7.4× |
-| formatting | simple | 1× | 2.1× | 2.4× |
-| formatting | structured | 1× | 1.9× | 2× |
-| formatting | nested | 1× | 3.8× | 5× |
-| formatting | unicode | 1× | 2× | 1.9× |
-| formatting | rich | 1× | 4.6× | 5.1× |
-| formatting | exception | 1× | 1.1× | 1.2× |
-
-### CPython 3.13.16
-
-Measured: 2026-10-18T08:15:25.050587+00:00. Revision: `cc23c334a5f68097995128bc3a2b2aaddb20df8f`.
+**CPython 3.10.22**. Measured: 2026-10-25T08:50:17.594989+00:00. Revision: `70c2907f5ac43b7b8648b6f080b45918705a6e8d`.
 
 Environment: Linux 6.17.0-1022-azure, x86_64; AMD EPYC 7763 64-Core Processor.
 
-Dependencies: `msgspec==0.22.0`, `orjson==3.13.0`, `pytest==9.1.1`, `pytest-benchmark==5.3.0`, `python-json-logger==4.2.1.dev1`.
+Dependencies: `msgspec==0.22.0`, `orjson==3.13.0`, `pytest==9.1.1`, `pytest-benchmark==5.3.0`, `python-json-logger==4.3.0.dev1`.
+
+**PyPy 3.10.16**. Measured: 2026-10-25T08:49:22.989582+00:00. Revision: `70c2907f5ac43b7b8648b6f080b45918705a6e8d`.
+
+Environment: Linux 6.17.0-1022-azure, x86_64; AMD EPYC 7763 64-Core Processor. PyPy release: 7.3.19.
+
+Dependencies: `pytest==9.1.1`, `pytest-benchmark==5.3.0`, `python-json-logger==4.3.0.dev1`.
 
 #### Times and variation
 
-![Median times and interquartile ranges for CPython 3.13.16](assets/benchmarking/cpython-3.13.16-times.svg)
+![Median times and interquartile ranges for Python 3.10](assets/benchmarking/python-3.10-times.svg)
 
 | Layer | Workload | Encoder | Median (µs) | IQR (µs) | Mean ± SD (µs) | Rounds × iterations |
 | --- | --- | --- | ---: | ---: | ---: | ---: |
-| serialization | simple | json | 1.93 | 0.026 | 1.95 ± 0.16 | 53,926 × 10 |
-| serialization | simple | orjson | 0.352 | 0.0074 | 0.358 ± 0.054 | 187,618 × 16 |
-| serialization | simple | msgspec | 0.192 | 0.0036 | 0.195 ± 0.016 | 54,278 × 100 |
-| serialization | structured | json | 2.75 | 0.05 | 2.8 ± 0.48 | 190,115 × 2 |
-| serialization | structured | orjson | 0.6 | 0.015 | 0.613 ± 0.1 | 174,490 × 10 |
-| serialization | structured | msgspec | 0.443 | 0.0067 | 0.451 ± 0.075 | 195,695 × 12 |
-| serialization | nested | json | 71.1 | 0.51 | 72.2 ± 4.1 | 14,203 × 1 |
-| serialization | nested | orjson | 22.6 | 0.19 | 22.8 ± 1.6 | 45,104 × 1 |
-| serialization | nested | msgspec | 14.8 | 0.17 | 15.1 ± 1.5 | 69,320 × 1 |
-| serialization | unicode | json | 3.68 | 0.055 | 3.76 ± 0.62 | 139,802 × 2 |
-| serialization | unicode | orjson | 1.38 | 0.012 | 1.41 ± 0.15 | 73,606 × 10 |
-| serialization | unicode | msgspec | 1.27 | 0.007 | 1.28 ± 0.13 | 78,964 × 10 |
-| serialization | rich | json | 9.29 | 0.16 | 9.49 ± 1.4 | 112,906 × 1 |
-| serialization | rich | orjson | 0.831 | 0.016 | 0.845 ± 0.12 | 127,162 × 10 |
-| serialization | rich | msgspec | 0.571 | 0.01 | 0.578 ± 0.076 | 183,151 × 10 |
-| serialization | exception | json | 2.55 | 0.037 | 2.59 ± 0.34 | 135,081 × 3 |
-| serialization | exception | orjson | 0.457 | 0.0075 | 0.464 ± 0.065 | 188,680 × 12 |
-| serialization | exception | msgspec | 0.367 | 0.006 | 0.374 ± 0.059 | 187,266 × 15 |
-| formatting | simple | json | 3.85 | 0.085 | 3.91 ± 0.51 | 137,099 × 2 |
-| formatting | simple | orjson | 2.16 | 0.038 | 2.19 ± 0.19 | 48,499 × 10 |
-| formatting | simple | msgspec | 1.97 | 0.051 | 2 ± 0.2 | 53,637 × 10 |
-| formatting | structured | json | 5.57 | 0.14 | 5.68 ± 0.97 | 190,115 × 1 |
-| formatting | structured | orjson | 3.31 | 0.079 | 3.35 ± 0.46 | 159,185 × 2 |
-| formatting | structured | msgspec | 3.18 | 0.095 | 3.22 ± 0.47 | 167,758 × 2 |
-| formatting | nested | json | 72.4 | 0.71 | 73.7 ± 5.8 | 14,189 × 1 |
-| formatting | nested | orjson | 24 | 0.24 | 24.3 ± 2 | 42,528 × 1 |
-| formatting | nested | msgspec | 16.4 | 0.17 | 16.6 ± 1.6 | 62,579 × 1 |
-| formatting | unicode | json | 5.7 | 0.12 | 5.81 ± 1.1 | 184,163 × 1 |
-| formatting | unicode | orjson | 3.4 | 0.06 | 3.46 ± 0.51 | 154,298 × 2 |
-| formatting | unicode | msgspec | 3.25 | 0.07 | 3.29 ± 0.47 | 161,005 × 2 |
-| formatting | rich | json | 11.5 | 0.2 | 11.8 ± 1.9 | 91,158 × 1 |
-| formatting | rich | orjson | 3.05 | 0.07 | 3.09 ± 0.46 | 174,826 × 2 |
-| formatting | rich | msgspec | 2.76 | 0.079 | 2.81 ± 0.45 | 191,571 × 2 |
-| formatting | exception | json | 78.5 | 2.3 | 81.6 ± 8.4 | 13,224 × 1 |
-| formatting | exception | orjson | 73.7 | 2.3 | 76.8 ± 8.7 | 14,142 × 1 |
-| formatting | exception | msgspec | 72.2 | 1.9 | 75.3 ± 8.7 | 14,266 × 1 |
+| serialization | simple | json (CPython) | 2.48 | 0.033 | 2.51 ± 0.21 | 41,817 × 10 |
+| serialization | simple | orjson (CPython) | 0.43 | 0.0062 | 0.437 ± 0.07 | 185,874 × 13 |
+| serialization | simple | msgspec (CPython) | 0.235 | 0.0022 | 0.237 ± 0.018 | 44,009 × 100 |
+| serialization | simple | json (PyPy) | 0.373 | 0.011 | 0.39 ± 0.11 | 194,175 × 15 |
+| serialization | structured | json (CPython) | 3.47 | 0.065 | 3.53 ± 0.57 | 151,930 × 2 |
+| serialization | structured | orjson (CPython) | 0.645 | 0.011 | 0.661 ± 0.12 | 159,975 × 10 |
+| serialization | structured | msgspec (CPython) | 0.473 | 0.0091 | 0.479 ± 0.069 | 183,824 × 12 |
+| serialization | structured | json (PyPy) | 1.01 | 0.019 | 1.09 ± 0.32 | 103,649 × 10 |
+| serialization | nested | json (CPython) | 99.7 | 0.91 | 101 ± 5 | 10,173 × 1 |
+| serialization | nested | orjson (CPython) | 22.2 | 0.16 | 22.5 ± 1.8 | 44,739 × 1 |
+| serialization | nested | msgspec (CPython) | 15.7 | 0.17 | 16 ± 1.5 | 74,823 × 1 |
+| serialization | nested | json (PyPy) | 59.1 | 1.6 | 64.2 ± 1.3e+02 | 17,453 × 1 |
+| serialization | unicode | json (CPython) | 4.05 | 0.065 | 4.12 ± 0.63 | 128,634 × 2 |
+| serialization | unicode | orjson (CPython) | 1.41 | 0.012 | 1.43 ± 0.17 | 72,125 × 10 |
+| serialization | unicode | msgspec (CPython) | 1.25 | 0.012 | 1.26 ± 0.13 | 83,251 × 10 |
+| serialization | unicode | json (PyPy) | 1.88 | 0.021 | 1.96 ± 0.32 | 54,482 × 10 |
+| serialization | rich | json (CPython) | 14.9 | 0.21 | 15.3 ± 2.3 | 69,267 × 1 |
+| serialization | rich | orjson (CPython) | 0.858 | 0.01 | 0.869 ± 0.11 | 119,261 × 10 |
+| serialization | rich | msgspec (CPython) | 0.611 | 0.01 | 0.621 ± 0.094 | 167,729 × 10 |
+| serialization | rich | json (PyPy) | 10.6 | 0.18 | 11 ± 2.3 | 100,716 × 1 |
+| serialization | exception | json (CPython) | 3.23 | 0.06 | 3.29 ± 0.5 | 160,231 × 2 |
+| serialization | exception | orjson (CPython) | 0.554 | 0.012 | 0.567 ± 0.11 | 190,115 × 10 |
+| serialization | exception | msgspec (CPython) | 0.458 | 0.0092 | 0.465 ± 0.079 | 191,571 × 12 |
+| serialization | exception | json (PyPy) | 0.985 | 0.015 | 1.03 ± 3.2 | 105,742 × 10 |
+| formatting | simple | json (CPython) | 5.04 | 0.075 | 5.13 ± 0.68 | 102,797 × 2 |
+| formatting | simple | orjson (CPython) | 2.88 | 0.051 | 2.93 ± 0.49 | 182,816 × 2 |
+| formatting | simple | msgspec (CPython) | 2.63 | 0.045 | 2.67 ± 0.45 | 198,060 × 2 |
+| formatting | simple | json (PyPy) | 2.64 | 0.05 | 2.78 ± 12 | 196,890 × 2 |
+| formatting | structured | json (CPython) | 7.43 | 0.13 | 7.59 ± 1.3 | 139,218 × 1 |
+| formatting | structured | orjson (CPython) | 4.4 | 0.065 | 4.47 ± 0.6 | 116,064 × 2 |
+| formatting | structured | msgspec (CPython) | 4.16 | 0.06 | 4.3 ± 1.8 | 123,993 × 2 |
+| formatting | structured | json (PyPy) | 4.21 | 0.055 | 4.35 ± 2.8 | 122,459 × 2 |
+| formatting | nested | json (CPython) | 102 | 1.2 | 103 ± 5 | 10,010 × 1 |
+| formatting | nested | orjson (CPython) | 25 | 0.19 | 25.4 ± 2.3 | 40,168 × 1 |
+| formatting | nested | msgspec (CPython) | 16.4 | 0.18 | 16.7 ± 1.7 | 62,540 × 1 |
+| formatting | nested | json (PyPy) | 63.8 | 4 | 69.3 ± 1.2e+02 | 16,531 × 1 |
+| formatting | unicode | json (CPython) | 6.69 | 0.11 | 6.82 ± 1.1 | 155,232 × 1 |
+| formatting | unicode | orjson (CPython) | 4.04 | 0.06 | 4.11 ± 0.64 | 128,618 × 2 |
+| formatting | unicode | msgspec (CPython) | 3.76 | 0.046 | 3.82 ± 0.56 | 136,538 × 2 |
+| formatting | unicode | json (PyPy) | 4.28 | 0.075 | 4.54 ± 22 | 120,715 × 2 |
+| formatting | rich | json (CPython) | 19 | 0.65 | 19.9 ± 4.9 | 54,544 × 1 |
+| formatting | rich | orjson (CPython) | 3.92 | 0.056 | 3.98 ± 0.57 | 133,281 × 2 |
+| formatting | rich | msgspec (CPython) | 3.57 | 0.056 | 3.62 ± 0.53 | 144,865 × 2 |
+| formatting | rich | json (PyPy) | 15.8 | 0.29 | 16.6 ± 3.7 | 66,278 × 1 |
+| formatting | exception | json (CPython) | 38.1 | 0.84 | 39.2 ± 4.4 | 27,881 × 1 |
+| formatting | exception | orjson (CPython) | 32.9 | 0.76 | 34 ± 4.5 | 32,147 × 1 |
+| formatting | exception | msgspec (CPython) | 33 | 0.9 | 34 ± 4 | 32,262 × 1 |
+| formatting | exception | json (PyPy) | 9.52 | 0.15 | 10.7 ± 49 | 108,378 × 1 |
 
 #### Speedup
 
-![Median speedups relative to stdlib JSON for CPython 3.13.16](assets/benchmarking/cpython-3.13.16-speedup.svg)
+![Median speedups relative to stdlib JSON for Python 3.10](assets/benchmarking/python-3.10-speedup.svg)
 
-| Layer | Workload | json | orjson | msgspec |
-| --- | --- | ---: | ---: | ---: |
-| serialization | simple | 1× | 5.5× | 10× |
-| serialization | structured | 1× | 4.6× | 6.2× |
-| serialization | nested | 1× | 3.2× | 4.8× |
-| serialization | unicode | 1× | 2.7× | 2.9× |
-| serialization | rich | 1× | 11× | 16× |
-| serialization | exception | 1× | 5.6× | 6.9× |
-| formatting | simple | 1× | 1.8× | 2× |
-| formatting | structured | 1× | 1.7× | 1.8× |
-| formatting | nested | 1× | 3× | 4.4× |
-| formatting | unicode | 1× | 1.7× | 1.8× |
-| formatting | rich | 1× | 3.8× | 4.2× |
-| formatting | exception | 1× | 1.1× | 1.1× |
+Reference: json (CPython) (1×).
 
-### CPython 3.14.8
+| Layer | Workload | json (CPython) | orjson (CPython) | msgspec (CPython) | json (PyPy) |
+| --- | --- | ---: | ---: | ---: | ---: |
+| serialization | simple | 1× | 5.8× | 11× | 6.6× |
+| serialization | structured | 1× | 5.4× | 7.3× | 3.4× |
+| serialization | nested | 1× | 4.5× | 6.3× | 1.7× |
+| serialization | unicode | 1× | 2.9× | 3.2× | 2.2× |
+| serialization | rich | 1× | 17× | 24× | 1.4× |
+| serialization | exception | 1× | 5.8× | 7.1× | 3.3× |
+| formatting | simple | 1× | 1.8× | 1.9× | 1.9× |
+| formatting | structured | 1× | 1.7× | 1.8× | 1.8× |
+| formatting | nested | 1× | 4.1× | 6.2× | 1.6× |
+| formatting | unicode | 1× | 1.7× | 1.8× | 1.6× |
+| formatting | rich | 1× | 4.8× | 5.3× | 1.2× |
+| formatting | exception | 1× | 1.2× | 1.2× | 4× |
 
-Measured: 2026-10-18T08:15:17.678283+00:00. Revision: `cc23c334a5f68097995128bc3a2b2aaddb20df8f`.
+### Python 3.11
 
-Environment: Linux 6.17.0-1022-azure, x86_64; AMD EPYC 9V74 80-Core Processor.
+**CPython 3.11.17**. Measured: 2026-10-25T08:51:01.183076+00:00. Revision: `70c2907f5ac43b7b8648b6f080b45918705a6e8d`.
 
-Dependencies: `msgspec==0.22.0`, `orjson==3.13.0`, `pytest==9.1.1`, `pytest-benchmark==5.3.0`, `python-json-logger==4.2.1.dev1`.
+Environment: Linux 6.17.0-1022-azure, x86_64; AMD EPYC 7763 64-Core Processor.
+
+Dependencies: `msgspec==0.22.0`, `orjson==3.13.0`, `pytest==9.1.1`, `pytest-benchmark==5.3.0`, `python-json-logger==4.3.0.dev1`.
+
+**PyPy 3.11.17**. Measured: 2026-10-25T08:49:18.141526+00:00. Revision: `70c2907f5ac43b7b8648b6f080b45918705a6e8d`.
+
+Environment: Linux 6.17.0-1022-azure, x86_64; AMD EPYC 9V45 96-Core Processor. PyPy release: 8.0.1.
+
+Dependencies: `pytest==9.1.1`, `pytest-benchmark==5.3.0`, `python-json-logger==4.3.0.dev1`.
 
 #### Times and variation
 
-![Median times and interquartile ranges for CPython 3.14.8](assets/benchmarking/cpython-3.14.8-times.svg)
+![Median times and interquartile ranges for Python 3.11](assets/benchmarking/python-3.11-times.svg)
 
 | Layer | Workload | Encoder | Median (µs) | IQR (µs) | Mean ± SD (µs) | Rounds × iterations |
 | --- | --- | --- | ---: | ---: | ---: | ---: |
-| serialization | simple | json | 1.54 | 0.015 | 1.55 ± 0.11 | 66,393 × 10 |
-| serialization | simple | orjson | 0.222 | 0.003 | 0.228 ± 0.019 | 46,079 × 100 |
-| serialization | simple | msgspec | 0.147 | 0.0011 | 0.149 ± 0.011 | 69,009 × 100 |
-| serialization | structured | json | 2.07 | 0.02 | 2.1 ± 0.18 | 49,481 × 10 |
-| serialization | structured | orjson | 0.38 | 0.0086 | 0.389 ± 0.049 | 195,046 × 14 |
-| serialization | structured | msgspec | 0.325 | 0.0054 | 0.328 ± 0.038 | 189,826 × 17 |
-| serialization | nested | json | 52.1 | 0.37 | 52.8 ± 2.7 | 19,618 × 1 |
-| serialization | nested | orjson | 16.8 | 0.19 | 17 ± 1.2 | 61,073 × 1 |
-| serialization | nested | msgspec | 11.6 | 0.13 | 11.7 ± 0.98 | 88,293 × 1 |
-| serialization | unicode | json | 3.01 | 0.03 | 3.05 ± 0.37 | 171,557 × 2 |
-| serialization | unicode | orjson | 0.95 | 0.018 | 0.968 ± 0.11 | 108,649 × 10 |
-| serialization | unicode | msgspec | 0.857 | 0.02 | 0.873 ± 0.084 | 119,589 × 10 |
-| serialization | rich | json | 6.66 | 0.091 | 6.75 ± 0.75 | 157,011 × 1 |
-| serialization | rich | orjson | 0.576 | 0.009 | 0.582 ± 0.063 | 180,571 × 10 |
-| serialization | rich | msgspec | 0.421 | 0.0069 | 0.429 ± 0.059 | 195,389 × 13 |
-| serialization | exception | json | 1.97 | 0.017 | 2 ± 0.18 | 52,527 × 10 |
-| serialization | exception | orjson | 0.338 | 0.0044 | 0.342 ± 0.038 | 190,913 × 16 |
-| serialization | exception | msgspec | 0.281 | 0.0032 | 0.284 ± 0.03 | 191,645 × 19 |
-| formatting | simple | json | 2.88 | 0.05 | 2.93 ± 0.36 | 182,216 × 2 |
-| formatting | simple | orjson | 1.62 | 0.026 | 1.64 ± 0.12 | 64,839 × 10 |
-| formatting | simple | msgspec | 1.43 | 0.025 | 1.44 ± 0.1 | 72,047 × 10 |
-| formatting | structured | json | 4.03 | 0.06 | 4.08 ± 0.43 | 128,519 × 2 |
-| formatting | structured | orjson | 2.36 | 0.029 | 2.38 ± 0.13 | 43,682 × 10 |
-| formatting | structured | msgspec | 2.2 | 0.024 | 2.22 ± 0.13 | 46,681 × 10 |
-| formatting | nested | json | 54 | 0.42 | 54.7 ± 2.6 | 18,862 × 1 |
-| formatting | nested | orjson | 17.8 | 0.14 | 18 ± 1.3 | 57,189 × 1 |
-| formatting | nested | msgspec | 13 | 0.18 | 13.1 ± 0.97 | 78,753 × 1 |
-| formatting | unicode | json | 4.35 | 0.046 | 4.4 ± 0.44 | 119,162 × 2 |
-| formatting | unicode | orjson | 2.42 | 0.031 | 2.45 ± 0.15 | 42,420 × 10 |
-| formatting | unicode | msgspec | 2.3 | 0.03 | 2.33 ± 0.16 | 44,380 × 10 |
-| formatting | rich | json | 8.16 | 0.11 | 8.38 ± 2.1 | 127,373 × 1 |
-| formatting | rich | orjson | 2.18 | 0.028 | 2.2 ± 0.14 | 46,747 × 10 |
-| formatting | rich | msgspec | 1.96 | 0.025 | 1.98 ± 0.12 | 52,499 × 10 |
-| formatting | exception | json | 37.9 | 0.9 | 39 ± 4.3 | 27,691 × 1 |
-| formatting | exception | orjson | 35.3 | 0.65 | 36.1 ± 3 | 29,534 × 1 |
-| formatting | exception | msgspec | 35.4 | 0.63 | 36.2 ± 3.4 | 29,386 × 1 |
+| serialization | simple | json (CPython) | 2.02 | 0.035 | 2.06 ± 0.23 | 50,462 × 10 |
+| serialization | simple | orjson (CPython) | 0.362 | 0.0067 | 0.369 ± 0.059 | 198,847 × 15 |
+| serialization | simple | msgspec (CPython) | 0.172 | 0.0039 | 0.178 ± 0.032 | 59,446 × 100 |
+| serialization | simple | json (PyPy) | 0.244 | 0.0066 | 0.248 ± 0.039 | 43,244 × 100 |
+| serialization | structured | json (CPython) | 3.14 | 0.066 | 3.25 ± 0.69 | 170,911 × 2 |
+| serialization | structured | orjson (CPython) | 0.58 | 0.013 | 0.589 ± 0.096 | 182,150 × 10 |
+| serialization | structured | msgspec (CPython) | 0.412 | 0.0069 | 0.421 ± 0.073 | 191,571 × 13 |
+| serialization | structured | json (PyPy) | 0.825 | 0.0061 | 0.843 ± 2.2 | 121,774 × 10 |
+| serialization | nested | json (CPython) | 106 | 2.2 | 108 ± 6.4 | 9,672 × 1 |
+| serialization | nested | orjson (CPython) | 21.9 | 0.2 | 22.7 ± 4.7 | 46,534 × 1 |
+| serialization | nested | msgspec (CPython) | 14.1 | 0.2 | 14.4 ± 1.7 | 74,600 × 1 |
+| serialization | nested | json (PyPy) | 65.2 | 1.1 | 69 ± 98 | 15,730 × 1 |
+| serialization | unicode | json (CPython) | 3.73 | 0.06 | 3.81 ± 0.65 | 139,802 × 2 |
+| serialization | unicode | orjson (CPython) | 1.33 | 0.0093 | 1.35 ± 0.16 | 76,605 × 10 |
+| serialization | unicode | msgspec (CPython) | 1.19 | 0.0079 | 1.21 ± 0.15 | 84,460 × 10 |
+| serialization | unicode | json (PyPy) | 1.07 | 0.018 | 1.09 ± 0.12 | 97,324 × 10 |
+| serialization | rich | json (CPython) | 11.8 | 0.28 | 12.1 ± 1.9 | 91,660 × 1 |
+| serialization | rich | orjson (CPython) | 0.847 | 0.012 | 0.86 ± 0.12 | 124,922 × 10 |
+| serialization | rich | msgspec (CPython) | 0.592 | 0.009 | 0.6 ± 0.087 | 176,026 × 10 |
+| serialization | rich | json (PyPy) | 6.07 | 0.19 | 6.44 ± 17 | 172,177 × 1 |
+| serialization | exception | json (CPython) | 2.8 | 0.065 | 2.85 ± 0.49 | 187,653 × 2 |
+| serialization | exception | orjson (CPython) | 0.464 | 0.0067 | 0.471 ± 0.072 | 186,220 × 12 |
+| serialization | exception | msgspec (CPython) | 0.355 | 0.0061 | 0.359 ± 0.056 | 194,553 × 15 |
+| serialization | exception | json (PyPy) | 0.572 | 0.026 | 0.593 ± 1.5 | 182,516 × 10 |
+| formatting | simple | json (CPython) | 4.09 | 0.1 | 4.19 ± 0.78 | 130,481 × 2 |
+| formatting | simple | orjson (CPython) | 2.2 | 0.041 | 2.23 ± 0.2 | 47,688 × 10 |
+| formatting | simple | msgspec (CPython) | 2.03 | 0.033 | 2.06 ± 0.19 | 52,043 × 10 |
+| formatting | simple | json (PyPy) | 1.57 | 0.046 | 1.63 ± 4.8 | 66,446 × 10 |
+| formatting | structured | json (CPython) | 6.11 | 0.15 | 6.26 ± 1.3 | 171,204 × 1 |
+| formatting | structured | orjson (CPython) | 3.55 | 0.076 | 3.61 ± 0.57 | 146,135 × 2 |
+| formatting | structured | msgspec (CPython) | 3.3 | 0.075 | 3.35 ± 0.53 | 158,958 × 2 |
+| formatting | structured | json (PyPy) | 2.59 | 0.045 | 2.69 ± 7.9 | 198,492 × 2 |
+| formatting | nested | json (CPython) | 108 | 2.3 | 111 ± 8.3 | 9,454 × 1 |
+| formatting | nested | orjson (CPython) | 24 | 0.26 | 24.4 ± 2.2 | 42,512 × 1 |
+| formatting | nested | msgspec (CPython) | 16.4 | 0.24 | 16.7 ± 1.8 | 63,780 × 1 |
+| formatting | nested | json (PyPy) | 67.4 | 2.4 | 68.1 ± 14 | 15,284 × 1 |
+| formatting | unicode | json (CPython) | 5.83 | 0.12 | 5.95 ± 1.1 | 181,489 × 1 |
+| formatting | unicode | orjson (CPython) | 3.39 | 0.066 | 3.49 ± 10 | 156,691 × 2 |
+| formatting | unicode | msgspec (CPython) | 3.2 | 0.06 | 3.24 ± 0.52 | 164,990 × 2 |
+| formatting | unicode | json (PyPy) | 2.36 | 0.039 | 2.4 ± 0.15 | 43,602 × 10 |
+| formatting | rich | json (CPython) | 14.5 | 0.38 | 15 ± 2.3 | 73,282 × 1 |
+| formatting | rich | orjson (CPython) | 3.16 | 0.075 | 3.2 ± 0.47 | 169,177 × 2 |
+| formatting | rich | msgspec (CPython) | 2.85 | 0.07 | 2.93 ± 0.82 | 188,680 × 2 |
+| formatting | rich | json (PyPy) | 8.55 | 0.1 | 8.92 ± 34 | 122,235 × 1 |
+| formatting | exception | json (CPython) | 49.5 | 1.4 | 51.5 ± 6.1 | 20,992 × 1 |
+| formatting | exception | orjson (CPython) | 43.8 | 1.4 | 45.7 ± 6.1 | 24,040 × 1 |
+| formatting | exception | msgspec (CPython) | 44.1 | 1.4 | 45.9 ± 5.9 | 23,926 × 1 |
+| formatting | exception | json (PyPy) | 11.7 | 0.13 | 12.3 ± 25 | 86,972 × 1 |
 
 #### Speedup
 
-![Median speedups relative to stdlib JSON for CPython 3.14.8](assets/benchmarking/cpython-3.14.8-speedup.svg)
+![Median speedups relative to stdlib JSON for Python 3.11](assets/benchmarking/python-3.11-speedup.svg)
 
-| Layer | Workload | json | orjson | msgspec |
-| --- | --- | ---: | ---: | ---: |
-| serialization | simple | 1× | 6.9× | 10× |
-| serialization | structured | 1× | 5.4× | 6.4× |
-| serialization | nested | 1× | 3.1× | 4.5× |
-| serialization | unicode | 1× | 3.2× | 3.5× |
-| serialization | rich | 1× | 12× | 16× |
-| serialization | exception | 1× | 5.8× | 7× |
-| formatting | simple | 1× | 1.8× | 2× |
-| formatting | structured | 1× | 1.7× | 1.8× |
-| formatting | nested | 1× | 3× | 4.2× |
-| formatting | unicode | 1× | 1.8× | 1.9× |
-| formatting | rich | 1× | 3.7× | 4.2× |
-| formatting | exception | 1× | 1.1× | 1.1× |
+Reference: json (CPython) (1×).
 
-### CPython 3.15.0
+| Layer | Workload | json (CPython) | orjson (CPython) | msgspec (CPython) | json (PyPy) |
+| --- | --- | ---: | ---: | ---: | ---: |
+| serialization | simple | 1× | 5.6× | 12× | 8.3× |
+| serialization | structured | 1× | 5.4× | 7.6× | 3.8× |
+| serialization | nested | 1× | 4.8× | 7.5× | 1.6× |
+| serialization | unicode | 1× | 2.8× | 3.1× | 3.5× |
+| serialization | rich | 1× | 14× | 20× | 1.9× |
+| serialization | exception | 1× | 6× | 7.9× | 4.9× |
+| formatting | simple | 1× | 1.9× | 2× | 2.6× |
+| formatting | structured | 1× | 1.7× | 1.9× | 2.4× |
+| formatting | nested | 1× | 4.5× | 6.6× | 1.6× |
+| formatting | unicode | 1× | 1.7× | 1.8× | 2.5× |
+| formatting | rich | 1× | 4.6× | 5.1× | 1.7× |
+| formatting | exception | 1× | 1.1× | 1.1× | 4.2× |
 
-Measured: 2026-10-18T08:15:13.731617+00:00. Revision: `cc23c334a5f68097995128bc3a2b2aaddb20df8f`.
+### Python 3.12
+
+**CPython 3.12.3**. Measured: 2026-10-25T08:50:00.599430+00:00. Revision: `70c2907f5ac43b7b8648b6f080b45918705a6e8d`.
 
 Environment: Linux 6.17.0-1022-azure, x86_64; AMD EPYC 9V45 96-Core Processor.
 
-Dependencies: `msgspec==0.22.0`, `orjson==3.13.0`, `pytest==9.1.1`, `pytest-benchmark==5.3.0`, `python-json-logger==4.2.1.dev1`.
+Dependencies: `msgspec==0.22.0`, `orjson==3.13.0`, `pytest==9.1.1`, `pytest-benchmark==5.3.0`, `python-json-logger==4.3.0.dev1`.
+
+**PyPy 3.12.15**. Measured: 2026-10-25T08:49:22.839684+00:00. Revision: `70c2907f5ac43b7b8648b6f080b45918705a6e8d`.
+
+Environment: Linux 6.17.0-1022-azure, x86_64; AMD EPYC 7763 64-Core Processor. PyPy release: 8.0.1.
+
+Dependencies: `pytest==9.1.1`, `pytest-benchmark==5.3.0`, `python-json-logger==4.3.0.dev1`.
 
 #### Times and variation
 
-![Median times and interquartile ranges for CPython 3.15.0](assets/benchmarking/cpython-3.15.0-times.svg)
+![Median times and interquartile ranges for Python 3.12](assets/benchmarking/python-3.12-times.svg)
 
 | Layer | Workload | Encoder | Median (µs) | IQR (µs) | Mean ± SD (µs) | Rounds × iterations |
 | --- | --- | --- | ---: | ---: | ---: | ---: |
-| serialization | simple | json | 1.15 | 0.045 | 1.2 ± 0.49 | 87,743 × 10 |
-| serialization | simple | orjson | 0.19 | 0.0066 | 0.193 ± 0.018 | 52,442 × 100 |
-| serialization | simple | msgspec | 0.112 | 0.002 | 0.113 ± 0.0095 | 92,065 × 100 |
-| serialization | structured | json | 1.55 | 0.03 | 1.6 ± 0.2 | 65,994 × 10 |
-| serialization | structured | orjson | 0.28 | 0.011 | 0.284 ± 0.036 | 192,419 × 19 |
-| serialization | structured | msgspec | 0.223 | 0.0051 | 0.228 ± 0.022 | 42,472 × 100 |
-| serialization | nested | json | 30.6 | 0.48 | 31.1 ± 1.8 | 33,117 × 1 |
-| serialization | nested | orjson | 10.3 | 0.32 | 10.6 ± 1.3 | 99,951 × 1 |
-| serialization | nested | msgspec | 7.29 | 0.27 | 7.37 ± 0.72 | 146,628 × 1 |
-| serialization | unicode | json | 1.97 | 0.077 | 1.99 ± 0.13 | 51,603 × 10 |
-| serialization | unicode | orjson | 0.743 | 0.032 | 0.755 ± 0.089 | 139,063 × 10 |
-| serialization | unicode | msgspec | 0.721 | 0.009 | 0.731 ± 0.079 | 145,349 × 10 |
-| serialization | rich | json | 4.75 | 0.045 | 4.8 ± 0.42 | 107,829 × 2 |
-| serialization | rich | orjson | 0.475 | 0.0045 | 0.479 ± 0.051 | 194,251 × 11 |
-| serialization | rich | msgspec | 0.303 | 0.005 | 0.306 ± 0.03 | 191,645 × 18 |
-| serialization | exception | json | 1.54 | 0.07 | 1.54 ± 0.1 | 65,518 × 10 |
-| serialization | exception | orjson | 0.233 | 0.0031 | 0.235 ± 0.01 | 43,000 × 100 |
-| serialization | exception | msgspec | 0.195 | 0.0034 | 0.197 ± 0.011 | 53,568 × 100 |
-| formatting | simple | json | 2.01 | 0.024 | 2.03 ± 0.11 | 50,736 × 10 |
-| formatting | simple | orjson | 1.1 | 0.0081 | 1.11 ± 0.077 | 92,362 × 10 |
-| formatting | simple | msgspec | 1.04 | 0.052 | 1.06 ± 0.084 | 99,345 × 10 |
-| formatting | structured | json | 2.81 | 0.04 | 2.85 ± 0.28 | 182,183 × 2 |
-| formatting | structured | orjson | 1.6 | 0.013 | 1.61 ± 0.093 | 63,196 × 10 |
-| formatting | structured | msgspec | 1.53 | 0.012 | 1.55 ± 0.094 | 66,081 × 10 |
-| formatting | nested | json | 32.3 | 0.55 | 32.5 ± 1.5 | 31,499 × 1 |
-| formatting | nested | orjson | 12.9 | 0.091 | 12.7 ± 1.1 | 90,934 × 1 |
-| formatting | nested | msgspec | 8.09 | 0.07 | 8.17 ± 0.61 | 125,755 × 1 |
-| formatting | unicode | json | 2.96 | 0.12 | 3.06 ± 1.3 | 177,684 × 2 |
-| formatting | unicode | orjson | 1.63 | 0.035 | 1.66 ± 0.12 | 62,325 × 10 |
-| formatting | unicode | msgspec | 1.67 | 0.033 | 1.73 ± 0.55 | 62,368 × 10 |
-| formatting | rich | json | 5.63 | 0.079 | 5.69 ± 0.58 | 183,892 × 1 |
-| formatting | rich | orjson | 1.52 | 0.037 | 1.54 ± 0.099 | 67,101 × 10 |
-| formatting | rich | msgspec | 1.39 | 0.011 | 1.41 ± 0.09 | 73,207 × 10 |
-| formatting | exception | json | 31.3 | 0.7 | 31.7 ± 4 | 33,472 × 1 |
-| formatting | exception | orjson | 29.2 | 0.84 | 29.8 ± 6.5 | 36,204 × 1 |
-| formatting | exception | msgspec | 29.3 | 0.87 | 29.6 ± 5.3 | 36,548 × 1 |
+| serialization | simple | json (CPython) | 1.41 | 0.023 | 1.42 ± 0.095 | 73,363 × 10 |
+| serialization | simple | orjson (CPython) | 0.171 | 0.0037 | 0.172 ± 0.013 | 61,943 × 100 |
+| serialization | simple | msgspec (CPython) | 0.0973 | 0.0021 | 0.102 ± 0.046 | 101,575 × 100 |
+| serialization | simple | json (PyPy) | 0.54 | 0.008 | 0.561 ± 2.2 | 191,939 × 10 |
+| serialization | structured | json (CPython) | 1.86 | 0.017 | 1.88 ± 0.14 | 55,596 × 10 |
+| serialization | structured | orjson (CPython) | 0.293 | 0.0056 | 0.296 ± 0.037 | 195,428 × 18 |
+| serialization | structured | msgspec (CPython) | 0.222 | 0.012 | 0.223 ± 0.022 | 47,889 × 100 |
+| serialization | structured | json (PyPy) | 1.44 | 0.014 | 1.47 ± 0.21 | 70,943 × 10 |
+| serialization | nested | json (CPython) | 41.8 | 0.75 | 42.7 ± 3.9 | 24,906 × 1 |
+| serialization | nested | orjson (CPython) | 10.2 | 0.36 | 10.3 ± 0.78 | 103,264 × 1 |
+| serialization | nested | msgspec (CPython) | 6.86 | 0.19 | 7.1 ± 2.7 | 153,398 × 1 |
+| serialization | nested | json (PyPy) | 132 | 1.8 | 134 ± 6.6 | 7,667 × 1 |
+| serialization | unicode | json (CPython) | 2.19 | 0.032 | 2.23 ± 0.21 | 46,441 × 10 |
+| serialization | unicode | orjson (CPython) | 0.669 | 0.017 | 0.706 ± 0.36 | 159,262 × 10 |
+| serialization | unicode | msgspec (CPython) | 0.661 | 0.02 | 0.683 ± 0.31 | 160,283 × 10 |
+| serialization | unicode | json (PyPy) | 2.34 | 0.021 | 2.39 ± 0.22 | 43,625 × 10 |
+| serialization | rich | json (CPython) | 5.57 | 0.11 | 5.69 ± 2 | 185,254 × 1 |
+| serialization | rich | orjson (CPython) | 0.501 | 0.011 | 0.516 ± 0.24 | 185,598 × 11 |
+| serialization | rich | msgspec (CPython) | 0.281 | 0.0053 | 0.288 ± 0.13 | 192,050 × 19 |
+| serialization | rich | json (PyPy) | 12 | 0.17 | 12.4 ± 2.3 | 87,093 × 1 |
+| serialization | exception | json (CPython) | 1.7 | 0.018 | 1.73 ± 0.41 | 59,899 × 10 |
+| serialization | exception | orjson (CPython) | 0.229 | 0.006 | 0.232 ± 0.034 | 45,740 × 100 |
+| serialization | exception | msgspec (CPython) | 0.186 | 0.0045 | 0.187 ± 0.018 | 54,295 × 100 |
+| serialization | exception | json (PyPy) | 1.31 | 0.02 | 1.3 ± 0.18 | 89,687 × 10 |
+| formatting | simple | json (CPython) | 2.37 | 0.07 | 2.38 ± 0.16 | 44,536 × 10 |
+| formatting | simple | orjson (CPython) | 1.18 | 0.028 | 1.2 ± 0.2 | 85,933 × 10 |
+| formatting | simple | msgspec (CPython) | 1.09 | 0.019 | 1.12 ± 0.46 | 96,666 × 10 |
+| formatting | simple | json (PyPy) | 3.12 | 0.04 | 3.26 ± 12 | 165,262 × 2 |
+| formatting | structured | json (CPython) | 3.46 | 0.05 | 3.49 ± 0.35 | 149,032 × 2 |
+| formatting | structured | orjson (CPython) | 1.96 | 0.045 | 1.98 ± 0.16 | 51,656 × 10 |
+| formatting | structured | msgspec (CPython) | 1.95 | 0.03 | 1.97 ± 0.16 | 52,277 × 10 |
+| formatting | structured | json (PyPy) | 5.08 | 0.055 | 5.37 ± 23 | 100,513 × 2 |
+| formatting | nested | json (CPython) | 42.2 | 0.61 | 42.7 ± 4.1 | 24,563 × 1 |
+| formatting | nested | orjson (CPython) | 11.4 | 0.2 | 11.6 ± 2.6 | 90,196 × 1 |
+| formatting | nested | msgspec (CPython) | 7.96 | 0.13 | 8.12 ± 1.7 | 132,083 × 1 |
+| formatting | nested | json (PyPy) | 136 | 5 | 141 ± 41 | 7,536 × 1 |
+| formatting | unicode | json (CPython) | 3.22 | 0.045 | 3.26 ± 0.36 | 161,577 × 2 |
+| formatting | unicode | orjson (CPython) | 1.79 | 0.027 | 1.82 ± 0.32 | 56,603 × 10 |
+| formatting | unicode | msgspec (CPython) | 1.72 | 0.027 | 1.74 ± 0.1 | 60,296 × 10 |
+| formatting | unicode | json (PyPy) | 5.01 | 0.06 | 5.13 ± 0.78 | 102,902 × 2 |
+| formatting | rich | json (CPython) | 6.81 | 0.14 | 7.08 ± 3 | 154,560 × 1 |
+| formatting | rich | orjson (CPython) | 1.68 | 0.03 | 1.7 ± 0.1 | 60,115 × 10 |
+| formatting | rich | msgspec (CPython) | 1.54 | 0.021 | 1.59 ± 0.47 | 66,393 × 10 |
+| formatting | rich | json (PyPy) | 18 | 0.24 | 18.9 ± 35 | 58,337 × 1 |
+| formatting | exception | json (CPython) | 18.5 | 0.64 | 19.1 ± 4.9 | 57,320 × 1 |
+| formatting | exception | orjson (CPython) | 16.6 | 0.28 | 17 ± 3.1 | 62,799 × 1 |
+| formatting | exception | msgspec (CPython) | 16.3 | 0.35 | 16.5 ± 1.5 | 62,838 × 1 |
+| formatting | exception | json (PyPy) | 29.6 | 0.65 | 33.9 ± 1e+02 | 35,035 × 1 |
 
 #### Speedup
 
-![Median speedups relative to stdlib JSON for CPython 3.15.0](assets/benchmarking/cpython-3.15.0-speedup.svg)
+![Median speedups relative to stdlib JSON for Python 3.12](assets/benchmarking/python-3.12-speedup.svg)
 
-| Layer | Workload | json | orjson | msgspec |
+Reference: json (CPython) (1×).
+
+| Layer | Workload | json (CPython) | orjson (CPython) | msgspec (CPython) | json (PyPy) |
+| --- | --- | ---: | ---: | ---: | ---: |
+| serialization | simple | 1× | 8.3× | 14× | 2.6× |
+| serialization | structured | 1× | 6.3× | 8.4× | 1.3× |
+| serialization | nested | 1× | 4.1× | 6.1× | 0.32× |
+| serialization | unicode | 1× | 3.3× | 3.3× | 0.93× |
+| serialization | rich | 1× | 11× | 20× | 0.46× |
+| serialization | exception | 1× | 7.4× | 9.2× | 1.3× |
+| formatting | simple | 1× | 2× | 2.2× | 0.76× |
+| formatting | structured | 1× | 1.8× | 1.8× | 0.68× |
+| formatting | nested | 1× | 3.7× | 5.3× | 0.31× |
+| formatting | unicode | 1× | 1.8× | 1.9× | 0.64× |
+| formatting | rich | 1× | 4.1× | 4.4× | 0.38× |
+| formatting | exception | 1× | 1.1× | 1.1× | 0.63× |
+
+### Python 3.13
+
+**CPython 3.13.17**. Measured: 2026-10-25T08:50:12.277781+00:00. Revision: `70c2907f5ac43b7b8648b6f080b45918705a6e8d`.
+
+Environment: Linux 6.17.0-1022-azure, x86_64; AMD EPYC 7763 64-Core Processor.
+
+Dependencies: `msgspec==0.22.0`, `orjson==3.13.0`, `pytest==9.1.1`, `pytest-benchmark==5.3.0`, `python-json-logger==4.3.0.dev1`.
+
+#### Times and variation
+
+![Median times and interquartile ranges for Python 3.13](assets/benchmarking/python-3.13-times.svg)
+
+| Layer | Workload | Encoder | Median (µs) | IQR (µs) | Mean ± SD (µs) | Rounds × iterations |
+| --- | --- | --- | ---: | ---: | ---: | ---: |
+| serialization | simple | json (CPython) | 1.93 | 0.02 | 1.96 ± 0.16 | 52,925 × 10 |
+| serialization | simple | orjson (CPython) | 0.338 | 0.0051 | 0.344 ± 0.055 | 191,939 × 16 |
+| serialization | simple | msgspec (CPython) | 0.198 | 0.0036 | 0.2 ± 0.015 | 52,395 × 100 |
+| serialization | structured | json (CPython) | 2.71 | 0.045 | 2.78 ± 0.56 | 190,115 × 2 |
+| serialization | structured | orjson (CPython) | 0.558 | 0.01 | 0.566 ± 0.081 | 187,266 × 10 |
+| serialization | structured | msgspec (CPython) | 0.412 | 0.0069 | 0.417 ± 0.061 | 194,553 × 13 |
+| serialization | nested | json (CPython) | 70 | 0.74 | 71.2 ± 3.7 | 14,339 × 1 |
+| serialization | nested | orjson (CPython) | 22.4 | 0.17 | 22.8 ± 2.1 | 45,307 × 1 |
+| serialization | nested | msgspec (CPython) | 15.1 | 0.29 | 15.3 ± 1.4 | 70,092 × 1 |
+| serialization | unicode | json (CPython) | 3.65 | 0.045 | 3.79 ± 0.78 | 139,782 × 2 |
+| serialization | unicode | orjson (CPython) | 1.37 | 0.015 | 1.39 ± 0.15 | 74,600 × 10 |
+| serialization | unicode | msgspec (CPython) | 1.29 | 0.007 | 1.3 ± 0.14 | 79,277 × 10 |
+| serialization | rich | json (CPython) | 9.05 | 0.14 | 9.25 ± 1.5 | 114,208 × 1 |
+| serialization | rich | orjson (CPython) | 0.798 | 0.011 | 0.81 ± 0.1 | 129,283 × 10 |
+| serialization | rich | msgspec (CPython) | 0.58 | 0.009 | 0.586 ± 0.076 | 178,891 × 10 |
+| serialization | exception | json (CPython) | 2.59 | 0.044 | 2.63 ± 0.43 | 198,060 × 2 |
+| serialization | exception | orjson (CPython) | 0.447 | 0.0058 | 0.453 ± 0.071 | 190,477 × 12 |
+| serialization | exception | msgspec (CPython) | 0.369 | 0.0067 | 0.373 ± 0.052 | 187,266 × 15 |
+| formatting | simple | json (CPython) | 3.83 | 0.086 | 3.9 ± 0.57 | 136,725 × 2 |
+| formatting | simple | orjson (CPython) | 2.18 | 0.048 | 2.21 ± 0.19 | 48,335 × 10 |
+| formatting | simple | msgspec (CPython) | 2 | 0.044 | 2.02 ± 0.17 | 52,646 × 10 |
+| formatting | structured | json (CPython) | 5.57 | 0.14 | 5.68 ± 1 | 188,680 × 1 |
+| formatting | structured | orjson (CPython) | 3.38 | 0.095 | 3.44 ± 0.52 | 159,949 × 2 |
+| formatting | structured | msgspec (CPython) | 3.18 | 0.09 | 3.22 ± 0.49 | 169,751 × 2 |
+| formatting | nested | json (CPython) | 70.8 | 0.83 | 72.3 ± 6 | 14,227 × 1 |
+| formatting | nested | orjson (CPython) | 24 | 0.2 | 24.4 ± 2 | 42,295 × 1 |
+| formatting | nested | msgspec (CPython) | 16.5 | 0.19 | 16.8 ± 1.8 | 62,228 × 1 |
+| formatting | unicode | json (CPython) | 5.58 | 0.1 | 5.67 ± 1 | 185,529 × 1 |
+| formatting | unicode | orjson (CPython) | 3.3 | 0.065 | 3.36 ± 0.53 | 161,499 × 2 |
+| formatting | unicode | msgspec (CPython) | 3.22 | 0.06 | 3.27 ± 0.53 | 166,086 × 2 |
+| formatting | rich | json (CPython) | 11.3 | 0.19 | 11.6 ± 1.9 | 92,337 × 1 |
+| formatting | rich | orjson (CPython) | 3.03 | 0.07 | 3.07 ± 0.47 | 176,026 × 2 |
+| formatting | rich | msgspec (CPython) | 2.77 | 0.065 | 2.81 ± 0.45 | 192,345 × 2 |
+| formatting | exception | json (CPython) | 77 | 2.3 | 80.5 ± 9.2 | 13,378 × 1 |
+| formatting | exception | orjson (CPython) | 71.9 | 1.7 | 75 ± 8.5 | 14,282 × 1 |
+| formatting | exception | msgspec (CPython) | 71.9 | 2.5 | 75.2 ± 8.9 | 14,389 × 1 |
+
+#### Speedup
+
+![Median speedups relative to stdlib JSON for Python 3.13](assets/benchmarking/python-3.13-speedup.svg)
+
+Reference: json (CPython) (1×).
+
+| Layer | Workload | json (CPython) | orjson (CPython) | msgspec (CPython) |
 | --- | --- | ---: | ---: | ---: |
-| serialization | simple | 1× | 6.1× | 10× |
-| serialization | structured | 1× | 5.5× | 7× |
-| serialization | nested | 1× | 3× | 4.2× |
-| serialization | unicode | 1× | 2.6× | 2.7× |
-| serialization | rich | 1× | 10× | 16× |
-| serialization | exception | 1× | 6.6× | 7.9× |
+| serialization | simple | 1× | 5.7× | 9.8× |
+| serialization | structured | 1× | 4.9× | 6.6× |
+| serialization | nested | 1× | 3.1× | 4.6× |
+| serialization | unicode | 1× | 2.7× | 2.8× |
+| serialization | rich | 1× | 11× | 16× |
+| serialization | exception | 1× | 5.8× | 7× |
 | formatting | simple | 1× | 1.8× | 1.9× |
-| formatting | structured | 1× | 1.8× | 1.8× |
-| formatting | nested | 1× | 2.5× | 4× |
-| formatting | unicode | 1× | 1.8× | 1.8× |
+| formatting | structured | 1× | 1.6× | 1.8× |
+| formatting | nested | 1× | 2.9× | 4.3× |
+| formatting | unicode | 1× | 1.7× | 1.7× |
 | formatting | rich | 1× | 3.7× | 4.1× |
+| formatting | exception | 1× | 1.1× | 1.1× |
+
+### Python 3.14
+
+**CPython 3.14.9**. Measured: 2026-10-25T08:50:12.665132+00:00. Revision: `70c2907f5ac43b7b8648b6f080b45918705a6e8d`.
+
+Environment: Linux 6.17.0-1022-azure, x86_64; AMD EPYC 7763 64-Core Processor.
+
+Dependencies: `msgspec==0.22.0`, `orjson==3.13.0`, `pytest==9.1.1`, `pytest-benchmark==5.3.0`, `python-json-logger==4.3.0.dev1`.
+
+#### Times and variation
+
+![Median times and interquartile ranges for Python 3.14](assets/benchmarking/python-3.14-times.svg)
+
+| Layer | Workload | Encoder | Median (µs) | IQR (µs) | Mean ± SD (µs) | Rounds × iterations |
+| --- | --- | --- | ---: | ---: | ---: | ---: |
+| serialization | simple | json (CPython) | 1.96 | 0.019 | 1.99 ± 0.21 | 52,643 × 10 |
+| serialization | simple | orjson (CPython) | 0.369 | 0.0064 | 0.38 ± 0.085 | 199,641 × 14 |
+| serialization | simple | msgspec (CPython) | 0.208 | 0.0025 | 0.211 ± 0.02 | 49,641 × 100 |
+| serialization | structured | json (CPython) | 2.74 | 0.04 | 2.8 ± 0.56 | 188,324 × 2 |
+| serialization | structured | orjson (CPython) | 0.549 | 0.007 | 0.559 ± 0.1 | 185,529 × 10 |
+| serialization | structured | msgspec (CPython) | 0.411 | 0.0046 | 0.418 ± 0.071 | 193,051 × 13 |
+| serialization | nested | json (CPython) | 70.4 | 0.45 | 71.6 ± 4.4 | 14,546 × 1 |
+| serialization | nested | orjson (CPython) | 22.1 | 0.19 | 22.5 ± 2 | 45,978 × 1 |
+| serialization | nested | msgspec (CPython) | 14.4 | 0.18 | 14.8 ± 2.3 | 71,654 × 1 |
+| serialization | unicode | json (CPython) | 3.55 | 0.031 | 3.61 ± 0.59 | 143,617 × 2 |
+| serialization | unicode | orjson (CPython) | 1.33 | 0.0091 | 1.35 ± 0.18 | 77,078 × 10 |
+| serialization | unicode | msgspec (CPython) | 1.2 | 0.008 | 1.22 ± 0.14 | 84,232 × 10 |
+| serialization | rich | json (CPython) | 8.69 | 0.11 | 8.91 ± 1.5 | 118,540 × 1 |
+| serialization | rich | orjson (CPython) | 0.778 | 0.009 | 0.79 ± 0.11 | 131,165 × 10 |
+| serialization | rich | msgspec (CPython) | 0.569 | 0.008 | 0.579 ± 0.089 | 181,489 × 10 |
+| serialization | exception | json (CPython) | 2.56 | 0.024 | 2.6 ± 0.36 | 133,977 × 3 |
+| serialization | exception | orjson (CPython) | 0.449 | 0.0058 | 0.456 ± 0.065 | 189,754 × 12 |
+| serialization | exception | msgspec (CPython) | 0.368 | 0.0044 | 0.373 ± 0.053 | 198,453 × 14 |
+| formatting | simple | json (CPython) | 3.68 | 0.055 | 3.75 ± 0.57 | 141,985 × 2 |
+| formatting | simple | orjson (CPython) | 1.99 | 0.018 | 2.02 ± 0.17 | 51,664 × 10 |
+| formatting | simple | msgspec (CPython) | 1.8 | 0.018 | 1.82 ± 0.16 | 57,399 × 10 |
+| formatting | structured | json (CPython) | 5.35 | 0.1 | 5.46 ± 1 | 193,051 × 1 |
+| formatting | structured | orjson (CPython) | 3 | 0.05 | 3.05 ± 0.47 | 172,981 × 2 |
+| formatting | structured | msgspec (CPython) | 2.8 | 0.045 | 2.84 ± 0.43 | 182,482 × 2 |
+| formatting | nested | json (CPython) | 72.8 | 0.67 | 74.3 ± 6.4 | 13,958 × 1 |
+| formatting | nested | orjson (CPython) | 23.9 | 0.22 | 24.3 ± 2.3 | 41,835 × 1 |
+| formatting | nested | msgspec (CPython) | 16 | 0.17 | 16.3 ± 1.6 | 63,862 × 1 |
+| formatting | unicode | json (CPython) | 5.38 | 0.071 | 5.49 ± 0.98 | 191,976 × 1 |
+| formatting | unicode | orjson (CPython) | 3.16 | 0.04 | 3.25 ± 12 | 163,106 × 2 |
+| formatting | unicode | msgspec (CPython) | 3.02 | 0.03 | 3.06 ± 0.46 | 172,088 × 2 |
+| formatting | rich | json (CPython) | 11 | 0.17 | 11.4 ± 2.2 | 93,897 × 1 |
+| formatting | rich | orjson (CPython) | 2.8 | 0.044 | 2.84 ± 0.45 | 185,874 × 2 |
+| formatting | rich | msgspec (CPython) | 2.54 | 0.03 | 2.58 ± 0.34 | 134,157 × 3 |
+| formatting | exception | json (CPython) | 83.8 | 3.1 | 87.6 ± 9 | 12,445 × 1 |
+| formatting | exception | orjson (CPython) | 78.8 | 2.8 | 82.3 ± 8.9 | 13,245 × 1 |
+| formatting | exception | msgspec (CPython) | 79 | 2.8 | 82.7 ± 9.8 | 13,165 × 1 |
+
+#### Speedup
+
+![Median speedups relative to stdlib JSON for Python 3.14](assets/benchmarking/python-3.14-speedup.svg)
+
+Reference: json (CPython) (1×).
+
+| Layer | Workload | json (CPython) | orjson (CPython) | msgspec (CPython) |
+| --- | --- | ---: | ---: | ---: |
+| serialization | simple | 1× | 5.3× | 9.4× |
+| serialization | structured | 1× | 5× | 6.7× |
+| serialization | nested | 1× | 3.2× | 4.9× |
+| serialization | unicode | 1× | 2.7× | 2.9× |
+| serialization | rich | 1× | 11× | 15× |
+| serialization | exception | 1× | 5.7× | 6.9× |
+| formatting | simple | 1× | 1.8× | 2× |
+| formatting | structured | 1× | 1.8× | 1.9× |
+| formatting | nested | 1× | 3× | 4.5× |
+| formatting | unicode | 1× | 1.7× | 1.8× |
+| formatting | rich | 1× | 3.9× | 4.3× |
+| formatting | exception | 1× | 1.1× | 1.1× |
+
+### Python 3.15
+
+**CPython 3.15.1**. Measured: 2026-10-25T08:50:52.380316+00:00. Revision: `70c2907f5ac43b7b8648b6f080b45918705a6e8d`.
+
+Environment: Linux 6.17.0-1022-azure, x86_64; AMD EPYC 9V74 80-Core Processor.
+
+Dependencies: `msgspec==0.22.0`, `orjson==3.13.0`, `pytest==9.1.1`, `pytest-benchmark==5.3.0`, `python-json-logger==4.3.0.dev1`.
+
+#### Times and variation
+
+![Median times and interquartile ranges for Python 3.15](assets/benchmarking/python-3.15-times.svg)
+
+| Layer | Workload | Encoder | Median (µs) | IQR (µs) | Mean ± SD (µs) | Rounds × iterations |
+| --- | --- | --- | ---: | ---: | ---: | ---: |
+| serialization | simple | json (CPython) | 1.47 | 0.018 | 1.49 ± 0.14 | 70,073 × 10 |
+| serialization | simple | orjson (CPython) | 0.213 | 0.0031 | 0.216 ± 0.017 | 47,660 × 100 |
+| serialization | simple | msgspec (CPython) | 0.145 | 0.0013 | 0.147 ± 0.013 | 69,731 × 100 |
+| serialization | structured | json (CPython) | 2.04 | 0.027 | 2.07 ± 0.18 | 50,687 × 10 |
+| serialization | structured | orjson (CPython) | 0.361 | 0.0053 | 0.366 ± 0.045 | 190,187 × 15 |
+| serialization | structured | msgspec (CPython) | 0.322 | 0.0071 | 0.331 ± 0.056 | 192,382 × 17 |
+| serialization | nested | json (CPython) | 57 | 0.66 | 58 ± 4.3 | 21,478 × 1 |
+| serialization | nested | orjson (CPython) | 15.8 | 0.11 | 16 ± 1.2 | 64,380 × 1 |
+| serialization | nested | msgspec (CPython) | 12 | 0.18 | 12.1 ± 1.3 | 89,071 × 1 |
+| serialization | unicode | json (CPython) | 2.9 | 0.03 | 2.94 ± 0.39 | 177,368 × 2 |
+| serialization | unicode | orjson (CPython) | 0.84 | 0.013 | 0.855 ± 0.095 | 120,308 × 10 |
+| serialization | unicode | msgspec (CPython) | 0.864 | 0.018 | 0.884 ± 1.1 | 118,864 × 10 |
+| serialization | rich | json (CPython) | 6.38 | 0.1 | 6.48 ± 0.76 | 166,141 × 1 |
+| serialization | rich | orjson (CPython) | 0.549 | 0.009 | 0.556 ± 0.072 | 189,466 × 10 |
+| serialization | rich | msgspec (CPython) | 0.426 | 0.0062 | 0.431 ± 0.049 | 188,041 × 13 |
+| serialization | exception | json (CPython) | 1.94 | 0.023 | 1.97 ± 0.16 | 52,524 × 10 |
+| serialization | exception | orjson (CPython) | 0.298 | 0.0044 | 0.302 ± 0.035 | 192,382 × 18 |
+| serialization | exception | msgspec (CPython) | 0.282 | 0.0037 | 0.286 ± 0.036 | 190,913 × 19 |
+| formatting | simple | json (CPython) | 2.92 | 0.055 | 2.97 ± 0.36 | 180,571 × 2 |
+| formatting | simple | orjson (CPython) | 1.6 | 0.027 | 1.62 ± 0.12 | 65,561 × 10 |
+| formatting | simple | msgspec (CPython) | 1.43 | 0.019 | 1.44 ± 0.11 | 73,041 × 10 |
+| formatting | structured | json (CPython) | 4.13 | 0.07 | 4.18 ± 0.42 | 126,551 × 2 |
+| formatting | structured | orjson (CPython) | 2.37 | 0.03 | 2.42 ± 0.33 | 43,169 × 10 |
+| formatting | structured | msgspec (CPython) | 2.23 | 0.021 | 2.27 ± 0.33 | 46,122 × 10 |
+| formatting | nested | json (CPython) | 46.6 | 0.54 | 47.1 ± 2.5 | 21,965 × 1 |
+| formatting | nested | orjson (CPython) | 17.3 | 0.13 | 17.5 ± 1.4 | 59,015 × 1 |
+| formatting | nested | msgspec (CPython) | 12.9 | 0.12 | 13 ± 0.95 | 79,309 × 1 |
+| formatting | unicode | json (CPython) | 4.35 | 0.055 | 4.41 ± 0.42 | 118,316 × 2 |
+| formatting | unicode | orjson (CPython) | 2.26 | 0.023 | 2.29 ± 0.14 | 45,470 × 10 |
+| formatting | unicode | msgspec (CPython) | 2.22 | 0.027 | 2.26 ± 2.8 | 46,098 × 10 |
+| formatting | rich | json (CPython) | 8 | 0.12 | 8.12 ± 0.91 | 130,345 × 1 |
+| formatting | rich | orjson (CPython) | 2.14 | 0.022 | 2.16 ± 0.14 | 47,822 × 10 |
+| formatting | rich | msgspec (CPython) | 2.17 | 0.026 | 2.2 ± 0.16 | 52,087 × 10 |
+| formatting | exception | json (CPython) | 40.6 | 0.95 | 41.6 ± 4.1 | 25,505 × 1 |
+| formatting | exception | orjson (CPython) | 37.8 | 0.69 | 38.6 ± 2.9 | 27,409 × 1 |
+| formatting | exception | msgspec (CPython) | 37.3 | 0.69 | 38.2 ± 3.7 | 27,342 × 1 |
+
+#### Speedup
+
+![Median speedups relative to stdlib JSON for Python 3.15](assets/benchmarking/python-3.15-speedup.svg)
+
+Reference: json (CPython) (1×).
+
+| Layer | Workload | json (CPython) | orjson (CPython) | msgspec (CPython) |
+| --- | --- | ---: | ---: | ---: |
+| serialization | simple | 1× | 6.9× | 10× |
+| serialization | structured | 1× | 5.6× | 6.3× |
+| serialization | nested | 1× | 3.6× | 4.8× |
+| serialization | unicode | 1× | 3.4× | 3.4× |
+| serialization | rich | 1× | 12× | 15× |
+| serialization | exception | 1× | 6.5× | 6.9× |
+| formatting | simple | 1× | 1.8× | 2× |
+| formatting | structured | 1× | 1.7× | 1.8× |
+| formatting | nested | 1× | 2.7× | 3.6× |
+| formatting | unicode | 1× | 1.9× | 2× |
+| formatting | rich | 1× | 3.7× | 3.7× |
 | formatting | exception | 1× | 1.1× | 1.1× |
 
 <!-- benchmark-results:end -->

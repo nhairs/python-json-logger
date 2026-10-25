@@ -1,0 +1,745 @@
+{
+  "machine_info": {
+    "node": "runnervmtai0g",
+    "processor": "x86_64",
+    "machine": "x86_64",
+    "python_compiler": "",
+    "python_implementation": "PyPy",
+    "python_implementation_version": "7.3.19",
+    "python_version": "3.10.16",
+    "python_build": [
+      "64367dfeb263",
+      "Feb 24 2025"
+    ],
+    "release": "6.17.0-1022-azure",
+    "system": "Linux",
+    "cpu": {
+      "python_version": "3.10.16.final.0 (64 bit)",
+      "cpuinfo_version": [
+        10,
+        1,
+        1
+      ],
+      "cpuinfo_version_string": "10.1.1",
+      "arch": "X86_64",
+      "bits": 64,
+      "count": 4,
+      "arch_string_raw": "x86_64",
+      "vendor_id_raw": "AuthenticAMD",
+      "brand_raw": "AMD EPYC 7763 64-Core Processor",
+      "hz_advertised_friendly": "2.4454 GHz",
+      "hz_actual_friendly": "2.4454 GHz",
+      "hz_advertised": [
+        2445430000,
+        0
+      ],
+      "hz_actual": [
+        2445430000,
+        0
+      ],
+      "stepping": 1,
+      "model": 1,
+      "family": 25,
+      "flags": [
+        "3dnowext",
+        "3dnowprefetch",
+        "abm",
+        "adx",
+        "aes",
+        "aperfmperf",
+        "apic",
+        "arat",
+        "avx",
+        "avx2",
+        "bmi1",
+        "bmi2",
+        "clflush",
+        "clflushopt",
+        "clwb",
+        "clzero",
+        "cmov",
+        "cmp_legacy",
+        "constant_tsc",
+        "cpuid",
+        "cr8_legacy",
+        "cx16",
+        "cx8",
+        "de",
+        "decodeassists",
+        "erms",
+        "extd_apicid",
+        "f16c",
+        "flushbyasid",
+        "fma",
+        "fpu",
+        "fsgsbase",
+        "fsrm",
+        "fxsr",
+        "fxsr_opt",
+        "ht",
+        "hypervisor",
+        "invpcid",
+        "lahf_lm",
+        "lm",
+        "mca",
+        "mce",
+        "misalignsse",
+        "mmx",
+        "mmxext",
+        "movbe",
+        "msr",
+        "mtrr",
+        "nonstop_tsc",
+        "nopl",
+        "npt",
+        "nrip_save",
+        "nx",
+        "osvw",
+        "osxsave",
+        "pae",
+        "pat",
+        "pausefilter",
+        "pcid",
+        "pclmulqdq",
+        "pdpe1gb",
+        "pfthreshold",
+        "pge",
+        "pni",
+        "popcnt",
+        "pse",
+        "pse36",
+        "rdpid",
+        "rdpru",
+        "rdrand",
+        "rdrnd",
+        "rdseed",
+        "rdtscp",
+        "rep_good",
+        "sep",
+        "sha",
+        "sha_ni",
+        "smap",
+        "smep",
+        "sse",
+        "sse2",
+        "sse4_1",
+        "sse4_2",
+        "sse4a",
+        "ssse3",
+        "svm",
+        "syscall",
+        "topoext",
+        "tsc",
+        "tsc_known_freq",
+        "tsc_reliable",
+        "tsc_scale",
+        "umip",
+        "user_shstk",
+        "v_vmsave_vmload",
+        "vaes",
+        "vmcb_clean",
+        "vme",
+        "vmmcall",
+        "vpclmulqdq",
+        "xgetbv1",
+        "xsave",
+        "xsavec",
+        "xsaveerptr",
+        "xsaveopt",
+        "xsaves"
+      ],
+      "l3_cache_size": 524288,
+      "l2_cache_size": 1048576,
+      "l1_data_cache_size": 65536,
+      "l1_instruction_cache_size": 65536,
+      "l2_cache_line_size": 512,
+      "l2_cache_associativity": 6
+    }
+  },
+  "commit_info": {
+    "id": "70c2907f5ac43b7b8648b6f080b45918705a6e8d",
+    "time": "2026-10-25T08:48:25Z",
+    "author_time": "2026-10-25T08:48:25Z",
+    "dirty": false,
+    "project": "python-json-logger",
+    "branch": "brave-pelican/benchmark-baseline"
+  },
+  "benchmarks": [
+    {
+      "group": null,
+      "name": "test_formatter[serialization-simple-json]",
+      "fullname": "benchmarks/test_formatters.py::test_formatter[serialization-simple-json]",
+      "params": {
+        "layer": "serialization",
+        "workload": "UNSERIALIZABLE[<function simple at 0x0000000024146840>]",
+        "backend": "json"
+      },
+      "param": "serialization-simple-json",
+      "extra_info": {
+        "backend": "json",
+        "workload": "simple",
+        "layer": "serialization",
+        "output_bytes": 32
+      },
+      "options": {
+        "disable_gc": false,
+        "timer": "monotonic",
+        "min_rounds": 5,
+        "max_time": 1.0,
+        "min_time": 5e-06,
+        "precision": null,
+        "confidence": null,
+        "warmup": 100000
+      },
+      "stats": {
+        "min": 3.405999999965085e-07,
+        "max": 1.438173333336105e-05,
+        "mean": 3.9047660272044175e-07,
+        "stddev": 1.1125026298739462e-07,
+        "rounds": 194175,
+        "median": 3.733333334328866e-07,
+        "iqr": 1.1333332849972045e-08,
+        "q1": 3.680000001319665e-07,
+        "q3": 3.793333329819385e-07,
+        "iqr_outliers": 13067,
+        "stddev_outliers": 8455,
+        "outliers": "8455;13067",
+        "ld15iqr": 3.512666665983488e-07,
+        "hd15iqr": 3.967333332373831e-07,
+        "ops": 2560972.906016222,
+        "total": 0.07582079433321814,
+        "iterations": 15
+      }
+    },
+    {
+      "group": null,
+      "name": "test_formatter[serialization-structured-json]",
+      "fullname": "benchmarks/test_formatters.py::test_formatter[serialization-structured-json]",
+      "params": {
+        "layer": "serialization",
+        "workload": "UNSERIALIZABLE[<function structured at 0x00000000241467a0>]",
+        "backend": "json"
+      },
+      "param": "serialization-structured-json",
+      "extra_info": {
+        "backend": "json",
+        "workload": "structured",
+        "layer": "serialization",
+        "output_bytes": 122
+      },
+      "options": {
+        "disable_gc": false,
+        "timer": "monotonic",
+        "min_rounds": 5,
+        "max_time": 1.0,
+        "min_time": 5e-06,
+        "precision": null,
+        "confidence": null,
+        "warmup": 100000
+      },
+      "stats": {
+        "min": 9.578000003784837e-07,
+        "max": 1.2572600000027023e-05,
+        "mean": 1.0885249823934608e-06,
+        "stddev": 3.1941837320331423e-07,
+        "rounds": 103649,
+        "median": 1.0109000001534696e-06,
+        "iqr": 1.9000000150981662e-08,
+        "q1": 1.0028999994915466e-06,
+        "q3": 1.0218999996425283e-06,
+        "iqr_outliers": 9494,
+        "stddev_outliers": 7660,
+        "outliers": "7660;9494",
+        "ld15iqr": 9.747999996534417e-07,
+        "hd15iqr": 1.0508999999103708e-06,
+        "ops": 918674.3677680099,
+        "total": 0.1128245259001002,
+        "iterations": 10
+      }
+    },
+    {
+      "group": null,
+      "name": "test_formatter[serialization-nested-json]",
+      "fullname": "benchmarks/test_formatters.py::test_formatter[serialization-nested-json]",
+      "params": {
+        "layer": "serialization",
+        "workload": "UNSERIALIZABLE[<function nested at 0x0000000024146700>]",
+        "backend": "json"
+      },
+      "param": "serialization-nested-json",
+      "extra_info": {
+        "backend": "json",
+        "workload": "nested",
+        "layer": "serialization",
+        "output_bytes": 7723
+      },
+      "options": {
+        "disable_gc": false,
+        "timer": "monotonic",
+        "min_rounds": 5,
+        "max_time": 1.0,
+        "min_time": 5e-06,
+        "precision": null,
+        "confidence": null,
+        "warmup": 100000
+      },
+      "stats": {
+        "min": 5.7507999997596926e-05,
+        "max": 0.012677490999998042,
+        "mean": 6.42178773849616e-05,
+        "stddev": 0.00012698400595679332,
+        "rounds": 17453,
+        "median": 5.9110999998779334e-05,
+        "iqr": 1.5720000021701708e-06,
+        "q1": 5.8760999998241914e-05,
+        "q3": 6.0333000000412085e-05,
+        "iqr_outliers": 3584,
+        "stddev_outliers": 34,
+        "outliers": "34;3584",
+        "ld15iqr": 5.7507999997596926e-05,
+        "hd15iqr": 6.269800000069381e-05,
+        "ops": 15571.987750473016,
+        "total": 1.1207946139997347,
+        "iterations": 1
+      }
+    },
+    {
+      "group": null,
+      "name": "test_formatter[serialization-unicode-json]",
+      "fullname": "benchmarks/test_formatters.py::test_formatter[serialization-unicode-json]",
+      "params": {
+        "layer": "serialization",
+        "workload": "UNSERIALIZABLE[<function unicode_message at 0x0000000024146660>]",
+        "backend": "json"
+      },
+      "param": "serialization-unicode-json",
+      "extra_info": {
+        "backend": "json",
+        "workload": "unicode",
+        "layer": "serialization",
+        "output_bytes": 1035
+      },
+      "options": {
+        "disable_gc": false,
+        "timer": "monotonic",
+        "min_rounds": 5,
+        "max_time": 1.0,
+        "min_time": 5e-06,
+        "precision": null,
+        "confidence": null,
+        "warmup": 100000
+      },
+      "stats": {
+        "min": 1.8333999996400507e-06,
+        "max": 1.3655699999759463e-05,
+        "mean": 1.9558966227385746e-06,
+        "stddev": 3.1753846417095524e-07,
+        "rounds": 54482,
+        "median": 1.883500000587901e-06,
+        "iqr": 2.1000000316462192e-08,
+        "q1": 1.8744999998432377e-06,
+        "q3": 1.8955000001597e-06,
+        "iqr_outliers": 5773,
+        "stddev_outliers": 3060,
+        "outliers": "3060;5773",
+        "ld15iqr": 1.8433999997569117e-06,
+        "hd15iqr": 1.9275999996182236e-06,
+        "ops": 511274.465313885,
+        "total": 0.10656115980005387,
+        "iterations": 10
+      }
+    },
+    {
+      "group": null,
+      "name": "test_formatter[serialization-rich-json]",
+      "fullname": "benchmarks/test_formatters.py::test_formatter[serialization-rich-json]",
+      "params": {
+        "layer": "serialization",
+        "workload": "UNSERIALIZABLE[<function rich at 0x00000000241465c0>]",
+        "backend": "json"
+      },
+      "param": "serialization-rich-json",
+      "extra_info": {
+        "backend": "json",
+        "workload": "rich",
+        "layer": "serialization",
+        "output_bytes": 173
+      },
+      "options": {
+        "disable_gc": false,
+        "timer": "monotonic",
+        "min_rounds": 5,
+        "max_time": 1.0,
+        "min_time": 5e-06,
+        "precision": null,
+        "confidence": null,
+        "warmup": 100000
+      },
+      "stats": {
+        "min": 1.0220000000060736e-05,
+        "max": 0.0001304860000033159,
+        "mean": 1.102185217841738e-05,
+        "stddev": 2.290881317653784e-06,
+        "rounds": 100716,
+        "median": 1.0640000006389982e-05,
+        "iqr": 1.8099999721243876e-07,
+        "q1": 1.056900000406813e-05,
+        "q3": 1.0750000001280569e-05,
+        "iqr_outliers": 9329,
+        "stddev_outliers": 2515,
+        "outliers": "2515;9329",
+        "ld15iqr": 1.0298999995939084e-05,
+        "hd15iqr": 1.1029999996026163e-05,
+        "ops": 90728.8524480637,
+        "total": 1.1100768640014849,
+        "iterations": 1
+      }
+    },
+    {
+      "group": null,
+      "name": "test_formatter[serialization-exception-json]",
+      "fullname": "benchmarks/test_formatters.py::test_formatter[serialization-exception-json]",
+      "params": {
+        "layer": "serialization",
+        "workload": "UNSERIALIZABLE[<function exception at 0x0000000024146520>]",
+        "backend": "json"
+      },
+      "param": "serialization-exception-json",
+      "extra_info": {
+        "backend": "json",
+        "workload": "exception",
+        "layer": "serialization",
+        "output_bytes": 276
+      },
+      "options": {
+        "disable_gc": false,
+        "timer": "monotonic",
+        "min_rounds": 5,
+        "max_time": 1.0,
+        "min_time": 5e-06,
+        "precision": null,
+        "confidence": null,
+        "warmup": 100000
+      },
+      "stats": {
+        "min": 9.326000004250546e-07,
+        "max": 0.0010019832999994093,
+        "mean": 1.025214272474844e-06,
+        "stddev": 3.187120484656738e-06,
+        "rounds": 105742,
+        "median": 9.845999997537547e-07,
+        "iqr": 1.5100000183565456e-08,
+        "q1": 9.767999998189225e-07,
+        "q3": 9.91900000002488e-07,
+        "iqr_outliers": 5993,
+        "stddev_outliers": 88,
+        "outliers": "88;5993",
+        "ld15iqr": 9.54499999750169e-07,
+        "hd15iqr": 1.0146000001043375e-06,
+        "ops": 975405.8510971203,
+        "total": 0.10840820760000891,
+        "iterations": 10
+      }
+    },
+    {
+      "group": null,
+      "name": "test_formatter[formatting-simple-json]",
+      "fullname": "benchmarks/test_formatters.py::test_formatter[formatting-simple-json]",
+      "params": {
+        "layer": "formatting",
+        "workload": "UNSERIALIZABLE[<function simple at 0x0000000024146840>]",
+        "backend": "json"
+      },
+      "param": "formatting-simple-json",
+      "extra_info": {
+        "backend": "json",
+        "workload": "simple",
+        "layer": "formatting",
+        "output_bytes": 32
+      },
+      "options": {
+        "disable_gc": false,
+        "timer": "monotonic",
+        "min_rounds": 5,
+        "max_time": 1.0,
+        "min_time": 5e-06,
+        "precision": null,
+        "confidence": null,
+        "warmup": 100000
+      },
+      "stats": {
+        "min": 2.549499999560112e-06,
+        "max": 0.005169684000001951,
+        "mean": 2.7823097008418784e-06,
+        "stddev": 1.2190147757549645e-05,
+        "rounds": 196890,
+        "median": 2.640000001719045e-06,
+        "iqr": 4.999999703159119e-08,
+        "q1": 2.6200000000642376e-06,
+        "q3": 2.669999997095829e-06,
+        "iqr_outliers": 12949,
+        "stddev_outliers": 114,
+        "outliers": "114;12949",
+        "ld15iqr": 2.549499999560112e-06,
+        "hd15iqr": 2.744999999748643e-06,
+        "ops": 359413.6194462527,
+        "total": 0.5478089569987574,
+        "iterations": 2
+      }
+    },
+    {
+      "group": null,
+      "name": "test_formatter[formatting-structured-json]",
+      "fullname": "benchmarks/test_formatters.py::test_formatter[formatting-structured-json]",
+      "params": {
+        "layer": "formatting",
+        "workload": "UNSERIALIZABLE[<function structured at 0x00000000241467a0>]",
+        "backend": "json"
+      },
+      "param": "formatting-structured-json",
+      "extra_info": {
+        "backend": "json",
+        "workload": "structured",
+        "layer": "formatting",
+        "output_bytes": 122
+      },
+      "options": {
+        "disable_gc": false,
+        "timer": "monotonic",
+        "min_rounds": 5,
+        "max_time": 1.0,
+        "min_time": 5e-06,
+        "precision": null,
+        "confidence": null,
+        "warmup": 100000
+      },
+      "stats": {
+        "min": 4.097499999744514e-06,
+        "max": 0.0006660019999991107,
+        "mean": 4.351297573068279e-06,
+        "stddev": 2.7704542053039283e-06,
+        "rounds": 122459,
+        "median": 4.208000000005541e-06,
+        "iqr": 5.5000000998006726e-08,
+        "q1": 4.183000001489745e-06,
+        "q3": 4.238000002487752e-06,
+        "iqr_outliers": 8919,
+        "stddev_outliers": 2193,
+        "outliers": "2193;8919",
+        "ld15iqr": 4.102499996605502e-06,
+        "hd15iqr": 4.322500000597529e-06,
+        "ops": 229816.50489485112,
+        "total": 0.5328555495003684,
+        "iterations": 2
+      }
+    },
+    {
+      "group": null,
+      "name": "test_formatter[formatting-nested-json]",
+      "fullname": "benchmarks/test_formatters.py::test_formatter[formatting-nested-json]",
+      "params": {
+        "layer": "formatting",
+        "workload": "UNSERIALIZABLE[<function nested at 0x0000000024146700>]",
+        "backend": "json"
+      },
+      "param": "formatting-nested-json",
+      "extra_info": {
+        "backend": "json",
+        "workload": "nested",
+        "layer": "formatting",
+        "output_bytes": 7723
+      },
+      "options": {
+        "disable_gc": false,
+        "timer": "monotonic",
+        "min_rounds": 5,
+        "max_time": 1.0,
+        "min_time": 5e-06,
+        "precision": null,
+        "confidence": null,
+        "warmup": 100000
+      },
+      "stats": {
+        "min": 6.0613000002263107e-05,
+        "max": 0.01128037500000545,
+        "mean": 6.930596479345567e-05,
+        "stddev": 0.00011653566648971477,
+        "rounds": 16531,
+        "median": 6.382000000115795e-05,
+        "iqr": 3.95675000319784e-06,
+        "q1": 6.263799999572939e-05,
+        "q3": 6.659474999892723e-05,
+        "iqr_outliers": 2569,
+        "stddev_outliers": 42,
+        "outliers": "42;2569",
+        "ld15iqr": 6.0613000002263107e-05,
+        "hd15iqr": 7.253500000103941e-05,
+        "ops": 14428.772515903662,
+        "total": 1.1456969040006157,
+        "iterations": 1
+      }
+    },
+    {
+      "group": null,
+      "name": "test_formatter[formatting-unicode-json]",
+      "fullname": "benchmarks/test_formatters.py::test_formatter[formatting-unicode-json]",
+      "params": {
+        "layer": "formatting",
+        "workload": "UNSERIALIZABLE[<function unicode_message at 0x0000000024146660>]",
+        "backend": "json"
+      },
+      "param": "formatting-unicode-json",
+      "extra_info": {
+        "backend": "json",
+        "workload": "unicode",
+        "layer": "formatting",
+        "output_bytes": 1035
+      },
+      "options": {
+        "disable_gc": false,
+        "timer": "monotonic",
+        "min_rounds": 5,
+        "max_time": 1.0,
+        "min_time": 5e-06,
+        "precision": null,
+        "confidence": null,
+        "warmup": 100000
+      },
+      "stats": {
+        "min": 4.143000001732844e-06,
+        "max": 0.005473726499999998,
+        "mean": 4.5386906142572645e-06,
+        "stddev": 2.1602606007800637e-05,
+        "rounds": 120715,
+        "median": 4.278000002244653e-06,
+        "iqr": 7.500000265281415e-08,
+        "q1": 4.247999999762442e-06,
+        "q3": 4.323000002415256e-06,
+        "iqr_outliers": 8712,
+        "stddev_outliers": 58,
+        "outliers": "58;8712",
+        "ld15iqr": 4.143000001732844e-06,
+        "hd15iqr": 4.437999997719544e-06,
+        "ops": 220327.862150094,
+        "total": 0.5478880375000656,
+        "iterations": 2
+      }
+    },
+    {
+      "group": null,
+      "name": "test_formatter[formatting-rich-json]",
+      "fullname": "benchmarks/test_formatters.py::test_formatter[formatting-rich-json]",
+      "params": {
+        "layer": "formatting",
+        "workload": "UNSERIALIZABLE[<function rich at 0x00000000241465c0>]",
+        "backend": "json"
+      },
+      "param": "formatting-rich-json",
+      "extra_info": {
+        "backend": "json",
+        "workload": "rich",
+        "layer": "formatting",
+        "output_bytes": 173
+      },
+      "options": {
+        "disable_gc": false,
+        "timer": "monotonic",
+        "min_rounds": 5,
+        "max_time": 1.0,
+        "min_time": 5e-06,
+        "precision": null,
+        "confidence": null,
+        "warmup": 100000
+      },
+      "stats": {
+        "min": 1.5149000006431379e-05,
+        "max": 9.941199999730088e-05,
+        "mean": 1.6611300899243317e-05,
+        "stddev": 3.7440431235512168e-06,
+        "rounds": 66278,
+        "median": 1.5750000002867637e-05,
+        "iqr": 2.919999957384789e-07,
+        "q1": 1.563800000781157e-05,
+        "q3": 1.593000000355005e-05,
+        "iqr_outliers": 8364,
+        "stddev_outliers": 3125,
+        "outliers": "3125;8364",
+        "ld15iqr": 1.5208000007760347e-05,
+        "hd15iqr": 1.6369999997323248e-05,
+        "ops": 60199.98108911219,
+        "total": 1.1009638010000486,
+        "iterations": 1
+      }
+    },
+    {
+      "group": null,
+      "name": "test_formatter[formatting-exception-json]",
+      "fullname": "benchmarks/test_formatters.py::test_formatter[formatting-exception-json]",
+      "params": {
+        "layer": "formatting",
+        "workload": "UNSERIALIZABLE[<function exception at 0x0000000024146520>]",
+        "backend": "json"
+      },
+      "param": "formatting-exception-json",
+      "extra_info": {
+        "backend": "json",
+        "workload": "exception",
+        "layer": "formatting",
+        "output_bytes": 276
+      },
+      "options": {
+        "disable_gc": false,
+        "timer": "monotonic",
+        "min_rounds": 5,
+        "max_time": 1.0,
+        "min_time": 5e-06,
+        "precision": null,
+        "confidence": null,
+        "warmup": 100000
+      },
+      "stats": {
+        "min": 9.207999994487182e-06,
+        "max": 0.009306381000001807,
+        "mean": 1.0699550323872105e-05,
+        "stddev": 4.928643585786889e-05,
+        "rounds": 108378,
+        "median": 9.517999998820414e-06,
+        "iqr": 1.5099999473022763e-07,
+        "q1": 9.457000004431393e-06,
+        "q3": 9.60799999916162e-06,
+        "iqr_outliers": 12746,
+        "stddev_outliers": 226,
+        "outliers": "226;12746",
+        "ld15iqr": 9.237000000439366e-06,
+        "hd15iqr": 9.837999996875624e-06,
+        "ops": 93461.87173575588,
+        "total": 1.159595865000611,
+        "iterations": 1
+      }
+    }
+  ],
+  "datetime": "2026-10-25T08:49:22.989582+00:00",
+  "version": "5.3.0",
+  "environment": {
+    "python": "3.10.16",
+    "implementation": "PyPy",
+    "dependencies": {
+      "python-json-logger": "4.3.0.dev1",
+      "pytest": "9.1.1",
+      "pytest-benchmark": "5.3.0"
+    },
+    "backends": [
+      "json"
+    ],
+    "revision": "70c2907f5ac43b7b8648b6f080b45918705a6e8d",
+    "dirty": false,
+    "workflow_run": "40178087913",
+    "workflow_attempt": "1"
+  },
+  "curation": {
+    "source_sha256": "980349fe8f5c421e4d27ac8aa7aa9c68774e4c64088b02bf0ccd94a15197e243",
+    "omitted": [
+      "benchmarks[].stats.data"
+    ]
+  }
+}

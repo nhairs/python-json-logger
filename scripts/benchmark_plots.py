@@ -11,10 +11,20 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 
-from benchmark_report import BACKENDS, LAYERS, WORKLOADS, comparison_groups, load_results, render
+from benchmark_report import LAYERS, WORKLOADS, comparison_groups, load_results, render
 
-COLORS = {"json": "#0072B2", "orjson": "#D55E00", "msgspec": "#009E73"}
-MARKERS = {"json": "o", "orjson": "s", "msgspec": "^"}
+COLORS = {
+    "json (CPython)": "#0072B2",
+    "orjson (CPython)": "#D55E00",
+    "msgspec (CPython)": "#009E73",
+    "json (PyPy)": "#CC79A7",
+}
+MARKERS = {
+    "json (CPython)": "o",
+    "orjson (CPython)": "s",
+    "msgspec (CPython)": "^",
+    "json (PyPy)": "D",
+}
 STYLE = {
     "font.family": "DejaVu Sans",
     "svg.fonttype": "none",
@@ -44,8 +54,8 @@ def make_plot(result: dict, kind: str) -> Figure:
                     values,
                     positions,
                     xerr=errors,
-                    fmt=MARKERS[backend.split()[0]] if backend != "json (PyPy)" else "D",
-                    color=COLORS[backend.split()[0]] if backend != "json (PyPy)" else "#CC79A7",
+                    fmt=MARKERS[backend],
+                    color=COLORS[backend],
                     label=backend,
                     capsize=3,
                     markersize=5,
@@ -59,8 +69,8 @@ def make_plot(result: dict, kind: str) -> Figure:
                     values,
                     positions,
                     linestyle="none",
-                    marker=MARKERS[backend.split()[0]] if backend != "json (PyPy)" else "D",
-                    color=COLORS[backend.split()[0]] if backend != "json (PyPy)" else "#CC79A7",
+                    marker=MARKERS[backend],
+                    color=COLORS[backend],
                     label=backend,
                     markersize=5,
                 )

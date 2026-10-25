@@ -26,7 +26,7 @@ def load_results(paths: list[Path]) -> list[dict]:
         results.append(result)
     results.sort(
         key=lambda result: (
-            tuple(map(int, result["environment"]["python"].split("."))),
+            tuple(map(int, result["environment"]["python"].split(".")[:2])),
             result["environment"].get("implementation", "CPython"),
         )
     )
@@ -112,7 +112,12 @@ def render(paths: list[Path], plots: str | None = None) -> str:
                     f"Revision: `{environment['revision']}`"
                     + (" (working tree modified)." if environment["dirty"] else "."),
                     "",
-                    f"Environment: {machine['system']} {machine['release']}, {machine['machine']}; {cpu}.",
+                    f"Environment: {machine['system']} {machine['release']}, {machine['machine']}; {cpu}."
+                    + (
+                        f" PyPy release: {machine['python_implementation_version']}."
+                        if implementation == "PyPy" and "python_implementation_version" in machine
+                        else ""
+                    ),
                     "",
                     "Dependencies: "
                     + ", ".join(
@@ -156,14 +161,14 @@ def render(paths: list[Path], plots: str | None = None) -> str:
                     "",
                 ]
             )
+        reference = "json (CPython)" if "json (CPython)" in backends else "json (PyPy)"
+        sections.extend([f"Reference: {reference} (1×).", ""])
         sections.extend(
             [
                 "| Layer | Workload | " + " | ".join(backends) + " |",
                 "| --- | --- | " + " | ".join("---:" for _ in backends) + " |",
             ]
         )
-        reference = "json (CPython)" if "json (CPython)" in backends else "json (PyPy)"
-        sections.extend([f"Reference: {reference} (1×).", ""])
         for layer in LAYERS:
             for workload in WORKLOADS:
                 baseline = cases[layer, workload, reference]["median"]

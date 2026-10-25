@@ -129,12 +129,17 @@ def test_report_stdlib_only_pypy(result_file: Path, monkeypatch: pytest.MonkeyPa
     # Tox can set UTF-8 stdout independently of Windows' preferred locale.
     monkeypatch.setenv("PYTHONIOENCODING", "utf-8")
     cpython_file = result_file.with_name("cpython.json")
-    cpython_file.write_bytes(result_file.read_bytes())
+    cpython = json.loads(result_file.read_text())
+    cpython["environment"]["python"] = "3.15.1"
+    cpython_file.write_text(json.dumps(cpython))
     result = json.loads(result_file.read_text())
-    result["environment"].update(implementation="PyPy", python="3.15.1", backends=["json"])
+    result["environment"].update(implementation="PyPy", python="3.15.0", backends=["json"])
     result["benchmarks"] = [
         item for item in result["benchmarks"] if item["extra_info"]["backend"] == "json"
     ]
+    for item in result["benchmarks"]:
+        for statistic in ("median", "mean", "stddev", "q1", "q3", "iqr"):
+            item["stats"][statistic] /= 4
     result_file.write_text(json.dumps(result))
     text = subprocess.check_output(
         [sys.executable, str(REPORT), str(result_file), str(cpython_file)], encoding="utf-8"
@@ -144,8 +149,32 @@ def test_report_stdlib_only_pypy(result_file: Path, monkeypatch: pytest.MonkeyPa
     )
     assert text == reversed_text
     assert text.count("### Python 3.15") == 1
+    assert "Reference: json (CPython) (1×)." in text
     assert "json (PyPy)" in text
     assert "orjson (PyPy)" not in text
-    assert "**PyPy 3.15.1**" in text
-    assert "| serialization | simple | 1× | 2× | 2× | 1× |" in text
+    assert "| --- | --- | ---: | ---: | ---: | ---: |\n| serialization" in text
+    standalone = subprocess.check_output(
+        [sys.executable, str(REPORT), str(result_file)], encoding="utf-8"
+    )
+    assert "Reference: json (PyPy) (1×)." in standalone
+    assert "CPython" not in standalone
+    assert "**PyPy 3.15.0**" in text
+    assert "| serialization | simple | 1× | 2× | 2× | 4× |" in text
+    return
+
+
+def test_report_rejects_duplicate_minor_runtime(result_file: Path) -> None:
+    """Two patch versions of one implementation must not overwrite a comparison."""
+    other = result_file.with_name("duplicate.json")
+    result = json.loads(result_file.read_text())
+    result["environment"]["python"] = "3.15.1"
+    other.write_text(json.dumps(result))
+    completed = subprocess.run(
+        [sys.executable, str(REPORT), str(result_file), str(other)],
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode != 0
+    assert "Duplicate runtime" in completed.stderr
+    assert not completed.stdout
     return
