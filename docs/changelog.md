@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [4.3.0](https://github.com/nhairs/python-json-logger/compare/v4.2.0...v4.3.0) - UNRELEASED
 
 ### Added
+- `pythonjsonlogger.http.JsonHttpHandler` sends JSON via POST or PUT using synchronous Requests-compatible sessions, with Niquests as an optional default. Related to [#42](https://github.com/nhairs/python-json-logger/issues/42).
+- Private formatter byte output preserves native orjson/msgspec bytes for HTTP delivery while normal logging output remains a string.
 - Documentation: Quickstart examples are tested to ensure the sample output matches reality.
 - Add support for Python 3.15, PyPy 3.12
 
@@ -26,7 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `defaults` is copied on construction like `rename_fields` and `static_fields`, so DictConfigurator `ext://` prefixes are converted and mutating the caller's dict cannot change formatter state.
 - A string passed as `reserved_attrs` raises `TypeError` instead of being iterated as characters; use a list or tuple of field names.
 
-Thanks @dylanpulver, @Gonghan-Princess, @JackyHsu-X, @00200200, @SAY-5, @AryanRG
+Thanks @nhairs-bot, @dylanpulver, @Gonghan-Princess, @JackyHsu-X, @00200200, @SAY-5, @AryanRG
 
 ## [4.2.0](https://github.com/nhairs/python-json-logger/compare/v4.1.0...v4.2.0) - 2026-08-15
 

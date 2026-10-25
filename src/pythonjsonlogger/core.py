@@ -11,7 +11,7 @@ import logging
 import re
 import string
 import sys
-from typing import TypeAlias, Any
+from typing import TypeAlias, Any, Literal, overload
 from collections.abc import Container, Sequence
 
 ## Installed
@@ -245,7 +245,15 @@ class BaseJsonFormatter(logging.Formatter):
         """Return whether the parsed format fields include `asctime`."""
         return "asctime" in self._required_fields
 
-    def format(self, record: logging.LogRecord) -> str:
+    @overload
+    def format(self, record: logging.LogRecord, *, _output_type: Literal["str"] = "str") -> str: ...
+
+    @overload
+    def format(self, record: logging.LogRecord, *, _output_type: Literal["bytes"]) -> bytes: ...
+
+    def format(
+        self, record: logging.LogRecord, *, _output_type: Literal["str", "bytes"] = "str"
+    ) -> str | bytes:
         """Formats a log record and serializes to json
 
         When `record.msg` is a `dict`, adding `exc_info` and `stack_info` does not
@@ -253,10 +261,17 @@ class BaseJsonFormatter(logging.Formatter):
 
         Args:
             record: the record to format
+            _output_type: Internal, non-stable output selector. Normal logging calls
+                return a string; the HTTP handler requests UTF-8 bytes.
 
         *Changed in 4.2.0*: a `dict` `record.msg` is copied instead of modified
         in place.
+
+        *Changed in 4.3.0*: added the internal `_output_type` keyword.
         """
+        if _output_type not in ("str", "bytes"):
+            raise ValueError("_output_type must be 'str' or 'bytes'")
+
         message_dict: dict[str, Any] = {}
         # TODO: logging.LogRecord.msg and logging.LogRecord.message in typeshed
         #        are always type of str. We shouldn't need to override that.
@@ -288,7 +303,16 @@ class BaseJsonFormatter(logging.Formatter):
         self.add_fields(log_data, record, message_dict)
         log_data = self.process_log_record(log_data)
 
-        return self.serialize_log_record(log_data)
+        if _output_type == "str":
+            return self.serialize_log_record(log_data)
+
+        # Preserve existing serialization overrides, including instance-level hooks.
+        if (
+            getattr(self.serialize_log_record, "__func__", None)
+            is not BaseJsonFormatter.serialize_log_record
+        ):
+            return self.serialize_log_record(log_data).encode("utf8")
+        return self.prefix.encode("utf8") + self._jsonify_log_record_bytes(log_data)
 
     ## JSON Formatter Specific Methods
     ## -------------------------------------------------------------------------
@@ -400,6 +424,10 @@ class BaseJsonFormatter(logging.Formatter):
 
     def _get_rename(self, key: str) -> str:
         return self.rename_fields.get(key, key)
+
+    def _jsonify_log_record_bytes(self, log_data: LogData) -> bytes:
+        """Encode through the existing string hook unless a native encoder is available."""
+        return self.jsonify_log_record(log_data).encode("utf8")
 
     # Child Methods
     # ..........................................................................
