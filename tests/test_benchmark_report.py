@@ -68,11 +68,11 @@ def test_report_update(result_file: Path, tmp_path: Path) -> None:
     ]
     subprocess.run(command, check=True, capture_output=True)
     first = page.read_text(encoding="utf-8")
-    assert "| serialization | simple | json | 2 | 0.2 | 2.1 ± 0.3 | 20 × 5 |" in first
+    assert "| serialization | simple | json (CPython) | 2 | 0.2 | 2.1 ± 0.3 | 20 × 5 |" in first
     assert "| serialization | simple | 1× | 2× | 2× |" in first
     assert first.index("#### Times and variation") < first.index("#### Speedup")
-    assert "assets/benchmarking/cpython-3.15.0-times.svg" in first
-    assert "assets/benchmarking/cpython-3.15.0-speedup.svg" in first
+    assert "assets/benchmarking/python-3.15-times.svg" in first
+    assert "assets/benchmarking/python-3.15-speedup.svg" in first
     assert first.startswith("Introduction\n")
     assert first.endswith("Afterword\n")
     subprocess.run(command, check=True, capture_output=True)
@@ -131,7 +131,7 @@ def test_report_stdlib_only_pypy(result_file: Path, monkeypatch: pytest.MonkeyPa
     cpython_file = result_file.with_name("cpython.json")
     cpython_file.write_bytes(result_file.read_bytes())
     result = json.loads(result_file.read_text())
-    result["environment"].update(implementation="PyPy", backends=["json"])
+    result["environment"].update(implementation="PyPy", python="3.15.1", backends=["json"])
     result["benchmarks"] = [
         item for item in result["benchmarks"] if item["extra_info"]["backend"] == "json"
     ]
@@ -143,7 +143,9 @@ def test_report_stdlib_only_pypy(result_file: Path, monkeypatch: pytest.MonkeyPa
         [sys.executable, str(REPORT), str(cpython_file), str(result_file)], encoding="utf-8"
     )
     assert text == reversed_text
-    assert "### CPython 3.15.0" in text
-    assert "### PyPy 3.15.0" in text
-    assert "| serialization | simple | 1× | — | — |" in text
+    assert text.count("### Python 3.15") == 1
+    assert "json (PyPy)" in text
+    assert "orjson (PyPy)" not in text
+    assert "**PyPy 3.15.1**" in text
+    assert "| serialization | simple | 1× | 2× | 2× | 1× |" in text
     return

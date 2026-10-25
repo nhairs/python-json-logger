@@ -11,7 +11,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 
-from benchmark_report import BACKENDS, LAYERS, WORKLOADS, load_results, render
+from benchmark_report import BACKENDS, LAYERS, WORKLOADS, comparison_groups, load_results, render
 
 COLORS = {"json": "#0072B2", "orjson": "#D55E00", "msgspec": "#009E73"}
 MARKERS = {"json": "o", "orjson": "s", "msgspec": "^"}
@@ -24,16 +24,9 @@ STYLE = {
 
 def make_plot(result: dict, kind: str) -> Figure:
     """Compare encoders within each layer, with quartile whiskers for timing plots."""
-    environment = result["environment"]
-    backends = [name for name in BACKENDS if name in environment.get("backends", BACKENDS)]
-    cases = {
-        (
-            item["extra_info"]["layer"],
-            item["extra_info"]["workload"],
-            item["extra_info"]["backend"],
-        ): item["stats"]
-        for item in result["benchmarks"]
-    }
+    backends = result["backends"]
+    cases = result["cases"]
+    reference = "json (CPython)" if "json (CPython)" in backends else "json (PyPy)"
     figure, axes = plt.subplots(1, 2, figsize=(13, 5.8))
     for axis, layer in zip(axes, LAYERS):
         for index, backend in enumerate(backends):
@@ -51,23 +44,23 @@ def make_plot(result: dict, kind: str) -> Figure:
                     values,
                     positions,
                     xerr=errors,
-                    fmt=MARKERS[backend],
-                    color=COLORS[backend],
+                    fmt=MARKERS[backend.split()[0]] if backend != "json (PyPy)" else "D",
+                    color=COLORS[backend.split()[0]] if backend != "json (PyPy)" else "#CC79A7",
                     label=backend,
                     capsize=3,
                     markersize=5,
                 )
             else:
                 values = [
-                    cases[layer, workload, "json"]["median"] / item["median"]
+                    cases[layer, workload, reference]["median"] / item["median"]
                     for workload, item in zip(WORKLOADS, stats)
                 ]
                 axis.plot(
                     values,
                     positions,
                     linestyle="none",
-                    marker=MARKERS[backend],
-                    color=COLORS[backend],
+                    marker=MARKERS[backend.split()[0]] if backend != "json (PyPy)" else "D",
+                    color=COLORS[backend.split()[0]] if backend != "json (PyPy)" else "#CC79A7",
                     label=backend,
                     markersize=5,
                 )
@@ -82,10 +75,9 @@ def make_plot(result: dict, kind: str) -> Figure:
         else:
             axis.axvline(1, color="#666666", linestyle="--", linewidth=1)
             axis.set_xlim(left=0)
-            axis.set_xlabel("Speedup vs stdlib json — higher is faster")
-    implementation = environment.get("implementation", "CPython")
+            axis.set_xlabel(f"Speedup vs {reference} — higher is faster")
     title = "Median operation times" if kind == "times" else "Ratios of median times"
-    figure.suptitle(f"{implementation} {environment['python']}: {title}", fontsize=14)
+    figure.suptitle(f"Python {result['python']}: {title}", fontsize=14)
     handles, labels = axes[0].get_legend_handles_labels()
     figure.legend(
         handles, labels, loc="lower center", bbox_to_anchor=(0.5, 0.065), ncol=len(backends)
@@ -93,7 +85,7 @@ def make_plot(result: dict, kind: str) -> Figure:
     caption = (
         "Whiskers span Q1–Q3 (central 50% of rounds), not confidence intervals."
         if kind == "times"
-        else "Dashed line: stdlib reference (1×). These descriptive ratios have no confidence intervals."
+        else f"Dashed line: {reference} (1×). Descriptive ratios have no confidence intervals."
     )
     figure.text(0.5, 0.025, caption, ha="center", fontsize=9)
     figure.tight_layout(rect=(0, 0.14, 1, 0.92))
@@ -109,12 +101,10 @@ def main() -> None:
     render(args.results)  # Validate matrices and statistics before producing any plots.
     args.output.mkdir(parents=True, exist_ok=True)
     with matplotlib.rc_context(STYLE):
-        for result in load_results(args.results):
-            environment = result["environment"]
-            implementation = environment.get("implementation", "CPython").lower()
+        for result in comparison_groups(load_results(args.results)):
             for kind in ("times", "speedup"):
                 figure = make_plot(result, kind)
-                target = args.output / f"{implementation}-{environment['python']}-{kind}.svg"
+                target = args.output / f"python-{result['python']}-{kind}.svg"
                 figure.savefig(target, metadata={"Date": None})
                 plt.close(figure)
     return

@@ -33,16 +33,18 @@ def load_results(paths: list[Path]) -> list[dict]:
     return results
 
 
-def render(paths: list[Path], plots: str | None = None) -> str:
-    """Render separate timing, variation, and speedup tables."""
-    results = load_results(paths)
-    sections = []
+def comparison_groups(results: list[dict]) -> list[dict]:
+    """Validate exports and group implementations by Python major/minor version."""
+    groups: dict[str, dict] = {}
     runtimes = set()
     for result in results:
         environment = result["environment"]
         python = environment["python"]
         implementation = environment.get("implementation", "CPython")
-        runtime = (implementation, python)
+        minor = ".".join(python.split(".")[:2])
+        runtime = (implementation, minor)
+        if implementation not in ("CPython", "PyPy"):
+            raise ValueError(f"Unsupported implementation: {implementation}")
         if runtime in runtimes:
             raise ValueError(f"Duplicate runtime: {runtime}")
         runtimes.add(runtime)
@@ -77,33 +79,56 @@ def render(paths: list[Path], plots: str | None = None) -> str:
         }
         if set(cases) != required:
             raise ValueError(f"Incomplete or unexpected matrix for Python {python}")
-        machine = result["machine_info"]
-        cpu = machine.get("cpu", {}).get("brand_raw", machine.get("processor", "unknown"))
-        sections.extend(
-            [
-                f"### {implementation} {python}",
-                "",
-                f"Measured: {result['datetime']}. Revision: `{environment['revision']}`"
-                + (" (working tree modified)." if environment["dirty"] else "."),
-                "",
-                f"Environment: {machine['system']} {machine['release']}, {machine['machine']}; {cpu}.",
-                "",
-                "Dependencies: "
-                + ", ".join(
-                    f"`{key}=={value}`"
-                    for key, value in sorted(environment["dependencies"].items())
-                )
-                + ".",
-                "",
-                "#### Times and variation",
-                "",
-            ]
+        group = groups.setdefault(
+            minor, {"python": minor, "sources": [], "cases": {}, "backends": []}
         )
-        slug = f"{implementation.lower()}-{python}"
+        group["sources"].append(result)
+        for backend in backends:
+            label = f"{backend} ({implementation})"
+            group["backends"].append(label)
+            for layer in LAYERS:
+                for workload in WORKLOADS:
+                    group["cases"][layer, workload, label] = cases[layer, workload, backend]
+    return list(groups.values())
+
+
+def render(paths: list[Path], plots: str | None = None) -> str:
+    """Render version sections comparing encoders and Python implementations."""
+    results = load_results(paths)
+    sections = []
+    for group in comparison_groups(results):
+        python = group["python"]
+        backends = group["backends"]
+        cases = group["cases"]
+        sections.extend([f"### Python {python}", ""])
+        for result in group["sources"]:
+            environment = result["environment"]
+            implementation = environment.get("implementation", "CPython")
+            machine = result["machine_info"]
+            cpu = machine.get("cpu", {}).get("brand_raw", machine.get("processor", "unknown"))
+            sections.extend(
+                [
+                    f"**{implementation} {environment['python']}**. Measured: {result['datetime']}. "
+                    f"Revision: `{environment['revision']}`"
+                    + (" (working tree modified)." if environment["dirty"] else "."),
+                    "",
+                    f"Environment: {machine['system']} {machine['release']}, {machine['machine']}; {cpu}.",
+                    "",
+                    "Dependencies: "
+                    + ", ".join(
+                        f"`{key}=={value}`"
+                        for key, value in sorted(environment["dependencies"].items())
+                    )
+                    + ".",
+                    "",
+                ]
+            )
+        sections.extend(["#### Times and variation", ""])
+        slug = f"python-{python}"
         if plots:
             sections.extend(
                 [
-                    f"![Median times and interquartile ranges for {implementation} {python}]({plots}/{slug}-times.svg)",
+                    f"![Median times and interquartile ranges for Python {python}]({plots}/{slug}-times.svg)",
                     "",
                 ]
             )
@@ -115,9 +140,7 @@ def render(paths: list[Path], plots: str | None = None) -> str:
         )
         for layer in LAYERS:
             for workload in WORKLOADS:
-                for backend in BACKENDS:
-                    if backend not in backends:
-                        continue
+                for backend in backends:
                     stats = cases[layer, workload, backend]
                     sections.append(
                         f"| {layer} | {workload} | {backend} | "
@@ -129,26 +152,25 @@ def render(paths: list[Path], plots: str | None = None) -> str:
         if plots:
             sections.extend(
                 [
-                    f"![Median speedups relative to stdlib JSON for {implementation} {python}]({plots}/{slug}-speedup.svg)",
+                    f"![Median speedups relative to stdlib JSON for Python {python}]({plots}/{slug}-speedup.svg)",
                     "",
                 ]
             )
         sections.extend(
             [
-                "| Layer | Workload | json | orjson | msgspec |",
-                "| --- | --- | ---: | ---: | ---: |",
+                "| Layer | Workload | " + " | ".join(backends) + " |",
+                "| --- | --- | " + " | ".join("---:" for _ in backends) + " |",
             ]
         )
+        reference = "json (CPython)" if "json (CPython)" in backends else "json (PyPy)"
+        sections.extend([f"Reference: {reference} (1×).", ""])
         for layer in LAYERS:
             for workload in WORKLOADS:
-                baseline = cases[layer, workload, "json"]["median"]
+                baseline = cases[layer, workload, reference]["median"]
                 cells = []
-                for backend in BACKENDS:
-                    if backend in backends:
-                        timing = cases[layer, workload, backend]["median"]
-                        cells.append(f"{baseline / timing:.2g}×")
-                    else:
-                        cells.append("—")
+                for backend in backends:
+                    timing = cases[layer, workload, backend]["median"]
+                    cells.append(f"{baseline / timing:.2g}×")
                 sections.append(f"| {layer} | {workload} | " + " | ".join(cells) + " |")
         sections.append("")
     statistics = [benchmark["stats"] for result in results for benchmark in result["benchmarks"]]

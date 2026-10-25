@@ -19,7 +19,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v3
       - id: matrix
-        name: Read supported CPython versions from tox
+        name: Read supported Python runtimes from tox
         run: |
           uvx --with tox-uv tox list -d --no-desc > /tmp/tox-environments
           python - <<'PY' >> "$GITHUB_OUTPUT"
@@ -29,9 +29,9 @@ jobs:
           environments = [
               name + '-benchmark'
               for name in Path('/tmp/tox-environments').read_text().splitlines()
-              if re.fullmatch(r'py[0-9]+', name)
+              if re.fullmatch(r'(?:py|pypy)[0-9]+', name)
           ]
-          assert environments, 'No CPython environments found in tox'
+          assert environments, 'No Python environments found in tox'
           print('environments=' + json.dumps(environments))
           PY
 
