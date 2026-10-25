@@ -1,5 +1,7 @@
 # Cookbook
 
+For reusable handler recipes and destination field mappings, see [Integrations](integrations/index.md).
+
 Recipies for common tasks.
 
 ## Include all fields
