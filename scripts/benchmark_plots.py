@@ -159,6 +159,13 @@ def main() -> None:
                 figure = make_plot(result, kind)
                 target = args.output / f"python-{result['python']}-{kind}.svg"
                 figure.savefig(target, metadata={"Date": None})
+                target.write_text(
+                    "\n".join(
+                        line.rstrip() for line in target.read_text(encoding="utf-8").splitlines()
+                    )
+                    + "\n",
+                    encoding="utf-8",
+                )
                 plt.close(figure)
     return
 
