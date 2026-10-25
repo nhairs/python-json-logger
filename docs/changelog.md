@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [4.3.0](https://github.com/nhairs/python-json-logger/compare/v4.2.0...v4.3.0) - UNRELEASED
 
 ### Added
+- `pythonjsonlogger.http.JsonHttpHandler` sends JSON via POST or PUT using synchronous Requests-compatible sessions, with Niquests as an optional default. Related to [#42](https://github.com/nhairs/python-json-logger/issues/42).
 - Documentation: Quickstart examples are tested to ensure the sample output matches reality.
 - Add support for Python 3.15, PyPy 3.12
 

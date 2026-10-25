@@ -45,6 +45,8 @@ dev = [
     ## Optional but required for dev
     "orjson;implementation_name!='pypy'",
     "msgspec;implementation_name!='pypy'",
+    "niquests",
+    "requests",
     ## Lint
     "validate-pyproject[all]",
     "black",

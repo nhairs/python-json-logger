@@ -61,4 +61,17 @@ class MsgspecFormatter(core.BaseJsonFormatter):
 
     def jsonify_log_record(self, log_data: core.LogData) -> str:
         """Returns a json string of the log data."""
-        return self._encoder.encode(log_data).decode("utf8")
+        return self._encode_log_data(log_data).decode("utf8")
+
+    def _jsonify_log_record_bytes(self, log_data: core.LogData) -> bytes:
+        # Preserve custom jsonify_log_record hooks, including overrides using super().
+        # The unmodified hook can use native bytes without decoding and re-encoding.
+        if (
+            getattr(self.jsonify_log_record, "__func__", None)
+            is not MsgspecFormatter.jsonify_log_record
+        ):
+            return super()._jsonify_log_record_bytes(log_data)
+        return self._encode_log_data(log_data)
+
+    def _encode_log_data(self, log_data: core.LogData) -> bytes:
+        return self._encoder.encode(log_data)

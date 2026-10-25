@@ -65,8 +65,21 @@ class OrjsonFormatter(core.BaseJsonFormatter):
 
     def jsonify_log_record(self, log_data: core.LogData) -> str:
         """Returns a json string of the log data."""
+        return self._encode_log_data(log_data).decode("utf8")
+
+    def _jsonify_log_record_bytes(self, log_data: core.LogData) -> bytes:
+        # Preserve custom jsonify_log_record hooks, including overrides using super().
+        # The unmodified hook can use native bytes without decoding and re-encoding.
+        if (
+            getattr(self.jsonify_log_record, "__func__", None)
+            is not OrjsonFormatter.jsonify_log_record
+        ):
+            return super()._jsonify_log_record_bytes(log_data)
+        return self._encode_log_data(log_data)
+
+    def _encode_log_data(self, log_data: core.LogData) -> bytes:
         opt = orjson.OPT_NON_STR_KEYS
         if self.json_indent:
             opt |= orjson.OPT_INDENT_2
 
-        return orjson.dumps(log_data, default=self.json_default, option=opt).decode("utf8")
+        return orjson.dumps(log_data, default=self.json_default, option=opt)

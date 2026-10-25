@@ -13,7 +13,7 @@ import logging
 import sys
 import traceback
 from types import TracebackType
-from typing import Any
+from typing import Any, Literal
 from collections.abc import Generator, Sequence
 import uuid
 import zoneinfo
@@ -1183,4 +1183,128 @@ def test_json_ensure_ascii_false(env: LoggingEnvironment):
     # Note: we don't use env.load_json as we want to know the raw output
     msg = env.buffer.getvalue().split('"message": "', 1)[1].split('"', 1)[0]
     assert msg == "Привет"
+    return
+
+
+@pytest.mark.parametrize("class_", ALL_FORMATTERS)
+@pytest.mark.parametrize("prefix", ["", "prefix: ", "雪: "])
+def test_private_byte_output(class_: type[BaseJsonFormatter], prefix: str):
+    formatter = class_(prefix=prefix, static_fields={"service": "test"})
+    record = logging.makeLogRecord({"msg": {"message": "雪", "nested": [1, True, None]}})
+    text = formatter.format(record)
+    assert isinstance(text, str)
+    assert formatter.format(record, _output_type="str") == text
+    payload = formatter.format(record, _output_type="bytes")
+    assert isinstance(payload, bytes)
+    assert payload == text.encode("utf8")
+    return
+
+
+@pytest.mark.parametrize("class_", ALL_FORMATTERS)
+def test_invalid_private_output_type(class_: type[BaseJsonFormatter]):
+    with pytest.raises(ValueError, match="_output_type"):
+        class_().format(logging.makeLogRecord({}), _output_type="invalid")  # type: ignore
+    return
+
+
+@pytest.mark.parametrize("class_", ALL_FORMATTERS)
+@pytest.mark.parametrize("hook", ["serialize_log_record", "jsonify_log_record"])
+@pytest.mark.parametrize("instance_override", [False, True])
+def test_byte_output_preserves_serialization_overrides(
+    class_: type[BaseJsonFormatter], hook: str, instance_override: bool
+):
+    def custom_serialization(self, log_data):
+        return '{"custom": "雪"}'
+
+    if instance_override:
+        formatter = class_(prefix="prefix: ")
+        setattr(formatter, hook, lambda data: custom_serialization(formatter, data))
+    else:
+        formatter = type("CustomFormatter", (class_,), {hook: custom_serialization})(
+            prefix="prefix: "
+        )
+    record = logging.makeLogRecord({"msg": "original"})
+    text = formatter.format(record)
+    assert "custom" in text
+    assert formatter.format(record, _output_type="bytes") == text.encode("utf8")
+    return
+
+
+@pytest.mark.parametrize("class_", ALL_FORMATTERS)
+def test_byte_output_preserves_super_serialization_override(class_: type[BaseJsonFormatter]):
+    class CustomFormatter(class_):
+        def jsonify_log_record(self, log_data):
+            return super().jsonify_log_record(log_data) + " "
+
+    formatter = CustomFormatter()
+    record = logging.makeLogRecord({"msg": "original"})
+    assert formatter.format(record, _output_type="bytes") == formatter.format(record).encode("utf8")
+    return
+
+
+@pytest.mark.parametrize("module_name", ["orjson", "msgspec"])
+def test_byte_output_retains_native_bytes(module_name: str, monkeypatch: pytest.MonkeyPatch):
+    import importlib
+    from types import SimpleNamespace
+
+    if not pythonjsonlogger.utils.package_is_available(module_name):
+        pytest.skip(f"{module_name} is not installed")
+    module = importlib.import_module(f"pythonjsonlogger.{module_name}")
+    formatter = getattr(
+        module, "OrjsonFormatter" if module_name == "orjson" else "MsgspecFormatter"
+    )()
+
+    class NativeBytes(bytes):
+        def decode(self, *args, **kwargs):
+            raise AssertionError("Native byte output must not be decoded")
+
+    native = NativeBytes(b'{"message":"original"}')
+    if module_name == "orjson":
+        monkeypatch.setattr(module.orjson, "dumps", lambda *args, **kwargs: native)
+    else:
+        formatter._encoder = SimpleNamespace(encode=lambda data: native)
+    assert (
+        formatter.format(logging.makeLogRecord({"msg": "original"}), _output_type="bytes") == native
+    )
+    return
+
+
+def test_formatter_output_type_annotations():
+    # assert_type is only available in typing on Python >=3.11; the checker's
+    # inferred assignments below also exercise compatibility on Python 3.10.
+    formatter = JsonFormatter()
+    record = logging.makeLogRecord({})
+    text: str = formatter.format(record)
+    explicit_text: str = formatter.format(record, _output_type="str")
+    payload: bytes = formatter.format(record, _output_type="bytes")
+    output_type: Literal["str", "bytes"] = "bytes" if bool(record.msg) else "str"
+    result: str | bytes = formatter.format(record, _output_type=output_type)
+    assert isinstance(result, (str, bytes))
+    assert payload == explicit_text.encode("utf8") == text.encode("utf8")
+    return
+
+
+@pytest.mark.parametrize("class_", ALL_FORMATTERS)
+def test_byte_output_preserves_exception_and_stack_fields(class_: type[BaseJsonFormatter]):
+    formatter = class_(
+        "asctime,message", style=",", exc_info_as_array=True, stack_info_as_array=True
+    )
+    try:
+        raise ValueError("雪")
+    except ValueError:
+        record = logging.makeLogRecord(
+            {
+                "msg": {"message": "failed", "nested": {"key": True}},
+                "exc_info": sys.exc_info(),
+                "stack_info": "frame one\nframe two",
+            }
+        )
+    original_message = {"message": "failed", "nested": {"key": True}}
+    payload = formatter.format(record, _output_type="bytes")
+    assert payload == formatter.format(record).encode("utf8")
+    data = json.loads(payload)
+    assert data["stack_info"] == ["frame one", "frame two"]
+    assert data["exc_info"][-1] == "ValueError: 雪"
+    assert "asctime" in data
+    assert record.msg == original_message
     return
