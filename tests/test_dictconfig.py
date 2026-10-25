@@ -95,3 +95,33 @@ def test_external_reference_support(env: LoggingEnvironment):
     assert log_json["ext-val"] == EXT_VAL
     assert log_json["dummy"] == "DUMMY"
     return
+
+
+def test_defaults_external_reference_support() -> None:
+    logging.config.dictConfig(
+        {
+            "version": 1,
+            "disable_existing_loggers": False,
+            "formatters": {
+                "default": {
+                    "()": "pythonjsonlogger.json.JsonFormatter",
+                    "defaults": {"ext-val": "ext://tests.test_dictconfig.EXT_VAL"},
+                }
+            },
+            "handlers": {
+                "default": {
+                    "level": "DEBUG",
+                    "formatter": "default",
+                    "class": "logging.StreamHandler",
+                    "stream": "ext://sys.stdout",
+                },
+            },
+            "loggers": {
+                "": {"handlers": ["default"], "level": "WARNING", "propagate": False},
+            },
+        }
+    )
+    formatter = logging.root.handlers[0].formatter
+    assert formatter.defaults["ext-val"] == EXT_VAL  # type: ignore[union-attr]
+    assert type(formatter.defaults) is dict  # type: ignore[union-attr]
+    return

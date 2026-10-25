@@ -4,23 +4,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [4.2.1](https://github.com/nhairs/python-json-logger/compare/v4.2.0...v4.2.1) - UNRELEASED
+## [4.3.0](https://github.com/nhairs/python-json-logger/compare/v4.2.0...v4.3.0) - UNRELEASED
 
 ### Added
+- Documentation: Quickstart examples are tested to ensure the sample output matches reality.
 - Add support for Python 3.15, PyPy 3.12
 
 ### Removed
 - `STYLE_STRING_FORMAT_REGEX`, which is no longer used to find `{` style fields. [#75](https://github.com/nhairs/python-json-logger/pull/75)
 
 ### Changed
+- Preserve an exception's own notes when encoding exception instances, including exception group summaries. Related to [#67](https://github.com/nhairs/python-json-logger/issues/67).
 - Constrain the documentation dependency to `mkdocs<2`. [#80](https://github.com/nhairs/python-json-logger/issues/80)
 - Replaced MyPy with Pyrefly for type checking
 
 ### Fixed
+- `exc_info_as_array=True` now splits cached exception text into lines when a transported log record has no `exc_info` tuple. [#89](https://github.com/nhairs/python-json-logger/issues/89)
+- `BaseJsonFormatter.usesTime()` now handles comma-separated and sequence formats, honors custom field parsing, and ignores escaped literal `asctime` fields. [#91](https://github.com/nhairs/python-json-logger/issues/91)
 - `%` style formats no longer treat the escaped literal `%%` as the start of a field, so `"%%(notafield)s"` is correctly read as literal text. [#75](https://github.com/nhairs/python-json-logger/pull/75)
 - `{` style formats now use `string.Formatter` (as `logging.StrFormatStyle.validate` does) to find fields, so escaped literal braces (`{{`/`}}`) are skipped and a conversion (`{message!r}`) or format spec (`{levelname:>8}`) is no longer treated as part of the field name. [#75](https://github.com/nhairs/python-json-logger/pull/75)
+- `defaults` is copied on construction like `rename_fields` and `static_fields`, so DictConfigurator `ext://` prefixes are converted and mutating the caller's dict cannot change formatter state.
+- A string passed as `reserved_attrs` raises `TypeError` instead of being iterated as characters; use a list or tuple of field names.
 
-Thanks @dylanpulver
+Thanks @dylanpulver, @Gonghan-Princess, @JackyHsu-X, @00200200, @SAY-5, @AryanRG
 
 ## [4.2.0](https://github.com/nhairs/python-json-logger/compare/v4.1.0...v4.2.0) - 2026-08-15
 
