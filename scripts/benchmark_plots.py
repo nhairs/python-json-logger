@@ -66,6 +66,8 @@ def make_speedup_plot(result: dict) -> Figure:
         axis.set_yticks(range(len(WORKLOADS)), WORKLOADS)
         axis.set_ylim(len(WORKLOADS) - 0.5, -0.5)
         axis.set_xlim(lower, upper * 1.2)
+        ticks = [tick for tick in axis.get_xticks() if lower <= tick <= upper * 1.2]
+        axis.set_xticks(sorted(set([lower, *ticks])))
         for row in range(len(WORKLOADS)):
             if row % 2 == 0:
                 axis.axhspan(row - 0.5, row + 0.5, color="#000000", alpha=0.045, zorder=0)
