@@ -14,6 +14,21 @@ nav:
   - quickstart.md
   - time.md
   - cookbook.md
+  - Integrations:
+    - Overview: integrations/index.md
+    - Fields: integrations/fields.md
+    - Delivery methods:
+      - stdout and stderr: integrations/delivery/streams.md
+      - Files: integrations/delivery/files.md
+      - Syslog: integrations/delivery/syslog.md
+      - HTTP and other handlers: integrations/delivery/handlers.md
+    - Destinations:
+      - Loki and Grafana Cloud: integrations/destinations/loki.md
+      - Graylog: integrations/destinations/graylog.md
+      - OpenObserve: integrations/destinations/openobserve.md
+      - Seq: integrations/destinations/seq.md
+    - Other formats: integrations/compatibility.md
+    - Cloud platforms: integrations/cloud.md
   - changelog.md
   - security.md
   - contributing.md

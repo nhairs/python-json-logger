@@ -1,5 +1,7 @@
 # Quick Start
 
+For destination field conventions and ways to ship logs, see [Integrations](integrations/index.md).
+
 ## Installation
 
 !!! note
