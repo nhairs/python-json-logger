@@ -35,6 +35,7 @@ def make_speedup_plot(result: dict) -> Figure:
     height = 0.8 / len(backends)
     for axis, layer in zip(axes, LAYERS):
         upper = 1.0
+        lower = 1.0
         for index, backend in enumerate(backends):
             positions = [row - 0.4 + height * (index + 0.5) for row in range(len(WORKLOADS))]
             values = [
@@ -43,6 +44,8 @@ def make_speedup_plot(result: dict) -> Figure:
                 for workload in WORKLOADS
             ]
             upper = max(upper, max(values))
+            if min(values) < 1:
+                lower = 0.0
             axis.barh(
                 positions,
                 values,
@@ -62,7 +65,7 @@ def make_speedup_plot(result: dict) -> Figure:
                 )
         axis.set_yticks(range(len(WORKLOADS)), WORKLOADS)
         axis.set_ylim(len(WORKLOADS) - 0.5, -0.5)
-        axis.set_xlim(0, upper * 1.2)
+        axis.set_xlim(lower, upper * 1.2)
         for row in range(len(WORKLOADS)):
             if row % 2 == 0:
                 axis.axhspan(row - 0.5, row + 0.5, color="#000000", alpha=0.045, zorder=0)
