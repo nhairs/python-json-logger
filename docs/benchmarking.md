@@ -122,8 +122,13 @@ or hosted-runner variation. Do not interpret the final displayed digit as a
 reliable performance difference. Check IQR and SD, and repeat complete runs on
 the same machine before drawing conclusions about small differences.
 
-Time plots use a logarithmic axis to accommodate the different workload sizes.
-Points show medians; whiskers span Q1–Q3. These whiskers show within-run spread,
+Timing plots use labeled horizontal bars, with one panel per workload and
+measurement layer. Speedup plots use two panels (serialization and complete
+formatting), with bars grouped by workload and guides at shared group boundaries.
+All axes are linear and start at zero, but
+ranges differ between panels. Compare bar lengths within a panel; use the
+numeric labels and tables to compare workloads. Timing bars show medians;
+whiskers span Q1–Q3. These whiskers show within-run spread,
 not confidence intervals, and do not measure between-run reproducibility.
 Separate speedup tables and plots divide the stdlib median by each backend's
 median for the same workload, layer, and Python major/minor version. The
