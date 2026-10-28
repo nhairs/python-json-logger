@@ -11,7 +11,14 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 
-from benchmark_report import LAYERS, WORKLOADS, comparison_groups, load_results, render
+from benchmark_report import (
+    LAYERS,
+    WORKLOADS,
+    comparison_groups,
+    formatting_summary,
+    load_results,
+    render,
+)
 
 COLORS = {
     "json (CPython)": "#0072B2",
@@ -130,6 +137,64 @@ def make_plot(result: dict, kind: str) -> Figure:
     return figure
 
 
+def make_summary_plot(summary: dict, kind: str, workload: str) -> Figure:
+    """Plot one workload per panel with medians and asymmetric version ranges."""
+    figure, axis = plt.subplots(figsize=(6, 3.2))
+    backends = [backend for backend, metrics in summary[workload].items() if kind in metrics]
+    stats = [summary[workload][backend][kind] for backend in backends]
+    values = [item["median"] for item in stats]
+    errors = [
+        [item["median"] - item["min"] for item in stats],
+        [item["max"] - item["median"] for item in stats],
+    ]
+    axis.barh(
+        range(len(backends)),
+        values,
+        xerr=errors,
+        capsize=4,
+        color=[COLORS[backend] for backend in backends],
+        alpha=0.85,
+        error_kw={"elinewidth": 1.2},
+        zorder=2,
+    )
+    upper = max((item["max"] for item in stats), default=1)
+    for row, item in enumerate(stats):
+        precision = 3 if kind == "times" else 2
+        suffix = "" if kind == "times" else "×"
+        axis.text(
+            item["max"] + upper * 0.025,
+            row,
+            f"{item['median']:.{precision}g}{suffix}",
+            va="center",
+            fontsize=9,
+        )
+    axis.set_yticks(range(len(backends)), backends, fontsize=9)
+    axis.invert_yaxis()
+    axis.set_xlim(0, upper * 1.25)
+    axis.set_title(workload)
+    axis.set_xlabel(
+        "Time (µs) — lower is faster" if kind == "times" else "Speedup (×) — higher is faster"
+    )
+    if kind == "speedup":
+        axis.axvline(1, color="#555555", linestyle="--", linewidth=1)
+    axis.grid(axis="x", alpha=0.25)
+    axis.set_axisbelow(True)
+    axis.spines[["top", "right"]].set_visible(False)
+    figure.tight_layout()
+    return figure
+
+
+def save_plot(figure: Figure, target: Path) -> None:
+    """Save SVG without timestamps or trailing whitespace."""
+    figure.savefig(target, metadata={"Date": None})
+    target.write_text(
+        "\n".join(line.rstrip() for line in target.read_text(encoding="utf-8").splitlines()) + "\n",
+        encoding="utf-8",
+    )
+    plt.close(figure)
+    return
+
+
 def main() -> None:
     """Write deterministic SVG files; install the benchmark-report dependency group."""
     parser = argparse.ArgumentParser(description=__doc__)
@@ -143,15 +208,14 @@ def main() -> None:
             for kind in ("times", "speedup"):
                 figure = make_plot(result, kind)
                 target = args.output / f"python-{result['python']}-{kind}.svg"
-                figure.savefig(target, metadata={"Date": None})
-                target.write_text(
-                    "\n".join(
-                        line.rstrip() for line in target.read_text(encoding="utf-8").splitlines()
-                    )
-                    + "\n",
-                    encoding="utf-8",
+                save_plot(figure, target)
+        summary = formatting_summary(comparison_groups(load_results(args.results)))
+        for kind in ("times", "speedup"):
+            for workload in WORKLOADS:
+                save_plot(
+                    make_summary_plot(summary, kind, workload),
+                    args.output / f"summary-{workload}-{kind}.svg",
                 )
-                plt.close(figure)
     return
 
 

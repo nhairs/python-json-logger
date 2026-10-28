@@ -3,6 +3,7 @@
 from itertools import product
 import hashlib
 import json
+import runpy
 from pathlib import Path
 import subprocess
 import sys
@@ -54,7 +55,9 @@ def test_report_update(result_file: Path, tmp_path: Path) -> None:
     """Tables show converted units and preserve prose across repeated regeneration."""
     page = tmp_path / "benchmarking.md"
     page.write_text(
-        "Introduction\n<!-- benchmark-results:start -->\nold\n"
+        "Introduction\n<!-- benchmark-summary:start -->\nold summary\n"
+        "<!-- benchmark-summary:end -->\n## Run benchmarks\n"
+        "<!-- benchmark-results:start -->\nold\n"
         "<!-- benchmark-results:end -->\nAfterword\n"
     )
     command = [
@@ -73,6 +76,12 @@ def test_report_update(result_file: Path, tmp_path: Path) -> None:
     assert first.index("#### Times and variation") < first.index("#### Speedup")
     assert "assets/benchmarking/python-3.15-times.svg" in first
     assert "assets/benchmarking/python-3.15-speedup.svg" in first
+    assert first.index("## Complete-formatting summary") < first.index("## Run benchmarks")
+    assert "summary-simple-times.svg" in first
+    assert "summary-simple-speedup.svg" in first
+    assert first.count('??? note "Timing statistics"') == 1
+    assert first.count('??? note "Speedup values"') == 1
+    assert "    | serialization | simple" in first
     assert first.startswith("Introduction\n")
     assert first.endswith("Afterword\n")
     subprocess.run(command, check=True, capture_output=True)
@@ -152,7 +161,7 @@ def test_report_stdlib_only_pypy(result_file: Path, monkeypatch: pytest.MonkeyPa
     assert "Reference: json (CPython) (1×)." in text
     assert "json (PyPy)" in text
     assert "orjson (PyPy)" not in text
-    assert "| --- | --- | ---: | ---: | ---: | ---: |\n| serialization" in text
+    assert "| --- | --- | ---: | ---: | ---: | ---: |\n    | serialization" in text
     standalone = subprocess.check_output(
         [sys.executable, str(REPORT), str(result_file)], encoding="utf-8"
     )
@@ -177,4 +186,56 @@ def test_report_rejects_duplicate_minor_runtime(result_file: Path) -> None:
     assert completed.returncode != 0
     assert "Duplicate runtime" in completed.stderr
     assert not completed.stdout
+    return
+
+
+def test_formatting_summary_version_ranges() -> None:
+    """Use equal-weight version medians and ratios with matched references only."""
+    report = runpy.run_path(str(REPORT))
+    groups = []
+    for version, baseline, other, pypy in (
+        ("3.10", 2, 1, 0.5),
+        ("3.11", 18, 2, None),
+        ("3.12", 20, 5, None),
+        ("3.13", None, None, 3),
+    ):
+        cases = {}
+        for workload in report["WORKLOADS"]:
+            for backend, value in (
+                ("json (CPython)", baseline),
+                ("orjson (CPython)", other),
+                ("json (PyPy)", pypy),
+            ):
+                if value is not None:
+                    cases["formatting", workload, backend] = {"median": value * 1e-6}
+            # Serialization must not affect the complete-formatting summary.
+            cases["serialization", workload, "json (CPython)"] = {"median": 100}
+        groups.append({"python": version, "cases": cases})
+    summary = report["formatting_summary"](groups)
+    for workload in report["WORKLOADS"]:
+        values = summary[workload]
+        assert list(values) == ["json (CPython)", "orjson (CPython)", "json (PyPy)"]
+        assert values["orjson (CPython)"]["times"] == {
+            "median": 2,
+            "min": 1,
+            "max": 5,
+            "versions": ["3.10", "3.11", "3.12"],
+        }
+        ratios = values["orjson (CPython)"]["speedup"]
+        assert ratios["median"] == pytest.approx(4)
+        assert ratios["min"] == pytest.approx(2)
+        assert ratios["max"] == pytest.approx(9)
+        assert ratios["versions"] == ["3.10", "3.11", "3.12"]
+        assert values["json (PyPy)"]["times"]["median"] == pytest.approx(1.75)
+        assert values["json (PyPy)"]["times"]["versions"] == ["3.10", "3.13"]
+        assert values["json (PyPy)"]["speedup"] == {
+            "median": 4,
+            "min": 4,
+            "max": 4,
+            "versions": ["3.10"],
+        }
+    standalone = report["formatting_summary"]([groups[-1]])
+    assert "speedup" not in standalone["simple"]["json (PyPy)"]
+    text = report["render_summary"]([groups[-1]])
+    assert "Unavailable | None" in text
     return

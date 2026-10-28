@@ -7,9 +7,14 @@ import hashlib
 import json
 import math
 from pathlib import Path
+from statistics import median
+from textwrap import indent
 
 START = "<!-- benchmark-results:start -->"
 END = "<!-- benchmark-results:end -->"
+SUMMARY_START = "<!-- benchmark-summary:start -->"
+SUMMARY_END = "<!-- benchmark-summary:end -->"
+SERIES = ("json (CPython)", "orjson (CPython)", "msgspec (CPython)", "json (PyPy)")
 BACKENDS = ("json", "orjson", "msgspec")
 LAYERS = ("serialization", "formatting")
 WORKLOADS = ("simple", "structured", "nested", "unicode", "rich", "exception")
@@ -90,6 +95,111 @@ def comparison_groups(results: list[dict]) -> list[dict]:
                 for workload in WORKLOADS:
                     group["cases"][layer, workload, label] = cases[layer, workload, backend]
     return list(groups.values())
+
+
+def formatting_summary(groups: list[dict]) -> dict:
+    """Aggregate per-version medians and matched CPython-relative ratios.
+
+    Missing CPython references contribute timings but no speedup ratios.
+    Each metric retains its own version coverage.
+    """
+    summary = {}
+    for workload in WORKLOADS:
+        summary[workload] = {}
+        for backend in SERIES:
+            metrics = {}
+            for kind in ("times", "speedup"):
+                values = []
+                versions = []
+                for group in groups:
+                    cases = group["cases"]
+                    key = ("formatting", workload, backend)
+                    reference = ("formatting", workload, "json (CPython)")
+                    if key not in cases or (kind == "speedup" and reference not in cases):
+                        continue
+                    timing = cases[key]["median"]
+                    values.append(
+                        timing * 1e6 if kind == "times" else cases[reference]["median"] / timing
+                    )
+                    versions.append(group["python"])
+                if values:
+                    metrics[kind] = {
+                        "median": median(values),
+                        "min": min(values),
+                        "max": max(values),
+                        "versions": versions,
+                    }
+            if metrics:
+                summary[workload][backend] = metrics
+    return summary
+
+
+def render_summary(groups: list[dict], plots: str | None = None) -> str:
+    """Render complete-formatting summaries with explicit version coverage."""
+    summary = formatting_summary(groups)
+    lines = [
+        "## Complete-formatting summary",
+        "",
+        "Complete formatting includes record processing and serialization. These results use the "
+        "[committed baseline](#baseline-results), not application throughput measurements.",
+        "",
+        "Bars show the median across Python versions of each version's median operation time. "
+        "Whiskers show the minimum–maximum across those versions, not individual timing samples "
+        "or confidence intervals. Each version has equal weight.",
+        "",
+        "Speedups are calculated against CPython stdlib JSON for the same workload and Python "
+        "major/minor version, then summarized across versions. They are not ratios of "
+        "cross-version median times. Only versions with a matching CPython reference contribute "
+        "to speedups. Values above 1× indicate faster formatting.",
+        "",
+        "Version coverage differs between runtimes, so these summaries do not isolate interpreter "
+        "performance. The tables list the versions included in each metric.",
+        "",
+    ]
+    if plots:
+        lines += [
+            "Timing panels: lower is faster. Speedup panels: higher is faster; the dashed line marks 1×. "
+            "Each panel starts at zero and has its own scale.",
+            "",
+            '<div class="benchmark-summary" markdown="1">',
+            "",
+        ]
+        for workload in WORKLOADS:
+            for kind, label in (("times", "Time (µs)"), ("speedup", "Speedup (×)")):
+                lines += [
+                    '<figure markdown="1">',
+                    "",
+                    f"![{workload}: complete-formatting {kind}, medians with version min–max ranges]"
+                    f"({plots}/summary-{workload}-{kind}.svg)",
+                    "",
+                    f"<figcaption>{workload} · {label}; median and version range</figcaption>",
+                    "</figure>",
+                    "",
+                ]
+        lines += ["</div>", ""]
+    lines += [
+        '??? note "Summary values and included versions"',
+        "",
+        "    | Workload | Encoder | Time median [min–max] (µs) | Timing versions | Speedup median [min–max] | Speedup versions |",
+        "    | --- | --- | ---: | --- | ---: | --- |",
+    ]
+    for workload, backends in summary.items():
+        for backend, metrics in backends.items():
+            cells = []
+            for kind in ("times", "speedup"):
+                if kind not in metrics:
+                    cells.extend(["Unavailable", "None"])
+                    continue
+                stats = metrics[kind]
+                precision = 3 if kind == "times" else 2
+                suffix = "" if kind == "times" else "×"
+                cells += [
+                    f"{stats['median']:.{precision}g}{suffix} "
+                    f"[{stats['min']:.{precision}g}–{stats['max']:.{precision}g}]{suffix}",
+                    f"{', '.join(stats['versions'])} (n={len(stats['versions'])})",
+                ]
+            lines.append(f"    | {workload} | {backend} | " + " | ".join(cells) + " |")
+    return "\n".join(lines) + "\n"
 
 
 def render(paths: list[Path], plots: str | None = None) -> str:
@@ -191,7 +301,20 @@ def render(paths: list[Path], plots: str | None = None) -> str:
         "including outliers. This does not measure between-run variation.",
         "",
     ]
-    return "\n".join(summary + sections)
+    lines = summary + sections
+    collapsed = []
+    in_table = False
+    for line in lines:
+        if line.startswith("|"):
+            if not in_table:
+                title = "Timing statistics" if "Median (µs)" in line else "Speedup values"
+                collapsed.extend([f'??? note "{title}"', ""])
+            collapsed.append(indent(line, "    "))
+            in_table = True
+        else:
+            collapsed.append(line)
+            in_table = False
+    return "\n".join(collapsed)
 
 
 def main() -> None:
@@ -225,9 +348,13 @@ def main() -> None:
         text = args.update.read_text(encoding="utf-8")
         before, rest = text.split(START, 1)
         _, after = rest.split(END, 1)
-        args.update.write_text(
-            before + START + "\n\n" + report + "\n" + END + after, encoding="utf-8"
-        )
+        text = before + START + "\n\n" + report + "\n" + END + after
+        if SUMMARY_START in text:
+            before, rest = text.split(SUMMARY_START, 1)
+            _, after = rest.split(SUMMARY_END, 1)
+            summary = render_summary(comparison_groups(load_results(args.results)), args.plots)
+            text = before + SUMMARY_START + "\n\n" + summary + "\n" + SUMMARY_END + after
+        args.update.write_text(text, encoding="utf-8")
     else:
         print(report)
     return

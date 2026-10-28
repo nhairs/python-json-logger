@@ -1,0 +1,20 @@
+.benchmark-summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.md-typeset .benchmark-summary figure {
+  margin: 0;
+  min-width: 0;
+}
+
+.benchmark-summary img {
+  width: 100%;
+}
+
+@media (max-width: 700px) {
+  .benchmark-summary {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
