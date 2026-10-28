@@ -158,25 +158,13 @@ def render_summary(groups: list[dict], plots: str | None = None) -> str:
     ]
     if plots:
         lines += [
-            "Timing panels: lower is faster. Speedup panels: higher is faster; the dashed line marks 1×. "
-            "Each panel starts at zero and has its own scale.",
+            f"![Complete-formatting times and speedups by workload, with median and version ranges]({plots}/summary.svg)",
             "",
-            '<div class="benchmark-summary" markdown="1">',
+            "Timing panels: lower is faster. Speedup panels: higher is faster; the dashed line marks 1×. "
+            "Each panel starts at zero and has its own scale. "
+            "Open the SVG to view or share the full-size summary.",
             "",
         ]
-        for workload in WORKLOADS:
-            for kind, label in (("times", "Time (µs)"), ("speedup", "Speedup (×)")):
-                lines += [
-                    '<figure markdown="1">',
-                    "",
-                    f"![{workload}: complete-formatting {kind}, medians with version min–max ranges]"
-                    f"({plots}/summary-{workload}-{kind}.svg)",
-                    "",
-                    f"<figcaption>{workload} · {label}; median and version range</figcaption>",
-                    "</figure>",
-                    "",
-                ]
-        lines += ["</div>", ""]
     lines += [
         '??? note "Summary values and included versions"',
         "",

@@ -137,50 +137,66 @@ def make_plot(result: dict, kind: str) -> Figure:
     return figure
 
 
-def make_summary_plot(summary: dict, kind: str, workload: str) -> Figure:
-    """Plot one workload per panel with medians and asymmetric version ranges."""
-    figure, axis = plt.subplots(figsize=(6, 3.2))
-    backends = [backend for backend, metrics in summary[workload].items() if kind in metrics]
-    stats = [summary[workload][backend][kind] for backend in backends]
-    values = [item["median"] for item in stats]
-    errors = [
-        [item["median"] - item["min"] for item in stats],
-        [item["max"] - item["median"] for item in stats],
-    ]
-    axis.barh(
-        range(len(backends)),
-        values,
-        xerr=errors,
-        capsize=4,
-        color=[COLORS[backend] for backend in backends],
-        alpha=0.85,
-        error_kw={"elinewidth": 1.2},
-        zorder=2,
+def make_summary_plot(summary: dict) -> Figure:
+    """Combine workload timing and speedup panels into one shareable figure."""
+    figure, axes = plt.subplots(len(WORKLOADS), 2, figsize=(13, 16))
+    for row, workload in enumerate(WORKLOADS):
+        for col, kind in enumerate(("times", "speedup")):
+            axis = axes[row, col]
+            backends = [
+                backend for backend, metrics in summary[workload].items() if kind in metrics
+            ]
+            stats = [summary[workload][backend][kind] for backend in backends]
+            values = [item["median"] for item in stats]
+            errors = [
+                [item["median"] - item["min"] for item in stats],
+                [item["max"] - item["median"] for item in stats],
+            ]
+            axis.barh(
+                range(len(backends)),
+                values,
+                xerr=errors,
+                capsize=4,
+                color=[COLORS[backend] for backend in backends],
+                alpha=0.85,
+                error_kw={"elinewidth": 1.2},
+                zorder=2,
+            )
+            upper = max((item["max"] for item in stats), default=1)
+            for index, item in enumerate(stats):
+                precision = 3 if kind == "times" else 2
+                suffix = "" if kind == "times" else "×"
+                axis.text(
+                    item["max"] + upper * 0.025,
+                    index,
+                    f"{item['median']:.{precision}g}{suffix}",
+                    va="center",
+                    fontsize=9,
+                )
+            axis.set_yticks(range(len(backends)), backends, fontsize=9)
+            axis.invert_yaxis()
+            axis.set_xlim(0, upper * 1.25)
+            axis.set_title(f"{workload} · {'Timing' if kind == 'times' else 'Speedup'}")
+            axis.set_xlabel(
+                "Time (µs) — lower is faster"
+                if kind == "times"
+                else "Speedup (×) — higher is faster"
+            )
+            if kind == "speedup":
+                axis.axvline(1, color="#555555", linestyle="--", linewidth=1)
+            axis.grid(axis="x", alpha=0.25)
+            axis.set_axisbelow(True)
+            axis.spines[["top", "right"]].set_visible(False)
+    figure.suptitle("Complete formatting across Python versions", fontsize=15)
+    figure.text(
+        0.5,
+        0.012,
+        "Bars: median across versions. Whiskers: version minimum–maximum, not sample variation.\n"
+        "Speedups use version-matched CPython stdlib JSON. Scales and version coverage differ; see the summary table.",
+        ha="center",
+        fontsize=10,
     )
-    upper = max((item["max"] for item in stats), default=1)
-    for row, item in enumerate(stats):
-        precision = 3 if kind == "times" else 2
-        suffix = "" if kind == "times" else "×"
-        axis.text(
-            item["max"] + upper * 0.025,
-            row,
-            f"{item['median']:.{precision}g}{suffix}",
-            va="center",
-            fontsize=9,
-        )
-    axis.set_yticks(range(len(backends)), backends, fontsize=9)
-    axis.invert_yaxis()
-    axis.set_xlim(0, upper * 1.25)
-    axis.set_title(workload)
-    axis.set_xlabel(
-        "Time (µs) — lower is faster" if kind == "times" else "Speedup (×) — higher is faster"
-    )
-    if kind == "speedup":
-        axis.axvline(1, color="#555555", linestyle="--", linewidth=1)
-    axis.grid(axis="x", alpha=0.25)
-    axis.set_axisbelow(True)
-    axis.spines[["top", "right"]].set_visible(False)
-    figure.tight_layout()
+    figure.tight_layout(rect=(0, 0.045, 1, 0.97), h_pad=1.5, w_pad=2)
     return figure
 
 
@@ -210,12 +226,7 @@ def main() -> None:
                 target = args.output / f"python-{result['python']}-{kind}.svg"
                 save_plot(figure, target)
         summary = formatting_summary(comparison_groups(load_results(args.results)))
-        for kind in ("times", "speedup"):
-            for workload in WORKLOADS:
-                save_plot(
-                    make_summary_plot(summary, kind, workload),
-                    args.output / f"summary-{workload}-{kind}.svg",
-                )
+        save_plot(make_summary_plot(summary), args.output / "summary.svg")
     return
 
 

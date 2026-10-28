@@ -51,9 +51,6 @@ theme:
         icon: material/weather-sunny
         name: Switch to light mode
 
-extra_css:
-  - assets/benchmarking/summary.css
-
 extra:
   social:
     - icon: fontawesome/brands/github
@@ -66,7 +63,6 @@ markdown_extensions:
       permalink: "🔗"
   - admonition
   - def_list
-  - md_in_html
   - mdx_truly_sane_lists
   - pymdownx.highlight:
       anchor_linenums: true

@@ -17,95 +17,9 @@ Speedups are calculated against CPython stdlib JSON for the same workload and Py
 
 Version coverage differs between runtimes, so these summaries do not isolate interpreter performance. The tables list the versions included in each metric.
 
-Timing panels: lower is faster. Speedup panels: higher is faster; the dashed line marks 1×. Each panel starts at zero and has its own scale.
+![Complete-formatting times and speedups by workload, with median and version ranges](assets/benchmarking/summary.svg)
 
-<div class="benchmark-summary" markdown="1">
-
-<figure markdown="1">
-
-![simple: complete-formatting times, medians with version min–max ranges](assets/benchmarking/summary-simple-times.svg)
-
-<figcaption>simple · Time (µs); median and version range</figcaption>
-</figure>
-
-<figure markdown="1">
-
-![simple: complete-formatting speedup, medians with version min–max ranges](assets/benchmarking/summary-simple-speedup.svg)
-
-<figcaption>simple · Speedup (×); median and version range</figcaption>
-</figure>
-
-<figure markdown="1">
-
-![structured: complete-formatting times, medians with version min–max ranges](assets/benchmarking/summary-structured-times.svg)
-
-<figcaption>structured · Time (µs); median and version range</figcaption>
-</figure>
-
-<figure markdown="1">
-
-![structured: complete-formatting speedup, medians with version min–max ranges](assets/benchmarking/summary-structured-speedup.svg)
-
-<figcaption>structured · Speedup (×); median and version range</figcaption>
-</figure>
-
-<figure markdown="1">
-
-![nested: complete-formatting times, medians with version min–max ranges](assets/benchmarking/summary-nested-times.svg)
-
-<figcaption>nested · Time (µs); median and version range</figcaption>
-</figure>
-
-<figure markdown="1">
-
-![nested: complete-formatting speedup, medians with version min–max ranges](assets/benchmarking/summary-nested-speedup.svg)
-
-<figcaption>nested · Speedup (×); median and version range</figcaption>
-</figure>
-
-<figure markdown="1">
-
-![unicode: complete-formatting times, medians with version min–max ranges](assets/benchmarking/summary-unicode-times.svg)
-
-<figcaption>unicode · Time (µs); median and version range</figcaption>
-</figure>
-
-<figure markdown="1">
-
-![unicode: complete-formatting speedup, medians with version min–max ranges](assets/benchmarking/summary-unicode-speedup.svg)
-
-<figcaption>unicode · Speedup (×); median and version range</figcaption>
-</figure>
-
-<figure markdown="1">
-
-![rich: complete-formatting times, medians with version min–max ranges](assets/benchmarking/summary-rich-times.svg)
-
-<figcaption>rich · Time (µs); median and version range</figcaption>
-</figure>
-
-<figure markdown="1">
-
-![rich: complete-formatting speedup, medians with version min–max ranges](assets/benchmarking/summary-rich-speedup.svg)
-
-<figcaption>rich · Speedup (×); median and version range</figcaption>
-</figure>
-
-<figure markdown="1">
-
-![exception: complete-formatting times, medians with version min–max ranges](assets/benchmarking/summary-exception-times.svg)
-
-<figcaption>exception · Time (µs); median and version range</figcaption>
-</figure>
-
-<figure markdown="1">
-
-![exception: complete-formatting speedup, medians with version min–max ranges](assets/benchmarking/summary-exception-speedup.svg)
-
-<figcaption>exception · Speedup (×); median and version range</figcaption>
-</figure>
-
-</div>
+Timing panels: lower is faster. Speedup panels: higher is faster; the dashed line marks 1×. Each panel starts at zero and has its own scale. Open the SVG to view or share the full-size summary.
 
 ??? note "Summary values and included versions"
 

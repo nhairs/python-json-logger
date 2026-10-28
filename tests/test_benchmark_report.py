@@ -77,8 +77,7 @@ def test_report_update(result_file: Path, tmp_path: Path) -> None:
     assert "assets/benchmarking/python-3.15-times.svg" in first
     assert "assets/benchmarking/python-3.15-speedup.svg" in first
     assert first.index("## Complete-formatting summary") < first.index("## Run benchmarks")
-    assert "summary-simple-times.svg" in first
-    assert "summary-simple-speedup.svg" in first
+    assert "assets/benchmarking/summary.svg" in first
     assert first.count('??? note "Timing statistics"') == 1
     assert first.count('??? note "Speedup values"') == 1
     assert "    | serialization | simple" in first
