@@ -30,7 +30,6 @@ def main() -> None:
         versions = json.loads(subprocess.check_output(["mike", "list", "--json"]))
         if any(item["version"] == "dev" for item in versions):
             subprocess.run(["mike", "delete", "dev"], check=True)
-        subprocess.run(["mike", "set-default", "latest"], check=True)
 
 
 if __name__ == "__main__":
