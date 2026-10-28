@@ -136,6 +136,11 @@ If you're not familiar with code review start by reading [this guide](https://go
 
 ## Common Topics
 
+### Publishing releases
+
+Maintainers can follow the [release setup and recovery guide](releasing.md) to
+configure trusted publishing and prepare a release.
+
 ### Adding a new encoder
 
 New encoders may be added depending on their popularity. Only encoders [in the top 1000 packages](https://hugovk.github.io/top-pypi-packages/) or with monthly downloads exceeding 10M/month will be considered.

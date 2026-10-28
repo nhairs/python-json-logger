@@ -1,6 +1,7 @@
 name: Test python-json-logger
 
 on:
+  workflow_call:
   push:
     branches:
       - main
