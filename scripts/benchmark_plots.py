@@ -35,7 +35,6 @@ def make_speedup_plot(result: dict) -> Figure:
     height = 0.8 / len(backends)
     for axis, layer in zip(axes, LAYERS):
         upper = 1.0
-        lower = 1.0
         for index, backend in enumerate(backends):
             positions = [row - 0.4 + height * (index + 0.5) for row in range(len(WORKLOADS))]
             values = [
@@ -44,8 +43,6 @@ def make_speedup_plot(result: dict) -> Figure:
                 for workload in WORKLOADS
             ]
             upper = max(upper, max(values))
-            if min(values) < 1:
-                lower = 0.0
             axis.barh(
                 positions,
                 values,
@@ -65,9 +62,7 @@ def make_speedup_plot(result: dict) -> Figure:
                 )
         axis.set_yticks(range(len(WORKLOADS)), WORKLOADS)
         axis.set_ylim(len(WORKLOADS) - 0.5, -0.5)
-        axis.set_xlim(lower, upper * 1.2)
-        ticks = [tick for tick in axis.get_xticks() if lower <= tick <= upper * 1.2]
-        axis.set_xticks(sorted(set([lower, *ticks])))
+        axis.set_xlim(0, upper * 1.2)
         for row in range(len(WORKLOADS)):
             if row % 2 == 0:
                 axis.axhspan(row - 0.5, row + 0.5, color="#000000", alpha=0.045, zorder=0)
@@ -105,7 +100,6 @@ def make_plot(result: dict, kind: str) -> Figure:
             axis = axes[row, col]
             stats = [cases[layer, workload, backend] for backend in backends]
             values = [item["median"] * 1e6 for item in stats]
-            ends = [item["q3"] * 1e6 for item in stats]
             labels = [f"{value:.3g}" for value in values]
             axis.barh(
                 range(len(backends)),
@@ -115,22 +109,9 @@ def make_plot(result: dict, kind: str) -> Figure:
                 alpha=0.85,
                 zorder=2,
             )
-            axis.errorbar(
-                values,
-                range(len(backends)),
-                xerr=[
-                    [(item["median"] - item["q1"]) * 1e6 for item in stats],
-                    [(item["q3"] - item["median"]) * 1e6 for item in stats],
-                ],
-                fmt="none",
-                ecolor="#222222",
-                capsize=3,
-                linewidth=1,
-                zorder=3,
-            )
-            upper = max(ends)
+            upper = max(values)
             for index, label in enumerate(labels):
-                axis.text(ends[index] + upper * 0.025, index, label, va="center", fontsize=9)
+                axis.text(values[index] + upper * 0.025, index, label, va="center", fontsize=9)
             axis.set_yticks(range(len(backends)), backends, fontsize=9)
             axis.invert_yaxis()
             axis.set_xlim(0, upper * 1.23)
@@ -143,7 +124,7 @@ def make_plot(result: dict, kind: str) -> Figure:
     figure.suptitle(f"Python {result['python']}: Median operation times", fontsize=15)
     caption = (
         "Every panel starts at zero; axis ranges differ by panel. Lower is faster.\n"
-        "Whiskers span Q1–Q3, not confidence intervals. Labels show median µs."
+        "Labels show median µs. Variation statistics are available in the tables."
     )
     figure.text(0.5, 0.012, caption, ha="center", fontsize=10)
     figure.tight_layout(rect=(0, 0.045, 1, 0.97), h_pad=1.5, w_pad=2)
