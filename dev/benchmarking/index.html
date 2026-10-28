@@ -432,6 +432,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#complete-formatting-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Complete-formatting summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#run-benchmarks" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1221,6 +1232,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#complete-formatting-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Complete-formatting summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#run-benchmarks" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1540,6 +1562,19 @@
 with the opt-in benchmark suite. Measurements cover serialization and complete
 record formatting. They help you choose a backend for a workload; they do not
 predict application throughput or handler I/O performance.</p>
+<h2 id="complete-formatting-summary">Complete-formatting summary<a class="headerlink" href="#complete-formatting-summary" title="Permanent link">🔗</a></h2>
+<p>These graphs summarize complete record formatting from the <a href="#baseline-results">baseline results</a>.
+Bars show the arithmetic mean of the per-version median operation times.
+Whiskers show the minimum–maximum of those version medians, not individual timing samples.</p>
+<p>Speedups average each version's ratio against CPython stdlib JSON for the same
+workload and Python major/minor version. Only versions with a matching reference
+contribute. Lower times and higher speedups indicate faster formatting.
+Each panel starts at zero and has its own scale.</p>
+<!-- benchmark-summary:start -->
+
+<p><img alt="Complete-formatting times and speedups by workload, with mean and version ranges" src="../assets/benchmarking/summary.svg" /></p>
+<!-- benchmark-summary:end -->
+
 <h2 id="run-benchmarks">Run benchmarks<a class="headerlink" href="#run-benchmarks" title="Permanent link">🔗</a></h2>
 <p>From a repository checkout, install the benchmark dependencies:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>uv<span class="w"> </span>sync<span class="w"> </span>--python<span class="w"> </span><span class="m">3</span>.15<span class="w"> </span>--no-default-groups<span class="w"> </span>--group<span class="w"> </span>benchmark
@@ -1722,6 +1757,8 @@ the cause of the pauses.</p>
 <p>Dependencies: <code>pytest==9.1.1</code>, <code>pytest-benchmark==5.3.0</code>, <code>python-json-logger==4.3.0.dev1</code>.</p>
 <h4 id="times-and-variation">Times and variation<a class="headerlink" href="#times-and-variation" title="Permanent link">🔗</a></h4>
 <p><img alt="Median operation times for Python 3.10" src="../assets/benchmarking/python-3.10-times.svg" /></p>
+<details class="note">
+<summary>Timing statistics</summary>
 <table>
 <thead>
 <tr>
@@ -2169,9 +2206,12 @@ the cause of the pauses.</p>
 </tr>
 </tbody>
 </table>
+</details>
 <h4 id="speedup">Speedup<a class="headerlink" href="#speedup" title="Permanent link">🔗</a></h4>
 <p><img alt="Median speedups relative to stdlib JSON for Python 3.10" src="../assets/benchmarking/python-3.10-speedup.svg" /></p>
 <p>Reference: json (CPython) (1×).</p>
+<details class="note">
+<summary>Speedup values</summary>
 <table>
 <thead>
 <tr>
@@ -2282,6 +2322,7 @@ the cause of the pauses.</p>
 </tr>
 </tbody>
 </table>
+</details>
 <h3 id="python-311">Python 3.11<a class="headerlink" href="#python-311" title="Permanent link">🔗</a></h3>
 <p><strong>CPython 3.11.18</strong>. Measured: 2026-10-28T02:18:00.061021+00:00. Revision: <code>3a26fc4e64acfc167d24623c96ccd72802f834d0</code>.</p>
 <p>Environment: Linux 6.17.0-1022-azure, x86_64; AMD EPYC 9V74 80-Core Processor.</p>
@@ -2291,6 +2332,8 @@ the cause of the pauses.</p>
 <p>Dependencies: <code>pytest==9.1.1</code>, <code>pytest-benchmark==5.3.0</code>, <code>python-json-logger==4.3.0.dev1</code>.</p>
 <h4 id="times-and-variation_1">Times and variation<a class="headerlink" href="#times-and-variation_1" title="Permanent link">🔗</a></h4>
 <p><img alt="Median operation times for Python 3.11" src="../assets/benchmarking/python-3.11-times.svg" /></p>
+<details class="note">
+<summary>Timing statistics</summary>
 <table>
 <thead>
 <tr>
@@ -2738,9 +2781,12 @@ the cause of the pauses.</p>
 </tr>
 </tbody>
 </table>
+</details>
 <h4 id="speedup_1">Speedup<a class="headerlink" href="#speedup_1" title="Permanent link">🔗</a></h4>
 <p><img alt="Median speedups relative to stdlib JSON for Python 3.11" src="../assets/benchmarking/python-3.11-speedup.svg" /></p>
 <p>Reference: json (CPython) (1×).</p>
+<details class="note">
+<summary>Speedup values</summary>
 <table>
 <thead>
 <tr>
@@ -2851,6 +2897,7 @@ the cause of the pauses.</p>
 </tr>
 </tbody>
 </table>
+</details>
 <h3 id="python-312">Python 3.12<a class="headerlink" href="#python-312" title="Permanent link">🔗</a></h3>
 <p><strong>CPython 3.12.3</strong>. Measured: 2026-10-28T02:19:33.887630+00:00. Revision: <code>3a26fc4e64acfc167d24623c96ccd72802f834d0</code>.</p>
 <p>Environment: Linux 6.17.0-1022-azure, x86_64; AMD EPYC 9V74 80-Core Processor.</p>
@@ -2860,6 +2907,8 @@ the cause of the pauses.</p>
 <p>Dependencies: <code>pytest==9.1.1</code>, <code>pytest-benchmark==5.3.0</code>, <code>python-json-logger==4.3.0.dev1</code>.</p>
 <h4 id="times-and-variation_2">Times and variation<a class="headerlink" href="#times-and-variation_2" title="Permanent link">🔗</a></h4>
 <p><img alt="Median operation times for Python 3.12" src="../assets/benchmarking/python-3.12-times.svg" /></p>
+<details class="note">
+<summary>Timing statistics</summary>
 <table>
 <thead>
 <tr>
@@ -3307,9 +3356,12 @@ the cause of the pauses.</p>
 </tr>
 </tbody>
 </table>
+</details>
 <h4 id="speedup_2">Speedup<a class="headerlink" href="#speedup_2" title="Permanent link">🔗</a></h4>
 <p><img alt="Median speedups relative to stdlib JSON for Python 3.12" src="../assets/benchmarking/python-3.12-speedup.svg" /></p>
 <p>Reference: json (CPython) (1×).</p>
+<details class="note">
+<summary>Speedup values</summary>
 <table>
 <thead>
 <tr>
@@ -3420,12 +3472,15 @@ the cause of the pauses.</p>
 </tr>
 </tbody>
 </table>
+</details>
 <h3 id="python-313">Python 3.13<a class="headerlink" href="#python-313" title="Permanent link">🔗</a></h3>
 <p><strong>CPython 3.13.18</strong>. Measured: 2026-10-28T02:21:07.877875+00:00. Revision: <code>3a26fc4e64acfc167d24623c96ccd72802f834d0</code>.</p>
 <p>Environment: Linux 6.17.0-1022-azure, x86_64; AMD EPYC 9V74 80-Core Processor.</p>
 <p>Dependencies: <code>msgspec==0.22.0</code>, <code>orjson==3.13.0</code>, <code>pytest==9.1.1</code>, <code>pytest-benchmark==5.3.0</code>, <code>python-json-logger==4.3.0.dev1</code>.</p>
 <h4 id="times-and-variation_3">Times and variation<a class="headerlink" href="#times-and-variation_3" title="Permanent link">🔗</a></h4>
 <p><img alt="Median operation times for Python 3.13" src="../assets/benchmarking/python-3.13-times.svg" /></p>
+<details class="note">
+<summary>Timing statistics</summary>
 <table>
 <thead>
 <tr>
@@ -3765,9 +3820,12 @@ the cause of the pauses.</p>
 </tr>
 </tbody>
 </table>
+</details>
 <h4 id="speedup_3">Speedup<a class="headerlink" href="#speedup_3" title="Permanent link">🔗</a></h4>
 <p><img alt="Median speedups relative to stdlib JSON for Python 3.13" src="../assets/benchmarking/python-3.13-speedup.svg" /></p>
 <p>Reference: json (CPython) (1×).</p>
+<details class="note">
+<summary>Speedup values</summary>
 <table>
 <thead>
 <tr>
@@ -3865,12 +3923,15 @@ the cause of the pauses.</p>
 </tr>
 </tbody>
 </table>
+</details>
 <h3 id="python-314">Python 3.14<a class="headerlink" href="#python-314" title="Permanent link">🔗</a></h3>
 <p><strong>CPython 3.14.10</strong>. Measured: 2026-10-28T02:22:40.796372+00:00. Revision: <code>3a26fc4e64acfc167d24623c96ccd72802f834d0</code>.</p>
 <p>Environment: Linux 6.17.0-1022-azure, x86_64; AMD EPYC 9V74 80-Core Processor.</p>
 <p>Dependencies: <code>msgspec==0.22.0</code>, <code>orjson==3.13.0</code>, <code>pytest==9.1.1</code>, <code>pytest-benchmark==5.3.0</code>, <code>python-json-logger==4.3.0.dev1</code>.</p>
 <h4 id="times-and-variation_4">Times and variation<a class="headerlink" href="#times-and-variation_4" title="Permanent link">🔗</a></h4>
 <p><img alt="Median operation times for Python 3.14" src="../assets/benchmarking/python-3.14-times.svg" /></p>
+<details class="note">
+<summary>Timing statistics</summary>
 <table>
 <thead>
 <tr>
@@ -4210,9 +4271,12 @@ the cause of the pauses.</p>
 </tr>
 </tbody>
 </table>
+</details>
 <h4 id="speedup_4">Speedup<a class="headerlink" href="#speedup_4" title="Permanent link">🔗</a></h4>
 <p><img alt="Median speedups relative to stdlib JSON for Python 3.14" src="../assets/benchmarking/python-3.14-speedup.svg" /></p>
 <p>Reference: json (CPython) (1×).</p>
+<details class="note">
+<summary>Speedup values</summary>
 <table>
 <thead>
 <tr>
@@ -4310,12 +4374,15 @@ the cause of the pauses.</p>
 </tr>
 </tbody>
 </table>
+</details>
 <h3 id="python-315">Python 3.15<a class="headerlink" href="#python-315" title="Permanent link">🔗</a></h3>
 <p><strong>CPython 3.15.2</strong>. Measured: 2026-10-28T02:24:12.733828+00:00. Revision: <code>3a26fc4e64acfc167d24623c96ccd72802f834d0</code>.</p>
 <p>Environment: Linux 6.17.0-1022-azure, x86_64; AMD EPYC 9V74 80-Core Processor.</p>
 <p>Dependencies: <code>msgspec==0.22.0</code>, <code>orjson==3.13.0</code>, <code>pytest==9.1.1</code>, <code>pytest-benchmark==5.3.0</code>, <code>python-json-logger==4.3.0.dev1</code>.</p>
 <h4 id="times-and-variation_5">Times and variation<a class="headerlink" href="#times-and-variation_5" title="Permanent link">🔗</a></h4>
 <p><img alt="Median operation times for Python 3.15" src="../assets/benchmarking/python-3.15-times.svg" /></p>
+<details class="note">
+<summary>Timing statistics</summary>
 <table>
 <thead>
 <tr>
@@ -4655,9 +4722,12 @@ the cause of the pauses.</p>
 </tr>
 </tbody>
 </table>
+</details>
 <h4 id="speedup_5">Speedup<a class="headerlink" href="#speedup_5" title="Permanent link">🔗</a></h4>
 <p><img alt="Median speedups relative to stdlib JSON for Python 3.15" src="../assets/benchmarking/python-3.15-speedup.svg" /></p>
 <p>Reference: json (CPython) (1×).</p>
+<details class="note">
+<summary>Speedup values</summary>
 <table>
 <thead>
 <tr>
@@ -4755,6 +4825,7 @@ the cause of the pauses.</p>
 </tr>
 </tbody>
 </table>
+</details>
 <!-- benchmark-results:end -->
 
 
