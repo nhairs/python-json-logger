@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime, timezone
+from enum import Enum
 from importlib import import_module
 import json
 import logging
@@ -26,6 +27,13 @@ class Request:
 
     method: str
     status: int
+
+
+class RequestStatus(Enum):
+    """Enum class and members for native and fallback encoding paths."""
+
+    OK = "ok"
+    ERROR = "error"
 
 
 @dataclass
@@ -80,7 +88,7 @@ def unicode_message() -> Workload:
 
 
 def rich() -> Workload:
-    """A UTC datetime, UUID, and dataclass with explicit serialized expectations."""
+    """Rich types including bytes and an Enum class and its members."""
     return Workload(
         "rich",
         {
@@ -88,12 +96,18 @@ def rich() -> Workload:
             "timestamp": datetime(2024, 1, 2, 3, 4, 5, tzinfo=timezone.utc),
             "request_id": UUID("12345678-1234-5678-1234-567812345678"),
             "request": Request("GET", 200),
+            "payload": b"request payload",
+            "status_type": RequestStatus,
+            "statuses": [RequestStatus.OK, RequestStatus.ERROR],
         },
         expected={
             "message": "request completed",
             "timestamp": "2024-01-02T03:04:05+00:00",
             "request_id": "12345678-1234-5678-1234-567812345678",
             "request": {"method": "GET", "status": 200},
+            "payload": "cmVxdWVzdCBwYXlsb2Fk",
+            "status_type": ["ok", "error"],
+            "statuses": ["ok", "error"],
         },
     )
 

@@ -10,20 +10,17 @@ env:
   UV_PYTHON_PREFERENCE: managed
 
 jobs:
-  runtimes:
-    name: Discover benchmark runtimes
+  benchmark:
+    name: Benchmark supported Python runtimes
     runs-on: ubuntu-latest
-    outputs:
-      environments: ${{ steps.matrix.outputs.environments }}
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v3
-      - id: matrix
-        name: Read supported Python runtimes from tox
+      - name: Read supported Python runtimes from tox
         run: |
           uvx --with tox-uv tox list -d --no-desc > /tmp/tox-environments
-          python - <<'PY' >> "$GITHUB_OUTPUT"
-          import json
+          python - <<'PYTHON' >> "$GITHUB_ENV"
           import re
           from pathlib import Path
           environments = [
@@ -32,31 +29,25 @@ jobs:
               if re.fullmatch(r'(?:py|pypy)[0-9]+', name)
           ]
           assert environments, 'No Python environments found in tox'
-          print('environments=' + json.dumps(environments))
-          PY
-
-  benchmark:
-    name: ${{ matrix.environment }}
-    needs: runtimes
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    strategy:
-      fail-fast: false
-      matrix:
-        environment: ${{ fromJSON(needs.runtimes.outputs.environments) }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v3
-      - name: Measure formatters with tox
-        run: uvx --with tox-uv tox -e '${{ matrix.environment }}'
+          print('BENCHMARK_ENVIRONMENTS=' + ','.join(environments))
+          PYTHON
+      - name: Measure formatters sequentially with tox
+        run: uvx --with tox-uv tox -e "$BENCHMARK_ENVIRONMENTS"
       - name: Collect and summarize measurements
+        if: always()
         run: |
-          mkdir -p benchmark-results
-          cp .tox/${{ matrix.environment }}/tmp/benchmark.json benchmark-results/${{ matrix.environment }}.json
+          python - <<'PYTHON'
+          from pathlib import Path
+          import shutil
+          target = Path('benchmark-results')
+          target.mkdir(exist_ok=True)
+          for source in Path('.tox').glob('*-benchmark/tmp/benchmark.json'):
+              shutil.copyfile(source, target / (source.parents[1].name + '.json'))
+          PYTHON
           python scripts/benchmark_report.py benchmark-results/*.json >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: benchmark-${{ matrix.environment }}
+          name: benchmark-results
           path: benchmark-results/*.json
           if-no-files-found: error
