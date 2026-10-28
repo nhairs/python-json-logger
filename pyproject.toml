@@ -73,6 +73,7 @@ dev = [
     "mkdocs-gen-files",
     "mkdocs-literate-nav",
     "mike",
+    "packaging",
 ]
 
 [tool.setuptools.packages.find]
