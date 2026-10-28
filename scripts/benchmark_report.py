@@ -133,7 +133,7 @@ def render(paths: list[Path], plots: str | None = None) -> str:
         if plots:
             sections.extend(
                 [
-                    f"![Median times and interquartile ranges for Python {python}]({plots}/{slug}-times.svg)",
+                    f"![Median operation times for Python {python}]({plots}/{slug}-times.svg)",
                     "",
                 ]
             )

@@ -200,7 +200,7 @@ Dependencies: `pytest==9.1.1`, `pytest-benchmark==5.3.0`, `python-json-logger==4
 
 #### Times and variation
 
-![Median times and interquartile ranges for Python 3.10](assets/benchmarking/python-3.10-times.svg)
+![Median operation times for Python 3.10](assets/benchmarking/python-3.10-times.svg)
 
 | Layer | Workload | Encoder | Median (µs) | IQR (µs) | Mean ± SD (µs) | Rounds × iterations |
 | --- | --- | --- | ---: | ---: | ---: | ---: |
@@ -290,7 +290,7 @@ Dependencies: `pytest==9.1.1`, `pytest-benchmark==5.3.0`, `python-json-logger==4
 
 #### Times and variation
 
-![Median times and interquartile ranges for Python 3.11](assets/benchmarking/python-3.11-times.svg)
+![Median operation times for Python 3.11](assets/benchmarking/python-3.11-times.svg)
 
 | Layer | Workload | Encoder | Median (µs) | IQR (µs) | Mean ± SD (µs) | Rounds × iterations |
 | --- | --- | --- | ---: | ---: | ---: | ---: |
@@ -380,7 +380,7 @@ Dependencies: `pytest==9.1.1`, `pytest-benchmark==5.3.0`, `python-json-logger==4
 
 #### Times and variation
 
-![Median times and interquartile ranges for Python 3.12](assets/benchmarking/python-3.12-times.svg)
+![Median operation times for Python 3.12](assets/benchmarking/python-3.12-times.svg)
 
 | Layer | Workload | Encoder | Median (µs) | IQR (µs) | Mean ± SD (µs) | Rounds × iterations |
 | --- | --- | --- | ---: | ---: | ---: | ---: |
@@ -464,7 +464,7 @@ Dependencies: `msgspec==0.22.0`, `orjson==3.13.0`, `pytest==9.1.1`, `pytest-benc
 
 #### Times and variation
 
-![Median times and interquartile ranges for Python 3.13](assets/benchmarking/python-3.13-times.svg)
+![Median operation times for Python 3.13](assets/benchmarking/python-3.13-times.svg)
 
 | Layer | Workload | Encoder | Median (µs) | IQR (µs) | Mean ± SD (µs) | Rounds × iterations |
 | --- | --- | --- | ---: | ---: | ---: | ---: |
@@ -536,7 +536,7 @@ Dependencies: `msgspec==0.22.0`, `orjson==3.13.0`, `pytest==9.1.1`, `pytest-benc
 
 #### Times and variation
 
-![Median times and interquartile ranges for Python 3.14](assets/benchmarking/python-3.14-times.svg)
+![Median operation times for Python 3.14](assets/benchmarking/python-3.14-times.svg)
 
 | Layer | Workload | Encoder | Median (µs) | IQR (µs) | Mean ± SD (µs) | Rounds × iterations |
 | --- | --- | --- | ---: | ---: | ---: | ---: |
@@ -608,7 +608,7 @@ Dependencies: `msgspec==0.22.0`, `orjson==3.13.0`, `pytest==9.1.1`, `pytest-benc
 
 #### Times and variation
 
-![Median times and interquartile ranges for Python 3.15](assets/benchmarking/python-3.15-times.svg)
+![Median operation times for Python 3.15](assets/benchmarking/python-3.15-times.svg)
 
 | Layer | Workload | Encoder | Median (µs) | IQR (µs) | Mean ± SD (µs) | Rounds × iterations |
 | --- | --- | --- | ---: | ---: | ---: | ---: |
