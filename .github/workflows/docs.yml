@@ -1,0 +1,61 @@
+name: Publish documentation
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: documentation-pages
+  cancel-in-progress: false
+jobs:
+  build:
+    if: github.repository == 'nhairs/python-json-logger' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      publish: ${{ steps.publish.outputs.publish }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: astral-sh/setup-uv@v3
+      - run: uv sync --python 3.12 --group dev
+      - name: Build versioned documentation
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git fetch origin gh-pages:gh-pages
+          uv run python scripts/publish_docs.py
+      - name: Publish history
+        id: publish
+        run: |
+          git fetch origin main
+          if [ "$(git rev-parse origin/main)" != "$GITHUB_SHA" ]; then
+            echo 'Skipping obsolete main revision'
+            exit 0
+          fi
+          git worktree add --detach "$RUNNER_TEMP/docs-history" gh-pages
+          mkdir "$RUNNER_TEMP/pages"
+          cp -rL "$RUNNER_TEMP/docs-history/." "$RUNNER_TEMP/pages/"
+          rm "$RUNNER_TEMP/pages/.git"
+          git push origin gh-pages:gh-pages
+          echo 'publish=true' >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-pages-artifact@v4
+        if: steps.publish.outputs.publish == 'true'
+        with:
+          path: ${{ runner.temp }}/pages
+  deploy:
+    needs: build
+    if: needs.build.outputs.publish == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/deploy-pages@v4
+        id: deployment

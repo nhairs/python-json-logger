@@ -1,7 +1,7 @@
 site_name: "Python JSON Logger"
 site_url: https://nhairs.github.io/python-json-logger
 repo_url: https://github.com/nhairs/python-json-logger
-edit_uri: tree/master/docs
+edit_uri: tree/main/docs
 copyright: "<a href='https://github.com/nhairs/python-json-logger/graphs/contributors'> Copyright &copy; Python JSON Logger Contributors</a>"
 watch:
   - mkdocs.yml
@@ -87,7 +87,7 @@ plugins:
         python:
           paths:
             - src
-          import:
+          inventories:
             - https://docs.python.org/3/objects.inv
           #  - https://mkdocstrings.github.io/objects.inv
           #  - https://mkdocstrings.github.io/griffe/objects.inv
