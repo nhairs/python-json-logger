@@ -29,4 +29,3 @@ def test_version_routing(value: str, label: str, stable: bool) -> None:
 def test_invalid_public_version(value: str) -> None:
     with pytest.raises(ValueError):
         PUBLISH["documentation_version"](value)
-
