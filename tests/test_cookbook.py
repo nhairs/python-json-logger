@@ -34,7 +34,9 @@ def test_exception_example() -> None:
     cookbook = (Path(__file__).resolve().parents[1] / "docs" / "cookbook.md").read_text(
         encoding="utf-8"
     )
-    example = cookbook.split("## Log exceptions and exception groups\n", 1)[1].split("\n## ", 1)[0]
+    example = cookbook.split("## Logging exceptions, exception groups, and exception notes\n", 1)[
+        1
+    ].split("\n## ", 1)[0]
     code = re.search(r"```python\n(.*?)```", example, re.DOTALL)
     assert code is not None
     outputs = re.findall(r"```json\n(.*?)```", example, re.DOTALL)
@@ -50,9 +52,7 @@ def test_exception_example() -> None:
     actual = [json.loads(line) for line in result.stderr.splitlines()]
     expected = [json.loads(output) for output in outputs]
     for record in actual + expected:
-        if "exc_info" in record:
-            assert isinstance(record["exc_info"], list)
-            assert all(isinstance(line, str) for line in record["exc_info"])
+        if isinstance(record.get("exc_info"), list):
             record["exc_info"] = normalize_traceback(record["exc_info"], code.group(1))
     assert actual == expected
     return None

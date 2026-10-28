@@ -97,7 +97,7 @@ logger.info(
 
 Finally, any non-standard attributes added to a `LogRecord` will also be included in the logged data. See [Cookbook: Request / Trace IDs](cookbook.md#request-trace-ids) for an example.
 
-For exceptions passed as dictionary values, see [Log exceptions and exception groups](cookbook.md#log-exceptions-and-exception-groups) for how their output differs from logging with `exc_info=True`.
+For exceptions passed as dictionary values, see [Logging exceptions, exception groups, and exception notes](cookbook.md#logging-exceptions-exception-groups-and-exception-notes) for how their output differs from logging with `exc_info=True`.
 
 #### Default Fields
 

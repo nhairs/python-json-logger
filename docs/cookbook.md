@@ -38,7 +38,7 @@ class SillyFormatter(JsonFormatter):
 ```
 
 
-## Log exceptions and exception groups
+## Logging exceptions, exception groups, and exception notes
 
 Use `exc_info=True` inside an exception handler to include a traceback in a JSON
 log record. This preserves exception notes, including notes on exception groups
@@ -148,10 +148,6 @@ does not recursively include members or their notes:
   "error": "ExceptionGroup: multiple errors (2 sub-exceptions)\nErrors occurred during processing."
 }
 ```
-
-*Changed in 4.3*: Default exception serialization includes the exception's own
-notes. Earlier versions omit notes from exception objects passed as values.
-This change does not affect notes included through `exc_info`.
 
 ## Request / Trace IDs
 
