@@ -18,6 +18,7 @@ nav:
   - changelog.md
   - security.md
   - contributing.md
+  - releasing.md
   - API Reference:
     - ... | reference/pythonjsonlogger/*
 
