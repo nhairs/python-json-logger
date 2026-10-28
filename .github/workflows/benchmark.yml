@@ -17,22 +17,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v3
-      - name: Read supported Python runtimes from tox
-        run: |
-          uvx --with tox-uv tox list -d --no-desc > /tmp/tox-environments
-          python - <<'PYTHON' >> "$GITHUB_ENV"
-          import re
-          from pathlib import Path
-          environments = [
-              name + '-benchmark'
-              for name in Path('/tmp/tox-environments').read_text().splitlines()
-              if re.fullmatch(r'(?:py|pypy)[0-9]+', name)
-          ]
-          assert environments, 'No Python environments found in tox'
-          print('BENCHMARK_ENVIRONMENTS=' + ','.join(environments))
-          PYTHON
       - name: Measure formatters sequentially with tox
-        run: uvx --with tox-uv tox -e "$BENCHMARK_ENVIRONMENTS"
+        run: uvx --with tox-uv tox -m benchmark
       - name: Collect and summarize measurements
         if: always()
         run: |
