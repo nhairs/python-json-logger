@@ -38,6 +38,121 @@ class SillyFormatter(JsonFormatter):
 ```
 
 
+## Log exceptions and exception groups
+
+Use `exc_info=True` inside an exception handler to include a traceback in a JSON
+log record. This preserves exception notes, including notes on exception groups
+and their members.
+
+The following example requires Python 3.11 or later for `add_note()` and
+`ExceptionGroup`. It uses `exc_info_as_array=True` to represent the traceback as
+an array of lines. With the default `False`, the same information is included in
+a single string containing newline characters.
+
+```python
+import logging
+from pythonjsonlogger.json import JsonFormatter
+
+logger = logging.getLogger("exception_example")
+logger.setLevel(logging.INFO)
+logger.propagate = False
+handler = logging.StreamHandler()
+handler.setFormatter(JsonFormatter(exc_info_as_array=True))
+logger.addHandler(handler)
+
+error = ValueError("invalid value")
+error.add_note("Check the input value.")
+
+other_error = RuntimeError("operation failed")
+other_error.add_note("Retry the operation.")
+
+group = ExceptionGroup("multiple errors", [error, other_error])
+group.add_note("Errors occurred during processing.")
+
+try:
+    raise error
+except ValueError:
+    logger.info("Exception with traceback", exc_info=True)
+
+try:
+    raise group
+except ExceptionGroup:
+    logger.info("Exception group with traceback", exc_info=True)
+
+logger.info({"message": "Exception as a value", "error": error})
+logger.info({"message": "Exception group as a value", "error": group})
+```
+
+The first call with `exc_info=True` includes the exception's traceback and note:
+
+```json
+{
+  "message": "Exception with traceback",
+  "exc_info": [
+    "Traceback (most recent call last):",
+    "  File \"<string>\", line 21, in <module>",
+    "    raise error",
+    "ValueError: invalid value",
+    "Check the input value."
+  ]
+}
+```
+
+The second includes the group's traceback, its own note, and both members with
+their notes:
+
+```json
+{
+  "message": "Exception group with traceback",
+  "exc_info": [
+    "  + Exception Group Traceback (most recent call last):",
+    "  |   File \"<string>\", line 26, in <module>",
+    "  |     raise group",
+    "  | ExceptionGroup: multiple errors (2 sub-exceptions)",
+    "  | Errors occurred during processing.",
+    "  +-+---------------- 1 ----------------",
+    "    | Traceback (most recent call last):",
+    "    |   File \"<string>\", line 21, in <module>",
+    "    |     raise error",
+    "    | ValueError: invalid value",
+    "    | Check the input value.",
+    "    +---------------- 2 ----------------",
+    "    | RuntimeError: operation failed",
+    "    | Retry the operation.",
+    "    +------------------------------------"
+  ]
+}
+```
+
+Traceback paths, line numbers, source excerpts, and presentation can vary with
+the script location and Python version. These examples show output from running
+the code with `python -c`.
+
+Passing an exception as a dictionary value uses the encoder's default exception
+serialization instead of traceback formatting. It includes the exception's name,
+message, and own notes, without a traceback:
+
+```json
+{
+  "message": "Exception as a value",
+  "error": "ValueError: invalid value\nCheck the input value."
+}
+```
+
+For an exception group, this produces the group summary and its own notes. It
+does not recursively include members or their notes:
+
+```json
+{
+  "message": "Exception group as a value",
+  "error": "ExceptionGroup: multiple errors (2 sub-exceptions)\nErrors occurred during processing."
+}
+```
+
+*Changed in 4.3*: Default exception serialization includes the exception's own
+notes. Earlier versions omit notes from exception objects passed as values.
+This change does not affect notes included through `exc_info`.
+
 ## Request / Trace IDs
 
 There are many ways to add consistent request IDs to your logging. The exact method will depend on your needs and application.
