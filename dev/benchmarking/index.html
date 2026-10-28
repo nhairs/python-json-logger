@@ -1,0 +1,4841 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://nhairs.github.io/python-json-logger/latest/benchmarking/">
+      
+      
+        <link rel="prev" href="../cookbook/">
+      
+      
+        <link rel="next" href="../changelog/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-ProperDocs 1.6.7, mkdocs-material-9.8.0">
+    
+    
+      
+        <title>Benchmarking - Python JSON Logger</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.57a0d79d.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.fb2fffe2.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="amber" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#benchmarking" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Python JSON Logger" class="md-header__button md-logo" aria-label="Python JSON Logger" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8 3a2 2 0 0 0-2 2v4a2 2 0 0 1-2 2H3v2h1a2 2 0 0 1 2 2v4a2 2 0 0 0 2 2h2v-2H8v-5a2 2 0 0 0-2-2 2 2 0 0 0 2-2V5h2V3m6 0a2 2 0 0 1 2 2v4a2 2 0 0 0 2 2h1v2h-1a2 2 0 0 0-2 2v4a2 2 0 0 1-2 2h-2v-2h2v-5a2 2 0 0 1 2-2 2 2 0 0 1-2-2V5h-2V3z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Python JSON Logger
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Benchmarking
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="amber" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="amber" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/nhairs/python-json-logger" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Python JSON Logger" class="md-nav__button md-logo" aria-label="Python JSON Logger" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8 3a2 2 0 0 0-2 2v4a2 2 0 0 1-2 2H3v2h1a2 2 0 0 1 2 2v4a2 2 0 0 0 2 2h2v-2H8v-5a2 2 0 0 0-2-2 2 2 0 0 0 2-2V5h2V3m6 0a2 2 0 0 1 2 2v4a2 2 0 0 0 2 2h1v2h-1a2 2 0 0 0-2 2v4a2 2 0 0 1-2 2h-2v-2h2v-5a2 2 0 0 1 2-2 2 2 0 0 1-2-2V5h-2V3z"/></svg>
+
+    </a>
+    Python JSON Logger
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/nhairs/python-json-logger" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick Start
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../time/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Logging Time
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cookbook/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cookbook
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Benchmarking
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Benchmarking
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#run-benchmarks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Run benchmarks
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#measurement-methodology" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Measurement methodology
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#repetitions-variation-and-precision" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Repetitions, variation, and precision
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#update-results" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Update results
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#baseline-results" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Baseline results
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Baseline results">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#python-310" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Python 3.10
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Python 3.10">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#times-and-variation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Times and variation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#speedup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Speedup
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python-311" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Python 3.11
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Python 3.11">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#times-and-variation_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Times and variation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#speedup_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Speedup
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python-312" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Python 3.12
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Python 3.12">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#times-and-variation_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Times and variation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#speedup_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Speedup
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python-313" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Python 3.13
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Python 3.13">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#times-and-variation_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Times and variation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#speedup_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Speedup
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python-314" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Python 3.14
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Python 3.14">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#times-and-variation_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Times and variation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#speedup_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Speedup
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python-315" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Python 3.15
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Python 3.15">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#times-and-variation_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Times and variation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#speedup_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Speedup
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../changelog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Change Log
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../security/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security Policy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    API Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_9_1" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../reference/pythonjsonlogger/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    <code class="doc-symbol doc-symbol-nav doc-symbol-module"></code> pythonjsonlogger
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_9_1" id="__nav_9_1_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_9_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    <code class="doc-symbol doc-symbol-nav doc-symbol-module"></code> pythonjsonlogger
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/pythonjsonlogger/core/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    <code class="doc-symbol doc-symbol-nav doc-symbol-module"></code> core
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/pythonjsonlogger/defaults/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    <code class="doc-symbol doc-symbol-nav doc-symbol-module"></code> defaults
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/pythonjsonlogger/exception/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    <code class="doc-symbol doc-symbol-nav doc-symbol-module"></code> exception
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/pythonjsonlogger/json/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    <code class="doc-symbol doc-symbol-nav doc-symbol-module"></code> json
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/pythonjsonlogger/jsonlogger/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    <code class="doc-symbol doc-symbol-nav doc-symbol-module"></code> jsonlogger
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/pythonjsonlogger/msgspec/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    <code class="doc-symbol doc-symbol-nav doc-symbol-module"></code> msgspec
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/pythonjsonlogger/orjson/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    <code class="doc-symbol doc-symbol-nav doc-symbol-module"></code> orjson
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/pythonjsonlogger/utils/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    <code class="doc-symbol doc-symbol-nav doc-symbol-module"></code> utils
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#run-benchmarks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Run benchmarks
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#measurement-methodology" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Measurement methodology
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#repetitions-variation-and-precision" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Repetitions, variation, and precision
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#update-results" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Update results
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#baseline-results" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Baseline results
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Baseline results">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#python-310" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Python 3.10
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Python 3.10">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#times-and-variation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Times and variation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#speedup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Speedup
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python-311" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Python 3.11
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Python 3.11">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#times-and-variation_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Times and variation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#speedup_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Speedup
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python-312" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Python 3.12
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Python 3.12">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#times-and-variation_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Times and variation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#speedup_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Speedup
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python-313" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Python 3.13
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Python 3.13">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#times-and-variation_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Times and variation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#speedup_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Speedup
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python-314" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Python 3.14
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Python 3.14">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#times-and-variation_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Times and variation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#speedup_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Speedup
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python-315" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Python 3.15
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Python 3.15">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#times-and-variation_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Times and variation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#speedup_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Speedup
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="benchmarking">Benchmarking<a class="headerlink" href="#benchmarking" title="Permanent link">🔗</a></h1>
+<p>Compare the default <code>JsonFormatter</code>, <code>OrjsonFormatter</code>, and <code>MsgspecFormatter</code>
+with the opt-in benchmark suite. Measurements cover serialization and complete
+record formatting. They help you choose a backend for a workload; they do not
+predict application throughput or handler I/O performance.</p>
+<h2 id="run-benchmarks">Run benchmarks<a class="headerlink" href="#run-benchmarks" title="Permanent link">🔗</a></h2>
+<p>From a repository checkout, install the benchmark dependencies:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>uv<span class="w"> </span>sync<span class="w"> </span>--python<span class="w"> </span><span class="m">3</span>.15<span class="w"> </span>--no-default-groups<span class="w"> </span>--group<span class="w"> </span>benchmark
+</code></pre></div>
+<p>On CPython, this group installs all three backends. On PyPy, it installs only the
+stdlib backend and benchmark tools. Cases for unavailable optional encoders are
+reported as skipped. The published comparison covers standard
+GIL-enabled CPython 3.10–3.15 and PyPy 3.10–3.12. Each published CPython result
+must contain all three backends; PyPy results contain stdlib JSON only.</p>
+<p>Check every case without collecting performance measurements:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>uv<span class="w"> </span>run<span class="w"> </span>--no-sync<span class="w"> </span>pytest<span class="w"> </span>benchmarks<span class="w"> </span>--benchmark-disable
+</code></pre></div>
+<p>Collect measurements with warmup and export the results:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>mkdir<span class="w"> </span>-p<span class="w"> </span>benchmark-results
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>uv<span class="w"> </span>run<span class="w"> </span>--no-sync<span class="w"> </span>pytest<span class="w"> </span>benchmarks<span class="w"> </span>--benchmark-warmup<span class="o">=</span>on<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span>--benchmark-json<span class="o">=</span>benchmark-results/python-3.15.json
+</code></pre></div>
+<p>You can also use tox with its uv runner:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>uvx<span class="w"> </span>--with<span class="w"> </span>tox-uv<span class="w"> </span>tox<span class="w"> </span>-e<span class="w"> </span>py315-benchmark
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>uvx<span class="w"> </span>--with<span class="w"> </span>tox-uv<span class="w"> </span>tox<span class="w"> </span>-e<span class="w"> </span>pypy312-benchmark
+</code></pre></div>
+<p>Append <code>-benchmark</code> to a supported tox runtime name to benchmark that interpreter.
+The workflow selects tox's <code>benchmark</code> label with <code>tox -m benchmark</code>. Ordinary
+test and benchmark environments share version lists in <code>tox.ini</code>, so supported
+versions are maintained in one place. Use <code>uvx --with tox-uv tox -e benchmark</code>
+to use the default interpreter. Results go to the environment's
+<code>envtmpdir</code>, such as <code>.tox/py315-benchmark/tmp/benchmark.json</code>. Pass pytest options
+after <code>--</code> to select cases or change measurement settings. For example, use
+<code>-k unicode</code> to select Unicode workloads. Normal test runs collect only <code>tests/</code>
+and do not need the benchmark dependencies.</p>
+<p>The manual <strong>Benchmark JSON formatters</strong> GitHub Actions workflow runs Linux
+x86-64 benchmarks for the supported CPython and PyPy versions. One tox
+invocation runs the runtimes sequentially in one job on the same runner.
+The job uploads a single artifact containing one JSON file per runtime, and its
+summary contains the comparison tables. Timing differences never fail CI.</p>
+<h2 id="measurement-methodology">Measurement methodology<a class="headerlink" href="#measurement-methodology" title="Permanent link">🔗</a></h2>
+<p>The suite uses <code>pytest-benchmark</code> for pytest integration, automatic calibration,
+statistics, and JSON export. Run on an otherwise idle machine, use warmup, and
+repeat runs before interpreting small differences. Benchmarks and Python
+environments run sequentially; do not run multiple benchmark sessions
+concurrently on the same machine.</p>
+<p>Each backend uses its default formatter configuration. The two measurement
+layers are:</p>
+<ul>
+<li><strong>Serialization:</strong> <code>jsonify_log_record()</code> on a prepared dictionary, including
+  bytes-to-string conversion in the <code>orjson</code> and <code>msgspec</code> formatters.</li>
+<li><strong>Formatting:</strong> <code>format(LogRecord)</code> on a prepared record, including field
+  extraction, message handling, exception formatting where applicable, and
+  serialization.</li>
+</ul>
+<p>Formatter and record construction, payload preparation, correctness checks, and
+handler I/O are outside the timed operation. Formatters and records are reused.
+Checks before and after measurement verify expected parsed content and
+consistent repeated output. Exception records retain <code>exc_info</code>, so formatting
+includes rendering the traceback on each call; serialization uses prepared
+exception text.</p>
+<table>
+<thead>
+<tr>
+<th>Workload</th>
+<th>Payload</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>simple</code></td>
+<td>A short string message</td>
+</tr>
+<tr>
+<td><code>structured</code></td>
+<td>A string message with scalar LogRecord extras</td>
+</tr>
+<tr>
+<td><code>nested</code></td>
+<td>A dictionary message containing 100 objects with lists and nested metrics</td>
+</tr>
+<tr>
+<td><code>unicode</code></td>
+<td>A repeated message containing accented text, Japanese text, and emoji</td>
+</tr>
+<tr>
+<td><code>rich</code></td>
+<td>A dictionary message containing a UTC datetime, UUID, dataclass, bytes, an Enum class, and its members</td>
+</tr>
+<tr>
+<td><code>exception</code></td>
+<td>A message and a prepared ValueError traceback</td>
+</tr>
+</tbody>
+</table>
+<p>Default outputs can differ. Stdlib JSON escapes non-ASCII characters and uses
+spaces between elements; the other backends emit compact UTF-8. UTC datetime
+strings use <code>+00:00</code> for stdlib and orjson, and <code>Z</code> for msgspec. These are
+comparisons of the supported formatter defaults, including native rich-type
+support and fallback encoding costs. They are not byte-identical raw encoder
+comparisons. Bytes are encoded as base64 strings; the Enum class is encoded as
+a list of member values, and each Enum member is encoded as its value. JSON results
+record each case's output size.</p>
+<h2 id="repetitions-variation-and-precision">Repetitions, variation, and precision<a class="headerlink" href="#repetitions-variation-and-precision" title="Permanent link">🔗</a></h2>
+<p>Warmup and calibration run before timing. <code>pytest-benchmark</code> chooses a batch of
+iterations per round and repeats those rounds. Statistics describe the
+per-operation average duration of each round, rather than individual logging
+call latencies. See the <a href="https://pytest-benchmark.readthedocs.io/en/latest/glossary.html">pytest-benchmark glossary</a>.</p>
+<p>The generated summary and timing tables record the actual round counts and
+iterations per round. Calibration and
+warmup calls are additional and are excluded from those counts. Each runtime
+has one full suite run; thousands of timing rounds are not thousands of
+independent suite runs or machines.</p>
+<p>Timing tables show median, arithmetic mean, standard deviation (SD), and
+interquartile range (IQR), all in microseconds per operation. IQR is Q3 minus Q1:
+the width containing the middle 50% of round averages. Median and IQR are less
+sensitive to slow outliers than mean and SD. The JSON also retains minimum,
+maximum, quartiles, and outlier counts.</p>
+<p>There is no universally trustworthy number of decimal places in microseconds.
+The generated summary reports the observed SD relative to the mean, including
+outliers. Reported times use at most three significant digits; spreads and speedups use
+at most two. This is display rounding, not a claim of accuracy. Batching reduces
+timer overhead, but cannot eliminate scheduler, garbage collection, CPU frequency,
+or hosted-runner variation. Do not interpret the final displayed digit as a
+reliable performance difference. Check IQR and SD, and repeat complete runs on
+the same machine before drawing conclusions about small differences.</p>
+<p>Timing plots use labeled horizontal bars, with one panel per workload and
+measurement layer. Speedup plots use two panels (serialization and complete
+formatting), with bars grouped by workload and guides at shared group boundaries.
+All axes are linear and start at zero; ranges differ between panels.
+Compare bar lengths within a panel; use the numeric labels and tables to compare
+workloads. Timing bars show medians without whiskers. IQR and SD remain in the
+tables to show within-run variation; they do not measure between-run reproducibility.
+Separate speedup tables and plots divide the stdlib median by each backend's
+median for the same workload, layer, and Python major/minor version. The
+reference is CPython stdlib JSON; a standalone PyPy report uses PyPy stdlib JSON. Values above 1 mean that the
+backend was faster in that measurement. Speedups are descriptive ratios without
+inferred confidence intervals. Only stdlib JSON is measured on PyPy. All runtimes
+in one workflow invocation share the same runner. Runtime versions and
+dependencies still differ, and separate invocations can use different hardware.
+Comparisons do not isolate interpreter performance. Exact patch versions and
+environments are recorded separately.</p>
+<h2 id="update-results">Update results<a class="headerlink" href="#update-results" title="Permanent link">🔗</a></h2>
+<p>The curated baseline consists of one JSON file per Python implementation and version under
+<code>benchmarks/results/</code>, collected from one workflow invocation. Later
+workflow runs remain artifacts until explicitly selected as a replacement.
+Download and extract the <code>benchmark-results</code> artifact from the chosen invocation into
+<code>benchmark-results/downloaded/</code>. Keep each JSON file under its original name.
+Curate the files and regenerate the tables:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>python<span class="w"> </span>scripts/benchmark_report.py<span class="w"> </span>benchmark-results/downloaded/*.json<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span>--curate<span class="w"> </span>benchmarks/results
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>python<span class="w"> </span>scripts/benchmark_report.py<span class="w"> </span>benchmarks/results/*.json<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">  </span>--update<span class="w"> </span>docs/benchmarking.md<span class="w"> </span>--plots<span class="w"> </span>assets/benchmarking
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>uv<span class="w"> </span>run<span class="w"> </span>--no-default-groups<span class="w"> </span>--group<span class="w"> </span>benchmark-report<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">  </span>python<span class="w"> </span>scripts/benchmark_plots.py<span class="w"> </span>benchmarks/results/*.json<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">  </span>--output<span class="w"> </span>docs/assets/benchmarking
+</code></pre></div>
+<p>Curation removes individual timing sample arrays to keep repository files small.
+It preserves every summary statistic and records the original file’s SHA-256
+hash. Workflow artifacts retain the full samples.</p>
+<p>Plot generation uses Matplotlib in the separate <code>benchmark-report</code> dependency
+group; it adds no dependency to timed benchmark runs or ordinary tests. The SVG
+files contain text labels and can be exported or shared separately. Both plot
+types are generated from the same committed summaries as the tables.</p>
+<p>The generator rejects incomplete or duplicate case matrices. Review the source
+revision, dependency versions, measurement settings, and variability before
+committing refreshed data. Artifact retention is finite; the committed curated
+JSON preserves the measurements used by this page.</p>
+<h2 id="baseline-results">Baseline results<a class="headerlink" href="#baseline-results" title="Permanent link">🔗</a></h2>
+<p>These measurements come from <a href="https://github.com/nhairs-bot/python-json-logger/actions/runs/40619767654">workflow run 40619767654</a>.
+Each table records its measured source revision, exact dependency versions, and environment.
+Some PyPy rounds take milliseconds despite microsecond medians; these outliers
+are retained and can make SD exceed the mean. These measurements do not identify
+the cause of the pauses.</p>
+<!-- benchmark-results:start -->
+
+<p>Observed repetitions: 8,500–199,721 rounds per case, with 1–100 iterations per round. Warmup and calibration calls are additional.</p>
+<p>Within-run SD/mean: 3.9%–5.6e+02% across cases, including outliers. This does not measure between-run variation.</p>
+<h3 id="python-310">Python 3.10<a class="headerlink" href="#python-310" title="Permanent link">🔗</a></h3>
+<p><strong>CPython 3.10.22</strong>. Measured: 2026-10-28T02:16:20.354127+00:00. Revision: <code>3a26fc4e64acfc167d24623c96ccd72802f834d0</code>.</p>
+<p>Environment: Linux 6.17.0-1022-azure, x86_64; AMD EPYC 9V74 80-Core Processor.</p>
+<p>Dependencies: <code>msgspec==0.22.0</code>, <code>orjson==3.13.0</code>, <code>pytest==9.1.1</code>, <code>pytest-benchmark==5.3.0</code>, <code>python-json-logger==4.3.0.dev1</code>.</p>
+<p><strong>PyPy 3.10.16</strong>. Measured: 2026-10-28T02:24:54.543640+00:00. Revision: <code>3a26fc4e64acfc167d24623c96ccd72802f834d0</code>.</p>
+<p>Environment: Linux 6.17.0-1022-azure, x86_64; AMD EPYC 9V74 80-Core Processor. PyPy release: 7.3.19.</p>
+<p>Dependencies: <code>pytest==9.1.1</code>, <code>pytest-benchmark==5.3.0</code>, <code>python-json-logger==4.3.0.dev1</code>.</p>
+<h4 id="times-and-variation">Times and variation<a class="headerlink" href="#times-and-variation" title="Permanent link">🔗</a></h4>
+<p><img alt="Median operation times for Python 3.10" src="../assets/benchmarking/python-3.10-times.svg" /></p>
+<table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Workload</th>
+<th>Encoder</th>
+<th style="text-align: right;">Median (µs)</th>
+<th style="text-align: right;">IQR (µs)</th>
+<th style="text-align: right;">Mean ± SD (µs)</th>
+<th style="text-align: right;">Rounds × iterations</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>serialization</td>
+<td>simple</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">2.53</td>
+<td style="text-align: right;">0.042</td>
+<td style="text-align: right;">2.56 ± 0.19</td>
+<td style="text-align: right;">41,176 × 10</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>simple</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">0.38</td>
+<td style="text-align: right;">0.0086</td>
+<td style="text-align: right;">0.389 ± 0.068</td>
+<td style="text-align: right;">199,323 × 14</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>simple</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">0.218</td>
+<td style="text-align: right;">0.0024</td>
+<td style="text-align: right;">0.223 ± 0.029</td>
+<td style="text-align: right;">47,502 × 100</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>simple</td>
+<td>json (PyPy)</td>
+<td style="text-align: right;">0.373</td>
+<td style="text-align: right;">0.013</td>
+<td style="text-align: right;">0.384 ± 0.088</td>
+<td style="text-align: right;">195,389 × 15</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>structured</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">3.57</td>
+<td style="text-align: right;">0.08</td>
+<td style="text-align: right;">3.64 ± 0.54</td>
+<td style="text-align: right;">146,822 × 2</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>structured</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">0.601</td>
+<td style="text-align: right;">0.018</td>
+<td style="text-align: right;">0.611 ± 0.16</td>
+<td style="text-align: right;">176,119 × 10</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>structured</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">0.489</td>
+<td style="text-align: right;">0.011</td>
+<td style="text-align: right;">0.496 ± 0.077</td>
+<td style="text-align: right;">195,389 × 11</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>structured</td>
+<td>json (PyPy)</td>
+<td style="text-align: right;">0.965</td>
+<td style="text-align: right;">0.021</td>
+<td style="text-align: right;">1.01 ± 4</td>
+<td style="text-align: right;">110,828 × 10</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>nested</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">97.1</td>
+<td style="text-align: right;">0.97</td>
+<td style="text-align: right;">98.5 ± 6.2</td>
+<td style="text-align: right;">10,460 × 1</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>nested</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">21.7</td>
+<td style="text-align: right;">0.2</td>
+<td style="text-align: right;">21.9 ± 1.6</td>
+<td style="text-align: right;">46,835 × 1</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>nested</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">14.5</td>
+<td style="text-align: right;">0.19</td>
+<td style="text-align: right;">14.7 ± 2.4</td>
+<td style="text-align: right;">71,271 × 1</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>nested</td>
+<td>json (PyPy)</td>
+<td style="text-align: right;">58.2</td>
+<td style="text-align: right;">1.1</td>
+<td style="text-align: right;">61.2 ± 98</td>
+<td style="text-align: right;">17,936 × 1</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>unicode</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">4.11</td>
+<td style="text-align: right;">0.066</td>
+<td style="text-align: right;">4.2 ± 0.62</td>
+<td style="text-align: right;">127,195 × 2</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>unicode</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">1.24</td>
+<td style="text-align: right;">0.014</td>
+<td style="text-align: right;">1.26 ± 0.15</td>
+<td style="text-align: right;">83,907 × 10</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>unicode</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">1.17</td>
+<td style="text-align: right;">0.013</td>
+<td style="text-align: right;">1.19 ± 0.12</td>
+<td style="text-align: right;">87,131 × 10</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>unicode</td>
+<td>json (PyPy)</td>
+<td style="text-align: right;">1.79</td>
+<td style="text-align: right;">0.024</td>
+<td style="text-align: right;">1.84 ± 0.26</td>
+<td style="text-align: right;">57,614 × 10</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>rich</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">22.8</td>
+<td style="text-align: right;">0.29</td>
+<td style="text-align: right;">23.2 ± 2.1</td>
+<td style="text-align: right;">45,202 × 1</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>rich</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">5.34</td>
+<td style="text-align: right;">0.11</td>
+<td style="text-align: right;">5.42 ± 0.8</td>
+<td style="text-align: right;">196,967 × 1</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>rich</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">3.51</td>
+<td style="text-align: right;">0.065</td>
+<td style="text-align: right;">3.56 ± 0.46</td>
+<td style="text-align: right;">153,847 × 2</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>rich</td>
+<td>json (PyPy)</td>
+<td style="text-align: right;">11.3</td>
+<td style="text-align: right;">0.2</td>
+<td style="text-align: right;">11.7 ± 29</td>
+<td style="text-align: right;">94,823 × 1</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>exception</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">3.28</td>
+<td style="text-align: right;">0.065</td>
+<td style="text-align: right;">3.35 ± 0.52</td>
+<td style="text-align: right;">158,756 × 2</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>exception</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">0.486</td>
+<td style="text-align: right;">0.015</td>
+<td style="text-align: right;">0.494 ± 0.074</td>
+<td style="text-align: right;">197,356 × 11</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>exception</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">0.41</td>
+<td style="text-align: right;">0.0093</td>
+<td style="text-align: right;">0.417 ± 0.066</td>
+<td style="text-align: right;">186,290 × 14</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>exception</td>
+<td>json (PyPy)</td>
+<td style="text-align: right;">0.969</td>
+<td style="text-align: right;">0.02</td>
+<td style="text-align: right;">0.991 ± 0.15</td>
+<td style="text-align: right;">109,602 × 10</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>simple</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">5.25</td>
+<td style="text-align: right;">0.1</td>
+<td style="text-align: right;">5.35 ± 0.68</td>
+<td style="text-align: right;">100,960 × 2</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>simple</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">3.09</td>
+<td style="text-align: right;">0.075</td>
+<td style="text-align: right;">3.15 ± 0.46</td>
+<td style="text-align: right;">170,970 × 2</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>simple</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">2.82</td>
+<td style="text-align: right;">0.065</td>
+<td style="text-align: right;">2.86 ± 0.41</td>
+<td style="text-align: right;">185,598 × 2</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>simple</td>
+<td>json (PyPy)</td>
+<td style="text-align: right;">2.55</td>
+<td style="text-align: right;">0.038</td>
+<td style="text-align: right;">2.64 ± 0.82</td>
+<td style="text-align: right;">40,606 × 10</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>structured</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">7.54</td>
+<td style="text-align: right;">0.16</td>
+<td style="text-align: right;">7.67 ± 1</td>
+<td style="text-align: right;">140,430 × 1</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>structured</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">4.49</td>
+<td style="text-align: right;">0.086</td>
+<td style="text-align: right;">4.56 ± 0.55</td>
+<td style="text-align: right;">115,701 × 2</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>structured</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">4.2</td>
+<td style="text-align: right;">0.099</td>
+<td style="text-align: right;">4.25 ± 0.49</td>
+<td style="text-align: right;">122,820 × 2</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>structured</td>
+<td>json (PyPy)</td>
+<td style="text-align: right;">4.38</td>
+<td style="text-align: right;">0.07</td>
+<td style="text-align: right;">4.5 ± 2.3</td>
+<td style="text-align: right;">121,922 × 2</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>nested</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">99.6</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">101 ± 4.4</td>
+<td style="text-align: right;">10,048 × 1</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>nested</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">24.9</td>
+<td style="text-align: right;">0.28</td>
+<td style="text-align: right;">25.3 ± 1.8</td>
+<td style="text-align: right;">41,518 × 1</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>nested</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">17.3</td>
+<td style="text-align: right;">0.22</td>
+<td style="text-align: right;">17.5 ± 1.5</td>
+<td style="text-align: right;">59,720 × 1</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>nested</td>
+<td>json (PyPy)</td>
+<td style="text-align: right;">60</td>
+<td style="text-align: right;">1.8</td>
+<td style="text-align: right;">64.1 ± 1e+02</td>
+<td style="text-align: right;">17,314 × 1</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>unicode</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">7.03</td>
+<td style="text-align: right;">0.13</td>
+<td style="text-align: right;">7.16 ± 1.1</td>
+<td style="text-align: right;">149,254 × 1</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>unicode</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">4.17</td>
+<td style="text-align: right;">0.07</td>
+<td style="text-align: right;">4.24 ± 0.54</td>
+<td style="text-align: right;">125,597 × 2</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>unicode</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">4.05</td>
+<td style="text-align: right;">0.13</td>
+<td style="text-align: right;">4.09 ± 0.52</td>
+<td style="text-align: right;">129,333 × 2</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>unicode</td>
+<td>json (PyPy)</td>
+<td style="text-align: right;">4.21</td>
+<td style="text-align: right;">0.07</td>
+<td style="text-align: right;">4.45 ± 20</td>
+<td style="text-align: right;">122,971 × 2</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>rich</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">26.6</td>
+<td style="text-align: right;">0.32</td>
+<td style="text-align: right;">27 ± 2</td>
+<td style="text-align: right;">39,034 × 1</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>rich</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">9.06</td>
+<td style="text-align: right;">0.14</td>
+<td style="text-align: right;">9.19 ± 1.1</td>
+<td style="text-align: right;">114,640 × 1</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>rich</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">7.19</td>
+<td style="text-align: right;">0.13</td>
+<td style="text-align: right;">7.31 ± 0.96</td>
+<td style="text-align: right;">144,928 × 1</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>rich</td>
+<td>json (PyPy)</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">0.28</td>
+<td style="text-align: right;">16.5 ± 3.3</td>
+<td style="text-align: right;">66,038 × 1</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>exception</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">26</td>
+<td style="text-align: right;">0.36</td>
+<td style="text-align: right;">26.5 ± 2.3</td>
+<td style="text-align: right;">39,608 × 1</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>exception</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">23.5</td>
+<td style="text-align: right;">0.31</td>
+<td style="text-align: right;">23.9 ± 1.9</td>
+<td style="text-align: right;">44,201 × 1</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>exception</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">23.2</td>
+<td style="text-align: right;">0.3</td>
+<td style="text-align: right;">23.6 ± 2.1</td>
+<td style="text-align: right;">44,457 × 1</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>exception</td>
+<td>json (PyPy)</td>
+<td style="text-align: right;">9.77</td>
+<td style="text-align: right;">0.17</td>
+<td style="text-align: right;">10.7 ± 47</td>
+<td style="text-align: right;">106,338 × 1</td>
+</tr>
+</tbody>
+</table>
+<h4 id="speedup">Speedup<a class="headerlink" href="#speedup" title="Permanent link">🔗</a></h4>
+<p><img alt="Median speedups relative to stdlib JSON for Python 3.10" src="../assets/benchmarking/python-3.10-speedup.svg" /></p>
+<p>Reference: json (CPython) (1×).</p>
+<table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Workload</th>
+<th style="text-align: right;">json (CPython)</th>
+<th style="text-align: right;">orjson (CPython)</th>
+<th style="text-align: right;">msgspec (CPython)</th>
+<th style="text-align: right;">json (PyPy)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>serialization</td>
+<td>simple</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">6.7×</td>
+<td style="text-align: right;">12×</td>
+<td style="text-align: right;">6.8×</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>structured</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">5.9×</td>
+<td style="text-align: right;">7.3×</td>
+<td style="text-align: right;">3.7×</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>nested</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">4.5×</td>
+<td style="text-align: right;">6.7×</td>
+<td style="text-align: right;">1.7×</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>unicode</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">3.3×</td>
+<td style="text-align: right;">3.5×</td>
+<td style="text-align: right;">2.3×</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>rich</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">4.3×</td>
+<td style="text-align: right;">6.5×</td>
+<td style="text-align: right;">2×</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>exception</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">6.8×</td>
+<td style="text-align: right;">8×</td>
+<td style="text-align: right;">3.4×</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>simple</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">1.7×</td>
+<td style="text-align: right;">1.9×</td>
+<td style="text-align: right;">2.1×</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>structured</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">1.7×</td>
+<td style="text-align: right;">1.8×</td>
+<td style="text-align: right;">1.7×</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>nested</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">4×</td>
+<td style="text-align: right;">5.8×</td>
+<td style="text-align: right;">1.7×</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>unicode</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">1.7×</td>
+<td style="text-align: right;">1.7×</td>
+<td style="text-align: right;">1.7×</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>rich</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">2.9×</td>
+<td style="text-align: right;">3.7×</td>
+<td style="text-align: right;">1.7×</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>exception</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">1.1×</td>
+<td style="text-align: right;">1.1×</td>
+<td style="text-align: right;">2.7×</td>
+</tr>
+</tbody>
+</table>
+<h3 id="python-311">Python 3.11<a class="headerlink" href="#python-311" title="Permanent link">🔗</a></h3>
+<p><strong>CPython 3.11.18</strong>. Measured: 2026-10-28T02:18:00.061021+00:00. Revision: <code>3a26fc4e64acfc167d24623c96ccd72802f834d0</code>.</p>
+<p>Environment: Linux 6.17.0-1022-azure, x86_64; AMD EPYC 9V74 80-Core Processor.</p>
+<p>Dependencies: <code>msgspec==0.22.0</code>, <code>orjson==3.13.0</code>, <code>pytest==9.1.1</code>, <code>pytest-benchmark==5.3.0</code>, <code>python-json-logger==4.3.0.dev1</code>.</p>
+<p><strong>PyPy 3.11.17</strong>. Measured: 2026-10-28T02:25:31.091341+00:00. Revision: <code>3a26fc4e64acfc167d24623c96ccd72802f834d0</code>.</p>
+<p>Environment: Linux 6.17.0-1022-azure, x86_64; AMD EPYC 9V74 80-Core Processor. PyPy release: 8.0.1.</p>
+<p>Dependencies: <code>pytest==9.1.1</code>, <code>pytest-benchmark==5.3.0</code>, <code>python-json-logger==4.3.0.dev1</code>.</p>
+<h4 id="times-and-variation_1">Times and variation<a class="headerlink" href="#times-and-variation_1" title="Permanent link">🔗</a></h4>
+<p><img alt="Median operation times for Python 3.11" src="../assets/benchmarking/python-3.11-times.svg" /></p>
+<table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Workload</th>
+<th>Encoder</th>
+<th style="text-align: right;">Median (µs)</th>
+<th style="text-align: right;">IQR (µs)</th>
+<th style="text-align: right;">Mean ± SD (µs)</th>
+<th style="text-align: right;">Rounds × iterations</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>serialization</td>
+<td>simple</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">2.12</td>
+<td style="text-align: right;">0.04</td>
+<td style="text-align: right;">2.18 ± 0.29</td>
+<td style="text-align: right;">48,755 × 10</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>simple</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">0.276</td>
+<td style="text-align: right;">0.0085</td>
+<td style="text-align: right;">0.287 ± 0.098</td>
+<td style="text-align: right;">191,278 × 20</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>simple</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">0.165</td>
+<td style="text-align: right;">0.002</td>
+<td style="text-align: right;">0.169 ± 0.021</td>
+<td style="text-align: right;">62,132 × 100</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>simple</td>
+<td>json (PyPy)</td>
+<td style="text-align: right;">0.486</td>
+<td style="text-align: right;">0.013</td>
+<td style="text-align: right;">0.5 ± 0.31</td>
+<td style="text-align: right;">182,183 × 12</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>structured</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">3.25</td>
+<td style="text-align: right;">0.07</td>
+<td style="text-align: right;">3.34 ± 0.75</td>
+<td style="text-align: right;">165,317 × 2</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>structured</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">0.477</td>
+<td style="text-align: right;">0.012</td>
+<td style="text-align: right;">0.486 ± 0.076</td>
+<td style="text-align: right;">182,516 × 12</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>structured</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">0.401</td>
+<td style="text-align: right;">0.0086</td>
+<td style="text-align: right;">0.407 ± 0.058</td>
+<td style="text-align: right;">186,986 × 14</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>structured</td>
+<td>json (PyPy)</td>
+<td style="text-align: right;">1.39</td>
+<td style="text-align: right;">0.025</td>
+<td style="text-align: right;">1.42 ± 0.17</td>
+<td style="text-align: right;">75,132 × 10</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>nested</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">104</td>
+<td style="text-align: right;">1.2</td>
+<td style="text-align: right;">106 ± 4.9</td>
+<td style="text-align: right;">9,796 × 1</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>nested</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">21.1</td>
+<td style="text-align: right;">0.18</td>
+<td style="text-align: right;">21.4 ± 1.6</td>
+<td style="text-align: right;">48,305 × 1</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>nested</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">14.4</td>
+<td style="text-align: right;">0.2</td>
+<td style="text-align: right;">14.5 ± 1.3</td>
+<td style="text-align: right;">72,569 × 1</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>nested</td>
+<td>json (PyPy)</td>
+<td style="text-align: right;">112</td>
+<td style="text-align: right;">1.7</td>
+<td style="text-align: right;">117 ± 1.4e+02</td>
+<td style="text-align: right;">9,107 × 1</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>unicode</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">3.94</td>
+<td style="text-align: right;">0.06</td>
+<td style="text-align: right;">4.01 ± 0.57</td>
+<td style="text-align: right;">131,909 × 2</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>unicode</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">1.29</td>
+<td style="text-align: right;">0.017</td>
+<td style="text-align: right;">1.31 ± 0.13</td>
+<td style="text-align: right;">80,071 × 10</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>unicode</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">1.19</td>
+<td style="text-align: right;">0.01</td>
+<td style="text-align: right;">1.2 ± 0.12</td>
+<td style="text-align: right;">85,347 × 10</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>unicode</td>
+<td>json (PyPy)</td>
+<td style="text-align: right;">1.97</td>
+<td style="text-align: right;">0.031</td>
+<td style="text-align: right;">2.05 ± 0.48</td>
+<td style="text-align: right;">54,804 × 10</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>rich</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">16.7</td>
+<td style="text-align: right;">0.23</td>
+<td style="text-align: right;">17 ± 1.5</td>
+<td style="text-align: right;">61,558 × 1</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>rich</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">3.88</td>
+<td style="text-align: right;">0.07</td>
+<td style="text-align: right;">3.93 ± 0.48</td>
+<td style="text-align: right;">134,935 × 2</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>rich</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">2.54</td>
+<td style="text-align: right;">0.033</td>
+<td style="text-align: right;">2.57 ± 0.19</td>
+<td style="text-align: right;">40,706 × 10</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>rich</td>
+<td>json (PyPy)</td>
+<td style="text-align: right;">13.3</td>
+<td style="text-align: right;">0.26</td>
+<td style="text-align: right;">13.6 ± 1.9</td>
+<td style="text-align: right;">78,685 × 1</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>exception</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">2.84</td>
+<td style="text-align: right;">0.055</td>
+<td style="text-align: right;">2.9 ± 0.49</td>
+<td style="text-align: right;">183,554 × 2</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>exception</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">0.345</td>
+<td style="text-align: right;">0.006</td>
+<td style="text-align: right;">0.35 ± 0.052</td>
+<td style="text-align: right;">198,492 × 15</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>exception</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">0.343</td>
+<td style="text-align: right;">0.0063</td>
+<td style="text-align: right;">0.348 ± 0.051</td>
+<td style="text-align: right;">188,751 × 16</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>exception</td>
+<td>json (PyPy)</td>
+<td style="text-align: right;">1.07</td>
+<td style="text-align: right;">0.06</td>
+<td style="text-align: right;">1.09 ± 2.4</td>
+<td style="text-align: right;">102,512 × 10</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>simple</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">4.03</td>
+<td style="text-align: right;">0.09</td>
+<td style="text-align: right;">4.09 ± 0.54</td>
+<td style="text-align: right;">132,258 × 2</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>simple</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">2.14</td>
+<td style="text-align: right;">0.037</td>
+<td style="text-align: right;">2.17 ± 0.2</td>
+<td style="text-align: right;">51,099 × 10</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>simple</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">1.92</td>
+<td style="text-align: right;">0.038</td>
+<td style="text-align: right;">1.94 ± 0.16</td>
+<td style="text-align: right;">54,148 × 10</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>simple</td>
+<td>json (PyPy)</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">0.07</td>
+<td style="text-align: right;">3.12 ± 10</td>
+<td style="text-align: right;">184,230 × 2</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>structured</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">6.08</td>
+<td style="text-align: right;">0.13</td>
+<td style="text-align: right;">6.18 ± 0.91</td>
+<td style="text-align: right;">173,041 × 1</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>structured</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">3.36</td>
+<td style="text-align: right;">0.08</td>
+<td style="text-align: right;">3.4 ± 0.45</td>
+<td style="text-align: right;">157,011 × 2</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>structured</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">3.23</td>
+<td style="text-align: right;">0.066</td>
+<td style="text-align: right;">3.28 ± 0.47</td>
+<td style="text-align: right;">163,693 × 2</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>structured</td>
+<td>json (PyPy)</td>
+<td style="text-align: right;">4.94</td>
+<td style="text-align: right;">0.25</td>
+<td style="text-align: right;">5.07 ± 13</td>
+<td style="text-align: right;">109,963 × 2</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>nested</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">106</td>
+<td style="text-align: right;">1.4</td>
+<td style="text-align: right;">109 ± 8.6</td>
+<td style="text-align: right;">9,697 × 1</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>nested</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">24</td>
+<td style="text-align: right;">0.23</td>
+<td style="text-align: right;">24.4 ± 2</td>
+<td style="text-align: right;">42,561 × 1</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>nested</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">16.6</td>
+<td style="text-align: right;">0.22</td>
+<td style="text-align: right;">16.8 ± 1.3</td>
+<td style="text-align: right;">63,156 × 1</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>nested</td>
+<td>json (PyPy)</td>
+<td style="text-align: right;">115</td>
+<td style="text-align: right;">2.6</td>
+<td style="text-align: right;">121 ± 1.6e+02</td>
+<td style="text-align: right;">8,852 × 1</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>unicode</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">6.06</td>
+<td style="text-align: right;">0.12</td>
+<td style="text-align: right;">6.17 ± 1</td>
+<td style="text-align: right;">174,277 × 1</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>unicode</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">3.33</td>
+<td style="text-align: right;">0.07</td>
+<td style="text-align: right;">3.39 ± 0.51</td>
+<td style="text-align: right;">157,754 × 2</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>unicode</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">3.26</td>
+<td style="text-align: right;">0.06</td>
+<td style="text-align: right;">3.31 ± 0.44</td>
+<td style="text-align: right;">160,257 × 2</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>unicode</td>
+<td>json (PyPy)</td>
+<td style="text-align: right;">4.43</td>
+<td style="text-align: right;">0.091</td>
+<td style="text-align: right;">4.53 ± 0.67</td>
+<td style="text-align: right;">118,864 × 2</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>rich</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">19.8</td>
+<td style="text-align: right;">0.27</td>
+<td style="text-align: right;">20.1 ± 1.7</td>
+<td style="text-align: right;">53,110 × 1</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>rich</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">6.57</td>
+<td style="text-align: right;">0.13</td>
+<td style="text-align: right;">6.66 ± 0.87</td>
+<td style="text-align: right;">160,540 × 1</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>rich</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">5.24</td>
+<td style="text-align: right;">0.095</td>
+<td style="text-align: right;">5.31 ± 0.57</td>
+<td style="text-align: right;">99,553 × 2</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>rich</td>
+<td>json (PyPy)</td>
+<td style="text-align: right;">17.9</td>
+<td style="text-align: right;">0.31</td>
+<td style="text-align: right;">18.4 ± 2.5</td>
+<td style="text-align: right;">58,391 × 1</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>exception</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">31.7</td>
+<td style="text-align: right;">0.44</td>
+<td style="text-align: right;">32.3 ± 2.6</td>
+<td style="text-align: right;">32,409 × 1</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>exception</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">28.7</td>
+<td style="text-align: right;">0.42</td>
+<td style="text-align: right;">29.3 ± 2.8</td>
+<td style="text-align: right;">35,813 × 1</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>exception</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">28.5</td>
+<td style="text-align: right;">0.41</td>
+<td style="text-align: right;">28.9 ± 2.3</td>
+<td style="text-align: right;">36,192 × 1</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>exception</td>
+<td>json (PyPy)</td>
+<td style="text-align: right;">20.9</td>
+<td style="text-align: right;">0.4</td>
+<td style="text-align: right;">22.8 ± 63</td>
+<td style="text-align: right;">49,213 × 1</td>
+</tr>
+</tbody>
+</table>
+<h4 id="speedup_1">Speedup<a class="headerlink" href="#speedup_1" title="Permanent link">🔗</a></h4>
+<p><img alt="Median speedups relative to stdlib JSON for Python 3.11" src="../assets/benchmarking/python-3.11-speedup.svg" /></p>
+<p>Reference: json (CPython) (1×).</p>
+<table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Workload</th>
+<th style="text-align: right;">json (CPython)</th>
+<th style="text-align: right;">orjson (CPython)</th>
+<th style="text-align: right;">msgspec (CPython)</th>
+<th style="text-align: right;">json (PyPy)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>serialization</td>
+<td>simple</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">7.7×</td>
+<td style="text-align: right;">13×</td>
+<td style="text-align: right;">4.3×</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>structured</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">6.8×</td>
+<td style="text-align: right;">8.1×</td>
+<td style="text-align: right;">2.3×</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>nested</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">4.9×</td>
+<td style="text-align: right;">7.3×</td>
+<td style="text-align: right;">0.93×</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>unicode</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">3×</td>
+<td style="text-align: right;">3.3×</td>
+<td style="text-align: right;">2×</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>rich</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">4.3×</td>
+<td style="text-align: right;">6.6×</td>
+<td style="text-align: right;">1.3×</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>exception</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">8.2×</td>
+<td style="text-align: right;">8.3×</td>
+<td style="text-align: right;">2.6×</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>simple</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">1.9×</td>
+<td style="text-align: right;">2.1×</td>
+<td style="text-align: right;">1.3×</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>structured</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">1.8×</td>
+<td style="text-align: right;">1.9×</td>
+<td style="text-align: right;">1.2×</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>nested</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">4.4×</td>
+<td style="text-align: right;">6.4×</td>
+<td style="text-align: right;">0.93×</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>unicode</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">1.8×</td>
+<td style="text-align: right;">1.9×</td>
+<td style="text-align: right;">1.4×</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>rich</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">3×</td>
+<td style="text-align: right;">3.8×</td>
+<td style="text-align: right;">1.1×</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>exception</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">1.1×</td>
+<td style="text-align: right;">1.1×</td>
+<td style="text-align: right;">1.5×</td>
+</tr>
+</tbody>
+</table>
+<h3 id="python-312">Python 3.12<a class="headerlink" href="#python-312" title="Permanent link">🔗</a></h3>
+<p><strong>CPython 3.12.3</strong>. Measured: 2026-10-28T02:19:33.887630+00:00. Revision: <code>3a26fc4e64acfc167d24623c96ccd72802f834d0</code>.</p>
+<p>Environment: Linux 6.17.0-1022-azure, x86_64; AMD EPYC 9V74 80-Core Processor.</p>
+<p>Dependencies: <code>msgspec==0.22.0</code>, <code>orjson==3.13.0</code>, <code>pytest==9.1.1</code>, <code>pytest-benchmark==5.3.0</code>, <code>python-json-logger==4.3.0.dev1</code>.</p>
+<p><strong>PyPy 3.12.15</strong>. Measured: 2026-10-28T02:26:07.723934+00:00. Revision: <code>3a26fc4e64acfc167d24623c96ccd72802f834d0</code>.</p>
+<p>Environment: Linux 6.17.0-1022-azure, x86_64; AMD EPYC 9V74 80-Core Processor. PyPy release: 8.0.1.</p>
+<p>Dependencies: <code>pytest==9.1.1</code>, <code>pytest-benchmark==5.3.0</code>, <code>python-json-logger==4.3.0.dev1</code>.</p>
+<h4 id="times-and-variation_2">Times and variation<a class="headerlink" href="#times-and-variation_2" title="Permanent link">🔗</a></h4>
+<p><img alt="Median operation times for Python 3.12" src="../assets/benchmarking/python-3.12-times.svg" /></p>
+<table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Workload</th>
+<th>Encoder</th>
+<th style="text-align: right;">Median (µs)</th>
+<th style="text-align: right;">IQR (µs)</th>
+<th style="text-align: right;">Mean ± SD (µs)</th>
+<th style="text-align: right;">Rounds × iterations</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>serialization</td>
+<td>simple</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">2.25</td>
+<td style="text-align: right;">0.024</td>
+<td style="text-align: right;">2.28 ± 0.19</td>
+<td style="text-align: right;">45,282 × 10</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>simple</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">0.283</td>
+<td style="text-align: right;">0.012</td>
+<td style="text-align: right;">0.292 ± 0.062</td>
+<td style="text-align: right;">198,099 × 17</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>simple</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">0.191</td>
+<td style="text-align: right;">0.0026</td>
+<td style="text-align: right;">0.194 ± 0.017</td>
+<td style="text-align: right;">54,031 × 100</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>simple</td>
+<td>json (PyPy)</td>
+<td style="text-align: right;">0.513</td>
+<td style="text-align: right;">0.015</td>
+<td style="text-align: right;">0.533 ± 2.1</td>
+<td style="text-align: right;">189,108 × 11</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>structured</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">3.18</td>
+<td style="text-align: right;">0.044</td>
+<td style="text-align: right;">3.25 ± 1.1</td>
+<td style="text-align: right;">162,629 × 2</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>structured</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">0.521</td>
+<td style="text-align: right;">0.011</td>
+<td style="text-align: right;">0.528 ± 0.096</td>
+<td style="text-align: right;">199,323 × 10</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>structured</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">0.427</td>
+<td style="text-align: right;">0.0099</td>
+<td style="text-align: right;">0.433 ± 0.075</td>
+<td style="text-align: right;">189,108 × 13</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>structured</td>
+<td>json (PyPy)</td>
+<td style="text-align: right;">1.39</td>
+<td style="text-align: right;">0.024</td>
+<td style="text-align: right;">1.41 ± 0.16</td>
+<td style="text-align: right;">74,683 × 10</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>nested</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">81.7</td>
+<td style="text-align: right;">0.69</td>
+<td style="text-align: right;">82.8 ± 4.4</td>
+<td style="text-align: right;">12,510 × 1</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>nested</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">22.7</td>
+<td style="text-align: right;">0.17</td>
+<td style="text-align: right;">23 ± 1.9</td>
+<td style="text-align: right;">44,755 × 1</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>nested</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">14.6</td>
+<td style="text-align: right;">0.17</td>
+<td style="text-align: right;">14.8 ± 1.6</td>
+<td style="text-align: right;">70,867 × 1</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>nested</td>
+<td>json (PyPy)</td>
+<td style="text-align: right;">120</td>
+<td style="text-align: right;">2.2</td>
+<td style="text-align: right;">123 ± 12</td>
+<td style="text-align: right;">8,688 × 1</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>unicode</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">3.89</td>
+<td style="text-align: right;">0.045</td>
+<td style="text-align: right;">3.95 ± 0.55</td>
+<td style="text-align: right;">132,767 × 2</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>unicode</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">1.24</td>
+<td style="text-align: right;">0.016</td>
+<td style="text-align: right;">1.26 ± 0.17</td>
+<td style="text-align: right;">81,847 × 10</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>unicode</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">1.13</td>
+<td style="text-align: right;">0.012</td>
+<td style="text-align: right;">1.15 ± 0.14</td>
+<td style="text-align: right;">89,630 × 10</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>unicode</td>
+<td>json (PyPy)</td>
+<td style="text-align: right;">2.01</td>
+<td style="text-align: right;">0.1</td>
+<td style="text-align: right;">2.02 ± 0.21</td>
+<td style="text-align: right;">53,511 × 10</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>rich</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">15.3</td>
+<td style="text-align: right;">0.2</td>
+<td style="text-align: right;">15.5 ± 1.9</td>
+<td style="text-align: right;">67,834 × 1</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>rich</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">3.45</td>
+<td style="text-align: right;">0.054</td>
+<td style="text-align: right;">3.5 ± 0.52</td>
+<td style="text-align: right;">149,701 × 2</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>rich</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">2.15</td>
+<td style="text-align: right;">0.027</td>
+<td style="text-align: right;">2.18 ± 0.21</td>
+<td style="text-align: right;">47,706 × 10</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>rich</td>
+<td>json (PyPy)</td>
+<td style="text-align: right;">13.1</td>
+<td style="text-align: right;">0.23</td>
+<td style="text-align: right;">13.6 ± 33</td>
+<td style="text-align: right;">80,007 × 1</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>exception</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">2.83</td>
+<td style="text-align: right;">0.039</td>
+<td style="text-align: right;">2.88 ± 0.44</td>
+<td style="text-align: right;">181,885 × 2</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>exception</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">0.41</td>
+<td style="text-align: right;">0.0085</td>
+<td style="text-align: right;">0.416 ± 0.065</td>
+<td style="text-align: right;">195,008 × 13</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>exception</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">0.361</td>
+<td style="text-align: right;">0.006</td>
+<td style="text-align: right;">0.366 ± 0.053</td>
+<td style="text-align: right;">190,187 × 15</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>exception</td>
+<td>json (PyPy)</td>
+<td style="text-align: right;">1.17</td>
+<td style="text-align: right;">0.016</td>
+<td style="text-align: right;">1.19 ± 0.16</td>
+<td style="text-align: right;">87,658 × 10</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>simple</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">4.23</td>
+<td style="text-align: right;">0.07</td>
+<td style="text-align: right;">4.29 ± 0.53</td>
+<td style="text-align: right;">120,584 × 2</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>simple</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">2.22</td>
+<td style="text-align: right;">0.027</td>
+<td style="text-align: right;">2.25 ± 0.18</td>
+<td style="text-align: right;">46,551 × 10</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>simple</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">1.99</td>
+<td style="text-align: right;">0.026</td>
+<td style="text-align: right;">2.05 ± 0.45</td>
+<td style="text-align: right;">51,285 × 10</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>simple</td>
+<td>json (PyPy)</td>
+<td style="text-align: right;">3.14</td>
+<td style="text-align: right;">0.05</td>
+<td style="text-align: right;">3.3 ± 19</td>
+<td style="text-align: right;">166,141 × 2</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>structured</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">6.36</td>
+<td style="text-align: right;">0.1</td>
+<td style="text-align: right;">6.49 ± 1.2</td>
+<td style="text-align: right;">161,839 × 1</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>structured</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">3.59</td>
+<td style="text-align: right;">0.066</td>
+<td style="text-align: right;">3.63 ± 0.45</td>
+<td style="text-align: right;">146,413 × 2</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>structured</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">3.41</td>
+<td style="text-align: right;">0.061</td>
+<td style="text-align: right;">3.46 ± 0.44</td>
+<td style="text-align: right;">153,870 × 2</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>structured</td>
+<td>json (PyPy)</td>
+<td style="text-align: right;">5.2</td>
+<td style="text-align: right;">0.081</td>
+<td style="text-align: right;">5.43 ± 22</td>
+<td style="text-align: right;">198,138 × 1</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>nested</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">83.2</td>
+<td style="text-align: right;">0.8</td>
+<td style="text-align: right;">84.1 ± 3.3</td>
+<td style="text-align: right;">12,369 × 1</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>nested</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">24.5</td>
+<td style="text-align: right;">0.2</td>
+<td style="text-align: right;">24.8 ± 1.7</td>
+<td style="text-align: right;">41,467 × 1</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>nested</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">16.4</td>
+<td style="text-align: right;">0.18</td>
+<td style="text-align: right;">16.6 ± 1.3</td>
+<td style="text-align: right;">62,720 × 1</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>nested</td>
+<td>json (PyPy)</td>
+<td style="text-align: right;">122</td>
+<td style="text-align: right;">2.9</td>
+<td style="text-align: right;">125 ± 37</td>
+<td style="text-align: right;">8,500 × 1</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>unicode</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">5.87</td>
+<td style="text-align: right;">0.08</td>
+<td style="text-align: right;">5.95 ± 0.81</td>
+<td style="text-align: right;">173,974 × 1</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>unicode</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">3.28</td>
+<td style="text-align: right;">0.06</td>
+<td style="text-align: right;">3.38 ± 1.3</td>
+<td style="text-align: right;">161,031 × 2</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>unicode</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">3.25</td>
+<td style="text-align: right;">0.056</td>
+<td style="text-align: right;">3.29 ± 0.41</td>
+<td style="text-align: right;">159,745 × 2</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>unicode</td>
+<td>json (PyPy)</td>
+<td style="text-align: right;">4.71</td>
+<td style="text-align: right;">0.09</td>
+<td style="text-align: right;">4.88 ± 13</td>
+<td style="text-align: right;">111,434 × 2</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>rich</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">17.8</td>
+<td style="text-align: right;">0.23</td>
+<td style="text-align: right;">18.1 ± 1.9</td>
+<td style="text-align: right;">57,684 × 1</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>rich</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">6.13</td>
+<td style="text-align: right;">0.12</td>
+<td style="text-align: right;">6.33 ± 1.2</td>
+<td style="text-align: right;">169,521 × 1</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>rich</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">4.68</td>
+<td style="text-align: right;">0.09</td>
+<td style="text-align: right;">4.74 ± 0.51</td>
+<td style="text-align: right;">108,296 × 2</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>rich</td>
+<td>json (PyPy)</td>
+<td style="text-align: right;">18</td>
+<td style="text-align: right;">0.3</td>
+<td style="text-align: right;">18.9 ± 59</td>
+<td style="text-align: right;">57,817 × 1</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>exception</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">34.2</td>
+<td style="text-align: right;">0.53</td>
+<td style="text-align: right;">35.4 ± 6.8</td>
+<td style="text-align: right;">29,950 × 1</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>exception</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">30.1</td>
+<td style="text-align: right;">0.45</td>
+<td style="text-align: right;">30.7 ± 3</td>
+<td style="text-align: right;">34,887 × 1</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>exception</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">30.5</td>
+<td style="text-align: right;">0.49</td>
+<td style="text-align: right;">31.1 ± 3.1</td>
+<td style="text-align: right;">33,882 × 1</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>exception</td>
+<td>json (PyPy)</td>
+<td style="text-align: right;">23.1</td>
+<td style="text-align: right;">0.43</td>
+<td style="text-align: right;">25.8 ± 90</td>
+<td style="text-align: right;">45,223 × 1</td>
+</tr>
+</tbody>
+</table>
+<h4 id="speedup_2">Speedup<a class="headerlink" href="#speedup_2" title="Permanent link">🔗</a></h4>
+<p><img alt="Median speedups relative to stdlib JSON for Python 3.12" src="../assets/benchmarking/python-3.12-speedup.svg" /></p>
+<p>Reference: json (CPython) (1×).</p>
+<table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Workload</th>
+<th style="text-align: right;">json (CPython)</th>
+<th style="text-align: right;">orjson (CPython)</th>
+<th style="text-align: right;">msgspec (CPython)</th>
+<th style="text-align: right;">json (PyPy)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>serialization</td>
+<td>simple</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">7.9×</td>
+<td style="text-align: right;">12×</td>
+<td style="text-align: right;">4.4×</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>structured</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">6.1×</td>
+<td style="text-align: right;">7.4×</td>
+<td style="text-align: right;">2.3×</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>nested</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">3.6×</td>
+<td style="text-align: right;">5.6×</td>
+<td style="text-align: right;">0.68×</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>unicode</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">3.1×</td>
+<td style="text-align: right;">3.4×</td>
+<td style="text-align: right;">1.9×</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>rich</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">4.4×</td>
+<td style="text-align: right;">7.1×</td>
+<td style="text-align: right;">1.2×</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>exception</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">6.9×</td>
+<td style="text-align: right;">7.9×</td>
+<td style="text-align: right;">2.4×</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>simple</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">1.9×</td>
+<td style="text-align: right;">2.1×</td>
+<td style="text-align: right;">1.3×</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>structured</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">1.8×</td>
+<td style="text-align: right;">1.9×</td>
+<td style="text-align: right;">1.2×</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>nested</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">3.4×</td>
+<td style="text-align: right;">5.1×</td>
+<td style="text-align: right;">0.68×</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>unicode</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">1.8×</td>
+<td style="text-align: right;">1.8×</td>
+<td style="text-align: right;">1.2×</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>rich</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">2.9×</td>
+<td style="text-align: right;">3.8×</td>
+<td style="text-align: right;">0.99×</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>exception</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">1.1×</td>
+<td style="text-align: right;">1.1×</td>
+<td style="text-align: right;">1.5×</td>
+</tr>
+</tbody>
+</table>
+<h3 id="python-313">Python 3.13<a class="headerlink" href="#python-313" title="Permanent link">🔗</a></h3>
+<p><strong>CPython 3.13.18</strong>. Measured: 2026-10-28T02:21:07.877875+00:00. Revision: <code>3a26fc4e64acfc167d24623c96ccd72802f834d0</code>.</p>
+<p>Environment: Linux 6.17.0-1022-azure, x86_64; AMD EPYC 9V74 80-Core Processor.</p>
+<p>Dependencies: <code>msgspec==0.22.0</code>, <code>orjson==3.13.0</code>, <code>pytest==9.1.1</code>, <code>pytest-benchmark==5.3.0</code>, <code>python-json-logger==4.3.0.dev1</code>.</p>
+<h4 id="times-and-variation_3">Times and variation<a class="headerlink" href="#times-and-variation_3" title="Permanent link">🔗</a></h4>
+<p><img alt="Median operation times for Python 3.13" src="../assets/benchmarking/python-3.13-times.svg" /></p>
+<table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Workload</th>
+<th>Encoder</th>
+<th style="text-align: right;">Median (µs)</th>
+<th style="text-align: right;">IQR (µs)</th>
+<th style="text-align: right;">Mean ± SD (µs)</th>
+<th style="text-align: right;">Rounds × iterations</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>serialization</td>
+<td>simple</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">1.9</td>
+<td style="text-align: right;">0.024</td>
+<td style="text-align: right;">1.94 ± 0.23</td>
+<td style="text-align: right;">55,136 × 10</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>simple</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">0.283</td>
+<td style="text-align: right;">0.0043</td>
+<td style="text-align: right;">0.288 ± 0.047</td>
+<td style="text-align: right;">191,315 × 19</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>simple</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">0.185</td>
+<td style="text-align: right;">0.0027</td>
+<td style="text-align: right;">0.191 ± 0.038</td>
+<td style="text-align: right;">53,283 × 100</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>structured</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">2.74</td>
+<td style="text-align: right;">0.056</td>
+<td style="text-align: right;">2.84 ± 0.58</td>
+<td style="text-align: right;">190,913 × 2</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>structured</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">0.495</td>
+<td style="text-align: right;">0.0092</td>
+<td style="text-align: right;">0.504 ± 0.12</td>
+<td style="text-align: right;">187,688 × 11</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>structured</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">0.411</td>
+<td style="text-align: right;">0.0085</td>
+<td style="text-align: right;">0.417 ± 0.058</td>
+<td style="text-align: right;">192,753 × 13</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>nested</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">67</td>
+<td style="text-align: right;">0.71</td>
+<td style="text-align: right;">68 ± 3.2</td>
+<td style="text-align: right;">15,233 × 1</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>nested</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">21.4</td>
+<td style="text-align: right;">0.13</td>
+<td style="text-align: right;">21.8 ± 1.9</td>
+<td style="text-align: right;">47,345 × 1</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>nested</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">14.6</td>
+<td style="text-align: right;">0.18</td>
+<td style="text-align: right;">14.8 ± 1.3</td>
+<td style="text-align: right;">70,867 × 1</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>unicode</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">3.73</td>
+<td style="text-align: right;">0.045</td>
+<td style="text-align: right;">3.78 ± 0.46</td>
+<td style="text-align: right;">140,430 × 2</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>unicode</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">1.33</td>
+<td style="text-align: right;">0.021</td>
+<td style="text-align: right;">1.35 ± 0.15</td>
+<td style="text-align: right;">77,767 × 10</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>unicode</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">1.21</td>
+<td style="text-align: right;">0.013</td>
+<td style="text-align: right;">1.23 ± 0.12</td>
+<td style="text-align: right;">84,761 × 10</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>rich</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">13.4</td>
+<td style="text-align: right;">0.18</td>
+<td style="text-align: right;">13.7 ± 1.7</td>
+<td style="text-align: right;">77,227 × 1</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>rich</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">3.35</td>
+<td style="text-align: right;">0.065</td>
+<td style="text-align: right;">3.4 ± 0.42</td>
+<td style="text-align: right;">155,280 × 2</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>rich</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">2.11</td>
+<td style="text-align: right;">0.03</td>
+<td style="text-align: right;">2.13 ± 0.15</td>
+<td style="text-align: right;">50,000 × 10</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>exception</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">2.6</td>
+<td style="text-align: right;">0.049</td>
+<td style="text-align: right;">2.63 ± 0.36</td>
+<td style="text-align: right;">199,721 × 2</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>exception</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">0.409</td>
+<td style="text-align: right;">0.0085</td>
+<td style="text-align: right;">0.414 ± 0.058</td>
+<td style="text-align: right;">199,323 × 13</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>exception</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">0.362</td>
+<td style="text-align: right;">0.008</td>
+<td style="text-align: right;">0.366 ± 0.05</td>
+<td style="text-align: right;">188,751 × 15</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>simple</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">3.68</td>
+<td style="text-align: right;">0.065</td>
+<td style="text-align: right;">3.72 ± 0.45</td>
+<td style="text-align: right;">142,634 × 2</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>simple</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">2.02</td>
+<td style="text-align: right;">0.029</td>
+<td style="text-align: right;">2.05 ± 0.21</td>
+<td style="text-align: right;">51,154 × 10</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>simple</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">1.81</td>
+<td style="text-align: right;">0.024</td>
+<td style="text-align: right;">1.83 ± 0.15</td>
+<td style="text-align: right;">57,817 × 10</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>structured</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">5.64</td>
+<td style="text-align: right;">0.11</td>
+<td style="text-align: right;">5.75 ± 1.2</td>
+<td style="text-align: right;">187,688 × 1</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>structured</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">3.35</td>
+<td style="text-align: right;">0.065</td>
+<td style="text-align: right;">3.39 ± 0.42</td>
+<td style="text-align: right;">156,740 × 2</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>structured</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">3.2</td>
+<td style="text-align: right;">0.065</td>
+<td style="text-align: right;">3.25 ± 0.46</td>
+<td style="text-align: right;">164,231 × 2</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>nested</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">68.5</td>
+<td style="text-align: right;">0.64</td>
+<td style="text-align: right;">69.4 ± 3.4</td>
+<td style="text-align: right;">14,892 × 1</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>nested</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">23.2</td>
+<td style="text-align: right;">0.18</td>
+<td style="text-align: right;">23.5 ± 1.7</td>
+<td style="text-align: right;">43,930 × 1</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>nested</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">16.3</td>
+<td style="text-align: right;">0.19</td>
+<td style="text-align: right;">16.5 ± 1.3</td>
+<td style="text-align: right;">63,400 × 1</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>unicode</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">5.6</td>
+<td style="text-align: right;">0.1</td>
+<td style="text-align: right;">5.67 ± 0.82</td>
+<td style="text-align: right;">189,466 × 1</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>unicode</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">3.23</td>
+<td style="text-align: right;">0.055</td>
+<td style="text-align: right;">3.28 ± 0.46</td>
+<td style="text-align: right;">162,101 × 2</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>unicode</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">3.2</td>
+<td style="text-align: right;">0.06</td>
+<td style="text-align: right;">3.25 ± 0.44</td>
+<td style="text-align: right;">160,798 × 2</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>rich</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">15.9</td>
+<td style="text-align: right;">0.25</td>
+<td style="text-align: right;">16.2 ± 1.5</td>
+<td style="text-align: right;">65,390 × 1</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>rich</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">5.97</td>
+<td style="text-align: right;">0.14</td>
+<td style="text-align: right;">6.06 ± 0.86</td>
+<td style="text-align: right;">177,684 × 1</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>rich</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">4.78</td>
+<td style="text-align: right;">0.08</td>
+<td style="text-align: right;">4.84 ± 0.53</td>
+<td style="text-align: right;">112,196 × 2</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>exception</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">48.8</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">50.9 ± 9.4</td>
+<td style="text-align: right;">21,119 × 1</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>exception</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">46</td>
+<td style="text-align: right;">0.77</td>
+<td style="text-align: right;">47.1 ± 4.2</td>
+<td style="text-align: right;">22,469 × 1</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>exception</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">45.6</td>
+<td style="text-align: right;">0.76</td>
+<td style="text-align: right;">46.7 ± 4.3</td>
+<td style="text-align: right;">22,540 × 1</td>
+</tr>
+</tbody>
+</table>
+<h4 id="speedup_3">Speedup<a class="headerlink" href="#speedup_3" title="Permanent link">🔗</a></h4>
+<p><img alt="Median speedups relative to stdlib JSON for Python 3.13" src="../assets/benchmarking/python-3.13-speedup.svg" /></p>
+<p>Reference: json (CPython) (1×).</p>
+<table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Workload</th>
+<th style="text-align: right;">json (CPython)</th>
+<th style="text-align: right;">orjson (CPython)</th>
+<th style="text-align: right;">msgspec (CPython)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>serialization</td>
+<td>simple</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">6.7×</td>
+<td style="text-align: right;">10×</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>structured</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">5.5×</td>
+<td style="text-align: right;">6.7×</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>nested</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">3.1×</td>
+<td style="text-align: right;">4.6×</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>unicode</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">2.8×</td>
+<td style="text-align: right;">3.1×</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>rich</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">4×</td>
+<td style="text-align: right;">6.4×</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>exception</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">6.4×</td>
+<td style="text-align: right;">7.2×</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>simple</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">1.8×</td>
+<td style="text-align: right;">2×</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>structured</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">1.7×</td>
+<td style="text-align: right;">1.8×</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>nested</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">3×</td>
+<td style="text-align: right;">4.2×</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>unicode</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">1.7×</td>
+<td style="text-align: right;">1.7×</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>rich</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">2.7×</td>
+<td style="text-align: right;">3.3×</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>exception</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">1.1×</td>
+<td style="text-align: right;">1.1×</td>
+</tr>
+</tbody>
+</table>
+<h3 id="python-314">Python 3.14<a class="headerlink" href="#python-314" title="Permanent link">🔗</a></h3>
+<p><strong>CPython 3.14.10</strong>. Measured: 2026-10-28T02:22:40.796372+00:00. Revision: <code>3a26fc4e64acfc167d24623c96ccd72802f834d0</code>.</p>
+<p>Environment: Linux 6.17.0-1022-azure, x86_64; AMD EPYC 9V74 80-Core Processor.</p>
+<p>Dependencies: <code>msgspec==0.22.0</code>, <code>orjson==3.13.0</code>, <code>pytest==9.1.1</code>, <code>pytest-benchmark==5.3.0</code>, <code>python-json-logger==4.3.0.dev1</code>.</p>
+<h4 id="times-and-variation_4">Times and variation<a class="headerlink" href="#times-and-variation_4" title="Permanent link">🔗</a></h4>
+<p><img alt="Median operation times for Python 3.14" src="../assets/benchmarking/python-3.14-times.svg" /></p>
+<table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Workload</th>
+<th>Encoder</th>
+<th style="text-align: right;">Median (µs)</th>
+<th style="text-align: right;">IQR (µs)</th>
+<th style="text-align: right;">Mean ± SD (µs)</th>
+<th style="text-align: right;">Rounds × iterations</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>serialization</td>
+<td>simple</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">1.9</td>
+<td style="text-align: right;">0.02</td>
+<td style="text-align: right;">1.94 ± 0.21</td>
+<td style="text-align: right;">53,857 × 10</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>simple</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">0.311</td>
+<td style="text-align: right;">0.0054</td>
+<td style="text-align: right;">0.32 ± 0.071</td>
+<td style="text-align: right;">196,541 × 17</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>simple</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">0.191</td>
+<td style="text-align: right;">0.0015</td>
+<td style="text-align: right;">0.194 ± 0.018</td>
+<td style="text-align: right;">52,888 × 100</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>structured</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">2.76</td>
+<td style="text-align: right;">0.035</td>
+<td style="text-align: right;">2.82 ± 0.44</td>
+<td style="text-align: right;">188,395 × 2</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>structured</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">0.497</td>
+<td style="text-align: right;">0.0074</td>
+<td style="text-align: right;">0.505 ± 0.076</td>
+<td style="text-align: right;">190,549 × 11</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>structured</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">0.418</td>
+<td style="text-align: right;">0.0085</td>
+<td style="text-align: right;">0.424 ± 0.07</td>
+<td style="text-align: right;">192,790 × 13</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>nested</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">68.1</td>
+<td style="text-align: right;">0.5</td>
+<td style="text-align: right;">69.1 ± 3.6</td>
+<td style="text-align: right;">14,930 × 1</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>nested</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">21.6</td>
+<td style="text-align: right;">0.14</td>
+<td style="text-align: right;">21.8 ± 1.6</td>
+<td style="text-align: right;">47,144 × 1</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>nested</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">14.4</td>
+<td style="text-align: right;">0.18</td>
+<td style="text-align: right;">14.6 ± 1.3</td>
+<td style="text-align: right;">71,526 × 1</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>unicode</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">3.87</td>
+<td style="text-align: right;">0.035</td>
+<td style="text-align: right;">3.93 ± 0.52</td>
+<td style="text-align: right;">132,609 × 2</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>unicode</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">1.32</td>
+<td style="text-align: right;">0.016</td>
+<td style="text-align: right;">1.37 ± 0.32</td>
+<td style="text-align: right;">77,221 × 10</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>unicode</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">1.2</td>
+<td style="text-align: right;">0.014</td>
+<td style="text-align: right;">1.23 ± 0.2</td>
+<td style="text-align: right;">84,126 × 10</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>rich</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">13.3</td>
+<td style="text-align: right;">0.16</td>
+<td style="text-align: right;">13.5 ± 1.4</td>
+<td style="text-align: right;">76,983 × 1</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>rich</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">3.32</td>
+<td style="text-align: right;">0.065</td>
+<td style="text-align: right;">3.38 ± 0.5</td>
+<td style="text-align: right;">161,839 × 2</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>rich</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">1.99</td>
+<td style="text-align: right;">0.031</td>
+<td style="text-align: right;">2.02 ± 0.16</td>
+<td style="text-align: right;">52,223 × 10</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>exception</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">2.56</td>
+<td style="text-align: right;">0.033</td>
+<td style="text-align: right;">2.61 ± 0.41</td>
+<td style="text-align: right;">134,031 × 3</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>exception</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">0.392</td>
+<td style="text-align: right;">0.0056</td>
+<td style="text-align: right;">0.397 ± 0.055</td>
+<td style="text-align: right;">187,688 × 14</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>exception</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">0.363</td>
+<td style="text-align: right;">0.0054</td>
+<td style="text-align: right;">0.367 ± 0.049</td>
+<td style="text-align: right;">189,108 × 15</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>simple</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">3.74</td>
+<td style="text-align: right;">0.06</td>
+<td style="text-align: right;">3.8 ± 0.5</td>
+<td style="text-align: right;">138,505 × 2</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>simple</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">2.03</td>
+<td style="text-align: right;">0.046</td>
+<td style="text-align: right;">2.05 ± 0.15</td>
+<td style="text-align: right;">51,707 × 10</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>simple</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">1.8</td>
+<td style="text-align: right;">0.027</td>
+<td style="text-align: right;">1.82 ± 0.14</td>
+<td style="text-align: right;">57,851 × 10</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>structured</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">5.34</td>
+<td style="text-align: right;">0.1</td>
+<td style="text-align: right;">5.43 ± 0.91</td>
+<td style="text-align: right;">195,772 × 1</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>structured</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">3.11</td>
+<td style="text-align: right;">0.07</td>
+<td style="text-align: right;">3.15 ± 0.41</td>
+<td style="text-align: right;">170,678 × 2</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>structured</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">2.88</td>
+<td style="text-align: right;">0.055</td>
+<td style="text-align: right;">2.93 ± 0.39</td>
+<td style="text-align: right;">181,226 × 2</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>nested</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">68.3</td>
+<td style="text-align: right;">0.5</td>
+<td style="text-align: right;">69.2 ± 3.3</td>
+<td style="text-align: right;">14,802 × 1</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>nested</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">23.2</td>
+<td style="text-align: right;">0.15</td>
+<td style="text-align: right;">23.5 ± 1.8</td>
+<td style="text-align: right;">43,814 × 1</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>nested</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">16.1</td>
+<td style="text-align: right;">0.19</td>
+<td style="text-align: right;">16.3 ± 1.4</td>
+<td style="text-align: right;">64,169 × 1</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>unicode</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">5.62</td>
+<td style="text-align: right;">0.071</td>
+<td style="text-align: right;">5.72 ± 0.87</td>
+<td style="text-align: right;">183,520 × 1</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>unicode</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">3.31</td>
+<td style="text-align: right;">0.05</td>
+<td style="text-align: right;">3.37 ± 0.47</td>
+<td style="text-align: right;">157,729 × 2</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>unicode</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">3.11</td>
+<td style="text-align: right;">0.049</td>
+<td style="text-align: right;">3.16 ± 1.4</td>
+<td style="text-align: right;">165,317 × 2</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>rich</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">15.4</td>
+<td style="text-align: right;">0.19</td>
+<td style="text-align: right;">15.6 ± 1.8</td>
+<td style="text-align: right;">67,377 × 1</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>rich</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">5.69</td>
+<td style="text-align: right;">0.1</td>
+<td style="text-align: right;">5.8 ± 1</td>
+<td style="text-align: right;">187,337 × 1</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>rich</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">4.46</td>
+<td style="text-align: right;">0.075</td>
+<td style="text-align: right;">4.53 ± 0.54</td>
+<td style="text-align: right;">118,456 × 2</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>exception</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">46.8</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">48.1 ± 4.7</td>
+<td style="text-align: right;">22,194 × 1</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>exception</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">44</td>
+<td style="text-align: right;">0.89</td>
+<td style="text-align: right;">45.3 ± 4.6</td>
+<td style="text-align: right;">23,589 × 1</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>exception</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">44</td>
+<td style="text-align: right;">0.9</td>
+<td style="text-align: right;">45.3 ± 4.8</td>
+<td style="text-align: right;">23,656 × 1</td>
+</tr>
+</tbody>
+</table>
+<h4 id="speedup_4">Speedup<a class="headerlink" href="#speedup_4" title="Permanent link">🔗</a></h4>
+<p><img alt="Median speedups relative to stdlib JSON for Python 3.14" src="../assets/benchmarking/python-3.14-speedup.svg" /></p>
+<p>Reference: json (CPython) (1×).</p>
+<table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Workload</th>
+<th style="text-align: right;">json (CPython)</th>
+<th style="text-align: right;">orjson (CPython)</th>
+<th style="text-align: right;">msgspec (CPython)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>serialization</td>
+<td>simple</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">6.1×</td>
+<td style="text-align: right;">10×</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>structured</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">5.6×</td>
+<td style="text-align: right;">6.6×</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>nested</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">3.2×</td>
+<td style="text-align: right;">4.7×</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>unicode</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">2.9×</td>
+<td style="text-align: right;">3.2×</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>rich</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">4×</td>
+<td style="text-align: right;">6.7×</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>exception</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">6.5×</td>
+<td style="text-align: right;">7.1×</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>simple</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">1.8×</td>
+<td style="text-align: right;">2.1×</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>structured</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">1.7×</td>
+<td style="text-align: right;">1.9×</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>nested</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">2.9×</td>
+<td style="text-align: right;">4.3×</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>unicode</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">1.7×</td>
+<td style="text-align: right;">1.8×</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>rich</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">2.7×</td>
+<td style="text-align: right;">3.5×</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>exception</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">1.1×</td>
+<td style="text-align: right;">1.1×</td>
+</tr>
+</tbody>
+</table>
+<h3 id="python-315">Python 3.15<a class="headerlink" href="#python-315" title="Permanent link">🔗</a></h3>
+<p><strong>CPython 3.15.2</strong>. Measured: 2026-10-28T02:24:12.733828+00:00. Revision: <code>3a26fc4e64acfc167d24623c96ccd72802f834d0</code>.</p>
+<p>Environment: Linux 6.17.0-1022-azure, x86_64; AMD EPYC 9V74 80-Core Processor.</p>
+<p>Dependencies: <code>msgspec==0.22.0</code>, <code>orjson==3.13.0</code>, <code>pytest==9.1.1</code>, <code>pytest-benchmark==5.3.0</code>, <code>python-json-logger==4.3.0.dev1</code>.</p>
+<h4 id="times-and-variation_5">Times and variation<a class="headerlink" href="#times-and-variation_5" title="Permanent link">🔗</a></h4>
+<p><img alt="Median operation times for Python 3.15" src="../assets/benchmarking/python-3.15-times.svg" /></p>
+<table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Workload</th>
+<th>Encoder</th>
+<th style="text-align: right;">Median (µs)</th>
+<th style="text-align: right;">IQR (µs)</th>
+<th style="text-align: right;">Mean ± SD (µs)</th>
+<th style="text-align: right;">Rounds × iterations</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>serialization</td>
+<td>simple</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">1.86</td>
+<td style="text-align: right;">0.022</td>
+<td style="text-align: right;">1.9 ± 0.58</td>
+<td style="text-align: right;">55,289 × 10</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>simple</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">0.309</td>
+<td style="text-align: right;">0.0077</td>
+<td style="text-align: right;">0.315 ± 0.067</td>
+<td style="text-align: right;">198,531 × 17</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>simple</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">0.191</td>
+<td style="text-align: right;">0.0016</td>
+<td style="text-align: right;">0.193 ± 0.015</td>
+<td style="text-align: right;">53,368 × 100</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>structured</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">2.67</td>
+<td style="text-align: right;">0.046</td>
+<td style="text-align: right;">2.72 ± 0.53</td>
+<td style="text-align: right;">195,389 × 2</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>structured</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">0.504</td>
+<td style="text-align: right;">0.0083</td>
+<td style="text-align: right;">0.512 ± 0.071</td>
+<td style="text-align: right;">186,290 × 11</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>structured</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">0.45</td>
+<td style="text-align: right;">0.013</td>
+<td style="text-align: right;">0.456 ± 0.066</td>
+<td style="text-align: right;">198,887 × 12</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>nested</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">55.5</td>
+<td style="text-align: right;">0.6</td>
+<td style="text-align: right;">56.5 ± 9.4</td>
+<td style="text-align: right;">18,474 × 1</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>nested</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">21</td>
+<td style="text-align: right;">0.13</td>
+<td style="text-align: right;">21.2 ± 1.6</td>
+<td style="text-align: right;">48,401 × 1</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>nested</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">14.9</td>
+<td style="text-align: right;">0.17</td>
+<td style="text-align: right;">15.1 ± 1.4</td>
+<td style="text-align: right;">69,195 × 1</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>unicode</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">3.68</td>
+<td style="text-align: right;">0.04</td>
+<td style="text-align: right;">3.74 ± 0.61</td>
+<td style="text-align: right;">138,870 × 2</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>unicode</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">1.08</td>
+<td style="text-align: right;">0.015</td>
+<td style="text-align: right;">1.1 ± 0.13</td>
+<td style="text-align: right;">96,099 × 10</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>unicode</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">1.07</td>
+<td style="text-align: right;">0.01</td>
+<td style="text-align: right;">1.09 ± 0.12</td>
+<td style="text-align: right;">94,287 × 10</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>rich</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">12.4</td>
+<td style="text-align: right;">0.19</td>
+<td style="text-align: right;">12.6 ± 1.3</td>
+<td style="text-align: right;">83,140 × 1</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>rich</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">3.19</td>
+<td style="text-align: right;">0.055</td>
+<td style="text-align: right;">3.25 ± 0.51</td>
+<td style="text-align: right;">163,962 × 2</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>rich</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">1.95</td>
+<td style="text-align: right;">0.027</td>
+<td style="text-align: right;">1.98 ± 0.16</td>
+<td style="text-align: right;">53,000 × 10</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>exception</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">2.45</td>
+<td style="text-align: right;">0.022</td>
+<td style="text-align: right;">2.48 ± 0.18</td>
+<td style="text-align: right;">41,674 × 10</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>exception</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">0.395</td>
+<td style="text-align: right;">0.0064</td>
+<td style="text-align: right;">0.4 ± 0.057</td>
+<td style="text-align: right;">186,255 × 14</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>exception</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">0.371</td>
+<td style="text-align: right;">0.0071</td>
+<td style="text-align: right;">0.377 ± 0.055</td>
+<td style="text-align: right;">198,531 × 14</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>simple</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">3.58</td>
+<td style="text-align: right;">0.06</td>
+<td style="text-align: right;">3.65 ± 0.54</td>
+<td style="text-align: right;">145,561 × 2</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>simple</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">1.96</td>
+<td style="text-align: right;">0.026</td>
+<td style="text-align: right;">1.99 ± 0.16</td>
+<td style="text-align: right;">52,387 × 10</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>simple</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">1.75</td>
+<td style="text-align: right;">0.024</td>
+<td style="text-align: right;">1.77 ± 0.16</td>
+<td style="text-align: right;">58,597 × 10</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>structured</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">5.08</td>
+<td style="text-align: right;">0.08</td>
+<td style="text-align: right;">5.16 ± 0.54</td>
+<td style="text-align: right;">102,733 × 2</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>structured</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">0.055</td>
+<td style="text-align: right;">3.04 ± 0.4</td>
+<td style="text-align: right;">174,551 × 2</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>structured</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">2.85</td>
+<td style="text-align: right;">0.05</td>
+<td style="text-align: right;">2.89 ± 0.41</td>
+<td style="text-align: right;">182,883 × 2</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>nested</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">58.9</td>
+<td style="text-align: right;">0.79</td>
+<td style="text-align: right;">60 ± 4.9</td>
+<td style="text-align: right;">17,417 × 1</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>nested</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">23.2</td>
+<td style="text-align: right;">0.22</td>
+<td style="text-align: right;">23.5 ± 1.8</td>
+<td style="text-align: right;">43,987 × 1</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>nested</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">16.5</td>
+<td style="text-align: right;">0.19</td>
+<td style="text-align: right;">16.7 ± 1.4</td>
+<td style="text-align: right;">62,251 × 1</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>unicode</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">5.42</td>
+<td style="text-align: right;">0.08</td>
+<td style="text-align: right;">5.52 ± 0.89</td>
+<td style="text-align: right;">189,826 × 1</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>unicode</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">2.94</td>
+<td style="text-align: right;">0.05</td>
+<td style="text-align: right;">3 ± 0.46</td>
+<td style="text-align: right;">176,741 × 2</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>unicode</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">2.9</td>
+<td style="text-align: right;">0.045</td>
+<td style="text-align: right;">2.94 ± 0.4</td>
+<td style="text-align: right;">178,955 × 2</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>rich</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">14.8</td>
+<td style="text-align: right;">0.21</td>
+<td style="text-align: right;">15.1 ± 1.4</td>
+<td style="text-align: right;">69,877 × 1</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>rich</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">5.55</td>
+<td style="text-align: right;">0.1</td>
+<td style="text-align: right;">5.65 ± 0.84</td>
+<td style="text-align: right;">189,826 × 1</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>rich</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">4.38</td>
+<td style="text-align: right;">0.07</td>
+<td style="text-align: right;">4.44 ± 0.53</td>
+<td style="text-align: right;">119,575 × 2</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>exception</td>
+<td>json (CPython)</td>
+<td style="text-align: right;">50.4</td>
+<td style="text-align: right;">1.1</td>
+<td style="text-align: right;">51.9 ± 4.9</td>
+<td style="text-align: right;">20,419 × 1</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>exception</td>
+<td>orjson (CPython)</td>
+<td style="text-align: right;">47.1</td>
+<td style="text-align: right;">0.92</td>
+<td style="text-align: right;">48.3 ± 4.6</td>
+<td style="text-align: right;">21,878 × 1</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>exception</td>
+<td>msgspec (CPython)</td>
+<td style="text-align: right;">47.2</td>
+<td style="text-align: right;">0.95</td>
+<td style="text-align: right;">48.5 ± 4.7</td>
+<td style="text-align: right;">21,840 × 1</td>
+</tr>
+</tbody>
+</table>
+<h4 id="speedup_5">Speedup<a class="headerlink" href="#speedup_5" title="Permanent link">🔗</a></h4>
+<p><img alt="Median speedups relative to stdlib JSON for Python 3.15" src="../assets/benchmarking/python-3.15-speedup.svg" /></p>
+<p>Reference: json (CPython) (1×).</p>
+<table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Workload</th>
+<th style="text-align: right;">json (CPython)</th>
+<th style="text-align: right;">orjson (CPython)</th>
+<th style="text-align: right;">msgspec (CPython)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>serialization</td>
+<td>simple</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">6×</td>
+<td style="text-align: right;">9.7×</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>structured</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">5.3×</td>
+<td style="text-align: right;">5.9×</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>nested</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">2.6×</td>
+<td style="text-align: right;">3.7×</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>unicode</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">3.4×</td>
+<td style="text-align: right;">3.4×</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>rich</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">3.9×</td>
+<td style="text-align: right;">6.3×</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td>exception</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">6.2×</td>
+<td style="text-align: right;">6.6×</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>simple</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">1.8×</td>
+<td style="text-align: right;">2×</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>structured</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">1.7×</td>
+<td style="text-align: right;">1.8×</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>nested</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">2.5×</td>
+<td style="text-align: right;">3.6×</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>unicode</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">1.8×</td>
+<td style="text-align: right;">1.9×</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>rich</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">2.7×</td>
+<td style="text-align: right;">3.4×</td>
+</tr>
+<tr>
+<td>formatting</td>
+<td>exception</td>
+<td style="text-align: right;">1×</td>
+<td style="text-align: right;">1.1×</td>
+<td style="text-align: right;">1.1×</td>
+</tr>
+</tbody>
+</table>
+<!-- benchmark-results:end -->
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      <a href='https://github.com/nhairs/python-json-logger/graphs/contributors'> Copyright &copy; Python JSON Logger Contributors</a>
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/nhairs/python-json-logger" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.instant", "navigation.sections", "navigation.indexes", "navigation.expand", "navigation.top", "content.code.annotate", "content.code.copy", "toc.follow"], "search": "../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.c21346df.min.js"></script>
+      
+    
+  </body>
+</html>
