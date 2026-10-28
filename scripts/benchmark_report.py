@@ -7,7 +7,7 @@ import hashlib
 import json
 import math
 from pathlib import Path
-from statistics import median
+from statistics import fmean
 from textwrap import indent
 
 START = "<!-- benchmark-results:start -->"
@@ -124,7 +124,7 @@ def formatting_summary(groups: list[dict]) -> dict:
                     versions.append(group["python"])
                 if values:
                     metrics[kind] = {
-                        "median": median(values),
+                        "mean": fmean(values),
                         "min": min(values),
                         "max": max(values),
                         "versions": versions,
@@ -143,13 +143,13 @@ def render_summary(groups: list[dict], plots: str | None = None) -> str:
         "Complete formatting includes record processing and serialization. These results use the "
         "[committed baseline](#baseline-results), not application throughput measurements.",
         "",
-        "Bars show the median across Python versions of each version's median operation time. "
+        "Bars show the arithmetic mean across Python versions of each version's median operation time. "
         "Whiskers show the minimum–maximum across those versions, not individual timing samples "
         "or confidence intervals. Each version has equal weight.",
         "",
         "Speedups are calculated against CPython stdlib JSON for the same workload and Python "
-        "major/minor version, then summarized across versions. They are not ratios of "
-        "cross-version median times. Only versions with a matching CPython reference contribute "
+        "major/minor version, then averaged across versions. They are not ratios of "
+        "cross-version mean times. Only versions with a matching CPython reference contribute "
         "to speedups. Values above 1× indicate faster formatting.",
         "",
         "Version coverage differs between runtimes, so these summaries do not isolate interpreter "
@@ -158,7 +158,7 @@ def render_summary(groups: list[dict], plots: str | None = None) -> str:
     ]
     if plots:
         lines += [
-            f"![Complete-formatting times and speedups by workload, with median and version ranges]({plots}/summary.svg)",
+            f"![Complete-formatting times and speedups by workload, with mean and version ranges]({plots}/summary.svg)",
             "",
             "Timing panels: lower is faster. Speedup panels: higher is faster; the dashed line marks 1×. "
             "Each panel starts at zero and has its own scale. "
@@ -168,7 +168,7 @@ def render_summary(groups: list[dict], plots: str | None = None) -> str:
     lines += [
         '??? note "Summary values and included versions"',
         "",
-        "    | Workload | Encoder | Time median [min–max] (µs) | Timing versions | Speedup median [min–max] | Speedup versions |",
+        "    | Workload | Encoder | Time mean [min–max] (µs) | Timing versions | Speedup mean [min–max] | Speedup versions |",
         "    | --- | --- | ---: | --- | ---: | --- |",
     ]
     for workload, backends in summary.items():
@@ -182,7 +182,7 @@ def render_summary(groups: list[dict], plots: str | None = None) -> str:
                 precision = 3 if kind == "times" else 2
                 suffix = "" if kind == "times" else "×"
                 cells += [
-                    f"{stats['median']:.{precision}g}{suffix} "
+                    f"{stats['mean']:.{precision}g}{suffix} "
                     f"[{stats['min']:.{precision}g}–{stats['max']:.{precision}g}]{suffix}",
                     f"{', '.join(stats['versions'])} (n={len(stats['versions'])})",
                 ]

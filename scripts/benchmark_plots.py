@@ -147,10 +147,10 @@ def make_summary_plot(summary: dict) -> Figure:
                 backend for backend, metrics in summary[workload].items() if kind in metrics
             ]
             stats = [summary[workload][backend][kind] for backend in backends]
-            values = [item["median"] for item in stats]
+            values = [item["mean"] for item in stats]
             errors = [
-                [item["median"] - item["min"] for item in stats],
-                [item["max"] - item["median"] for item in stats],
+                [item["mean"] - item["min"] for item in stats],
+                [item["max"] - item["mean"] for item in stats],
             ]
             axis.barh(
                 range(len(backends)),
@@ -169,7 +169,7 @@ def make_summary_plot(summary: dict) -> Figure:
                 axis.text(
                     item["max"] + upper * 0.025,
                     index,
-                    f"{item['median']:.{precision}g}{suffix}",
+                    f"{item['mean']:.{precision}g}{suffix}",
                     va="center",
                     fontsize=9,
                 )
@@ -191,7 +191,7 @@ def make_summary_plot(summary: dict) -> Figure:
     figure.text(
         0.5,
         0.012,
-        "Bars: median across versions. Whiskers: version minimum–maximum, not sample variation.\n"
+        "Bars: arithmetic mean across versions. Whiskers: version minimum–maximum, not sample variation.\n"
         "Speedups use version-matched CPython stdlib JSON. Scales and version coverage differ; see the summary table.",
         ha="center",
         fontsize=10,

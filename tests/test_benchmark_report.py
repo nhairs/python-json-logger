@@ -189,7 +189,7 @@ def test_report_rejects_duplicate_minor_runtime(result_file: Path) -> None:
 
 
 def test_formatting_summary_version_ranges() -> None:
-    """Use equal-weight version medians and ratios with matched references only."""
+    """Average equal-weight version medians and ratios with matched references only."""
     report = runpy.run_path(str(REPORT))
     groups = []
     for version, baseline, other, pypy in (
@@ -215,20 +215,20 @@ def test_formatting_summary_version_ranges() -> None:
         values = summary[workload]
         assert list(values) == ["json (CPython)", "orjson (CPython)", "json (PyPy)"]
         assert values["orjson (CPython)"]["times"] == {
-            "median": 2,
+            "mean": pytest.approx(8 / 3),
             "min": 1,
             "max": 5,
             "versions": ["3.10", "3.11", "3.12"],
         }
         ratios = values["orjson (CPython)"]["speedup"]
-        assert ratios["median"] == pytest.approx(4)
+        assert ratios["mean"] == pytest.approx(5)
         assert ratios["min"] == pytest.approx(2)
         assert ratios["max"] == pytest.approx(9)
         assert ratios["versions"] == ["3.10", "3.11", "3.12"]
-        assert values["json (PyPy)"]["times"]["median"] == pytest.approx(1.75)
+        assert values["json (PyPy)"]["times"]["mean"] == pytest.approx(1.75)
         assert values["json (PyPy)"]["times"]["versions"] == ["3.10", "3.13"]
         assert values["json (PyPy)"]["speedup"] == {
-            "median": 4,
+            "mean": 4,
             "min": 4,
             "max": 4,
             "versions": ["3.10"],

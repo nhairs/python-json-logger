@@ -11,44 +11,44 @@ predict application throughput or handler I/O performance.
 
 Complete formatting includes record processing and serialization. These results use the [committed baseline](#baseline-results), not application throughput measurements.
 
-Bars show the median across Python versions of each version's median operation time. Whiskers show the minimum–maximum across those versions, not individual timing samples or confidence intervals. Each version has equal weight.
+Bars show the arithmetic mean across Python versions of each version's median operation time. Whiskers show the minimum–maximum across those versions, not individual timing samples or confidence intervals. Each version has equal weight.
 
-Speedups are calculated against CPython stdlib JSON for the same workload and Python major/minor version, then summarized across versions. They are not ratios of cross-version median times. Only versions with a matching CPython reference contribute to speedups. Values above 1× indicate faster formatting.
+Speedups are calculated against CPython stdlib JSON for the same workload and Python major/minor version, then averaged across versions. They are not ratios of cross-version mean times. Only versions with a matching CPython reference contribute to speedups. Values above 1× indicate faster formatting.
 
 Version coverage differs between runtimes, so these summaries do not isolate interpreter performance. The tables list the versions included in each metric.
 
-![Complete-formatting times and speedups by workload, with median and version ranges](assets/benchmarking/summary.svg)
+![Complete-formatting times and speedups by workload, with mean and version ranges](assets/benchmarking/summary.svg)
 
 Timing panels: lower is faster. Speedup panels: higher is faster; the dashed line marks 1×. Each panel starts at zero and has its own scale. Open the SVG to view or share the full-size summary.
 
 ??? note "Summary values and included versions"
 
-    | Workload | Encoder | Time median [min–max] (µs) | Timing versions | Speedup median [min–max] | Speedup versions |
+    | Workload | Encoder | Time mean [min–max] (µs) | Timing versions | Speedup mean [min–max] | Speedup versions |
     | --- | --- | ---: | --- | ---: | --- |
-    | simple | json (CPython) | 3.88 [3.58–5.25] | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) | 1× [1–1]× | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) |
-    | simple | orjson (CPython) | 2.08 [1.96–3.09] | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) | 1.8× [1.7–1.9]× | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) |
-    | simple | msgspec (CPython) | 1.86 [1.75–2.82] | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) | 2.1× [1.9–2.1]× | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) |
-    | simple | json (PyPy) | 3 [2.55–3.14] | 3.10, 3.11, 3.12 (n=3) | 1.3× [1.3–2.1]× | 3.10, 3.11, 3.12 (n=3) |
-    | structured | json (CPython) | 5.86 [5.08–7.54] | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) | 1× [1–1]× | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) |
-    | structured | orjson (CPython) | 3.35 [3–4.49] | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) | 1.7× [1.7–1.8]× | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) |
-    | structured | msgspec (CPython) | 3.21 [2.85–4.2] | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) | 1.8× [1.8–1.9]× | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) |
-    | structured | json (PyPy) | 4.94 [4.38–5.2] | 3.10, 3.11, 3.12 (n=3) | 1.2× [1.2–1.7]× | 3.10, 3.11, 3.12 (n=3) |
-    | nested | json (CPython) | 75.8 [58.9–106] | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) | 1× [1–1]× | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) |
-    | nested | orjson (CPython) | 23.6 [23.2–24.9] | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) | 3.2× [2.5–4.4]× | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) |
-    | nested | msgspec (CPython) | 16.4 [16.1–17.3] | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) | 4.7× [3.6–6.4]× | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) |
-    | nested | json (PyPy) | 115 [60–122] | 3.10, 3.11, 3.12 (n=3) | 0.93× [0.68–1.7]× | 3.10, 3.11, 3.12 (n=3) |
-    | unicode | json (CPython) | 5.74 [5.42–7.03] | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) | 1× [1–1]× | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) |
-    | unicode | orjson (CPython) | 3.29 [2.94–4.17] | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) | 1.8× [1.7–1.8]× | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) |
-    | unicode | msgspec (CPython) | 3.22 [2.9–4.05] | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) | 1.8× [1.7–1.9]× | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) |
-    | unicode | json (PyPy) | 4.43 [4.21–4.71] | 3.10, 3.11, 3.12 (n=3) | 1.4× [1.2–1.7]× | 3.10, 3.11, 3.12 (n=3) |
-    | rich | json (CPython) | 16.8 [14.8–26.6] | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) | 1× [1–1]× | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) |
-    | rich | orjson (CPython) | 6.05 [5.55–9.06] | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) | 2.8× [2.7–3]× | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) |
-    | rich | msgspec (CPython) | 4.73 [4.38–7.19] | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) | 3.6× [3.3–3.8]× | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) |
-    | rich | json (PyPy) | 17.9 [16–18] | 3.10, 3.11, 3.12 (n=3) | 1.1× [0.99–1.7]× | 3.10, 3.11, 3.12 (n=3) |
-    | exception | json (CPython) | 40.5 [26–50.4] | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) | 1× [1–1]× | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) |
-    | exception | orjson (CPython) | 37.1 [23.5–47.1] | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) | 1.1× [1.1–1.1]× | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) |
-    | exception | msgspec (CPython) | 37.2 [23.2–47.2] | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) | 1.1× [1.1–1.1]× | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) |
-    | exception | json (PyPy) | 20.9 [9.77–23.1] | 3.10, 3.11, 3.12 (n=3) | 1.5× [1.5–2.7]× | 3.10, 3.11, 3.12 (n=3) |
+    | simple | json (CPython) | 4.08 [3.58–5.25] | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) | 1× [1–1]× | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) |
+    | simple | orjson (CPython) | 2.24 [1.96–3.09] | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) | 1.8× [1.7–1.9]× | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) |
+    | simple | msgspec (CPython) | 2.01 [1.75–2.82] | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) | 2× [1.9–2.1]× | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) |
+    | simple | json (PyPy) | 2.9 [2.55–3.14] | 3.10, 3.11, 3.12 (n=3) | 1.6× [1.3–2.1]× | 3.10, 3.11, 3.12 (n=3) |
+    | structured | json (CPython) | 6.01 [5.08–7.54] | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) | 1× [1–1]× | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) |
+    | structured | orjson (CPython) | 3.48 [3–4.49] | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) | 1.7× [1.7–1.8]× | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) |
+    | structured | msgspec (CPython) | 3.3 [2.85–4.2] | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) | 1.8× [1.8–1.9]× | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) |
+    | structured | json (PyPy) | 4.84 [4.38–5.2] | 3.10, 3.11, 3.12 (n=3) | 1.4× [1.2–1.7]× | 3.10, 3.11, 3.12 (n=3) |
+    | nested | json (CPython) | 80.8 [58.9–106] | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) | 1× [1–1]× | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) |
+    | nested | orjson (CPython) | 23.8 [23.2–24.9] | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) | 3.4× [2.5–4.4]× | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) |
+    | nested | msgspec (CPython) | 16.5 [16.1–17.3] | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) | 4.9× [3.6–6.4]× | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) |
+    | nested | json (PyPy) | 98.9 [60–122] | 3.10, 3.11, 3.12 (n=3) | 1.1× [0.68–1.7]× | 3.10, 3.11, 3.12 (n=3) |
+    | unicode | json (CPython) | 5.93 [5.42–7.03] | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) | 1× [1–1]× | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) |
+    | unicode | orjson (CPython) | 3.38 [2.94–4.17] | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) | 1.8× [1.7–1.8]× | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) |
+    | unicode | msgspec (CPython) | 3.29 [2.9–4.05] | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) | 1.8× [1.7–1.9]× | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) |
+    | unicode | json (PyPy) | 4.45 [4.21–4.71] | 3.10, 3.11, 3.12 (n=3) | 1.4× [1.2–1.7]× | 3.10, 3.11, 3.12 (n=3) |
+    | rich | json (CPython) | 18.4 [14.8–26.6] | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) | 1× [1–1]× | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) |
+    | rich | orjson (CPython) | 6.49 [5.55–9.06] | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) | 2.8× [2.7–3]× | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) |
+    | rich | msgspec (CPython) | 5.12 [4.38–7.19] | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) | 3.6× [3.3–3.8]× | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) |
+    | rich | json (PyPy) | 17.3 [16–18] | 3.10, 3.11, 3.12 (n=3) | 1.3× [0.99–1.7]× | 3.10, 3.11, 3.12 (n=3) |
+    | exception | json (CPython) | 39.7 [26–50.4] | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) | 1× [1–1]× | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) |
+    | exception | orjson (CPython) | 36.6 [23.5–47.1] | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) | 1.1× [1.1–1.1]× | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) |
+    | exception | msgspec (CPython) | 36.5 [23.2–47.2] | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) | 1.1× [1.1–1.1]× | 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6) |
+    | exception | json (PyPy) | 17.9 [9.77–23.1] | 3.10, 3.11, 3.12 (n=3) | 1.9× [1.5–2.7]× | 3.10, 3.11, 3.12 (n=3) |
 
 <!-- benchmark-summary:end -->
 
