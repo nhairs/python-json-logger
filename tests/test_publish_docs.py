@@ -14,7 +14,7 @@ PUBLISH = runpy.run_path(str(Path(__file__).parents[1] / "scripts" / "publish_do
     "value,label,stable",
     [
         ("4.3.0", "4.3.0", True),
-        ("4.3.0.post1", "4.3.0.post1", True),
+        ("4.3.0.post1", "4.3.0", True),
         ("4.3.0.dev1", "dev", False),
         ("4.3.0a1", "dev", False),
         ("4.3.0b1", "dev", False),

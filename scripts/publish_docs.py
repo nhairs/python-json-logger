@@ -14,7 +14,7 @@ def documentation_version(value: str) -> tuple[str, bool]:
     if version.local is not None:
         raise ValueError("Local versions cannot be published")
     development = version.is_devrelease or version.is_prerelease
-    return ("dev" if development else str(version)), not development
+    return ("dev" if development else version.base_version), not development
 
 
 def main() -> None:
