@@ -78,6 +78,11 @@ def test_report_update(result_file: Path, tmp_path: Path) -> None:
     assert "assets/benchmarking/python-3.15-speedup.svg" in first
     assert first.index("## Complete-formatting summary") < first.index("## Run benchmarks")
     assert "assets/benchmarking/summary.svg" in first
+    assert "Summary values and included versions" not in first
+    assert (
+        "Timing and speedup coverage for json (CPython), orjson (CPython), msgspec (CPython)"
+        in first
+    )
     assert first.count('??? note "Timing statistics"') == 1
     assert first.count('??? note "Speedup values"') == 1
     assert "    | serialization | simple" in first
@@ -236,5 +241,6 @@ def test_formatting_summary_version_ranges() -> None:
     standalone = report["formatting_summary"]([groups[-1]])
     assert "speedup" not in standalone["simple"]["json (PyPy)"]
     text = report["render_summary"]([groups[-1]])
-    assert "Unavailable | None" in text
+    assert "Timing coverage for json (PyPy): Python 3.13 (n=1)." in text
+    assert "Speedup coverage" not in text
     return

@@ -192,7 +192,7 @@ def make_summary_plot(summary: dict) -> Figure:
         0.5,
         0.012,
         "Bars: arithmetic mean across versions. Whiskers: version minimum–maximum, not sample variation.\n"
-        "Speedups use version-matched CPython stdlib JSON. Scales and version coverage differ; see the summary table.",
+        "Speedups use version-matched CPython stdlib JSON. Scales and version coverage differ; see the documentation.",
         ha="center",
         fontsize=10,
     )

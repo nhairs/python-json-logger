@@ -153,9 +153,25 @@ def render_summary(groups: list[dict], plots: str | None = None) -> str:
         "to speedups. Values above 1× indicate faster formatting.",
         "",
         "Version coverage differs between runtimes, so these summaries do not isolate interpreter "
-        "performance. The tables list the versions included in each metric.",
+        "performance. Version coverage is listed here; per-version measurements are in the baseline tables.",
         "",
     ]
+    coverage = {}
+    for backend, metrics in summary[WORKLOADS[0]].items():
+        for kind, stats in metrics.items():
+            key = (kind, tuple(stats["versions"]))
+            coverage.setdefault(key, []).append(backend)
+    combined = {}
+    for (kind, versions), backends in coverage.items():
+        key = (versions, tuple(backends))
+        combined.setdefault(key, []).append("timing" if kind == "times" else "speedup")
+    for (versions, backends), kinds in combined.items():
+        label = " and ".join(kinds).capitalize()
+        lines += [
+            f"- {label} coverage for {', '.join(backends)}: "
+            f"Python {', '.join(versions)} (n={len(versions)}).",
+        ]
+    lines.append("")
     if plots:
         lines += [
             f"![Complete-formatting times and speedups by workload, with mean and version ranges]({plots}/summary.svg)",
@@ -165,29 +181,7 @@ def render_summary(groups: list[dict], plots: str | None = None) -> str:
             "Open the SVG to view or share the full-size summary.",
             "",
         ]
-    lines += [
-        '??? note "Summary values and included versions"',
-        "",
-        "    | Workload | Encoder | Time mean [min–max] (µs) | Timing versions | Speedup mean [min–max] | Speedup versions |",
-        "    | --- | --- | ---: | --- | ---: | --- |",
-    ]
-    for workload, backends in summary.items():
-        for backend, metrics in backends.items():
-            cells = []
-            for kind in ("times", "speedup"):
-                if kind not in metrics:
-                    cells.extend(["Unavailable", "None"])
-                    continue
-                stats = metrics[kind]
-                precision = 3 if kind == "times" else 2
-                suffix = "" if kind == "times" else "×"
-                cells += [
-                    f"{stats['mean']:.{precision}g}{suffix} "
-                    f"[{stats['min']:.{precision}g}–{stats['max']:.{precision}g}]{suffix}",
-                    f"{', '.join(stats['versions'])} (n={len(stats['versions'])})",
-                ]
-            lines.append(f"    | {workload} | {backend} | " + " | ".join(cells) + " |")
-    return "\n".join(lines) + "\n"
+    return "\n".join(lines).rstrip() + "\n"
 
 
 def render(paths: list[Path], plots: str | None = None) -> str:

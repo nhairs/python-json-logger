@@ -3005,7 +3005,7 @@ L 922.660558 1058.037656
   </g>
   <g id="text_202">
    <text style="font-size: 10px; font-family: 'DejaVu Sans'" transform="translate(215.242188 1126.173266)">Bars: arithmetic mean across versions. Whiskers: version minimum–maximum, not sample variation.</text>
-   <text style="font-size: 10px; font-family: 'DejaVu Sans'" transform="translate(185.04375 1138.176)">Speedups use version-matched CPython stdlib JSON. Scales and version coverage differ; see the summary table.</text>
+   <text style="font-size: 10px; font-family: 'DejaVu Sans'" transform="translate(185.021094 1138.176)">Speedups use version-matched CPython stdlib JSON. Scales and version coverage differ; see the documentation.</text>
   </g>
  </g>
  <defs>
