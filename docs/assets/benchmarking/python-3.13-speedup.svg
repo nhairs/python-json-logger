@@ -490,11 +490,6 @@ L 462.522594 86.643516
    <g id="text_32">
     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: start" x="303.729148" y="441.059342" transform="rotate(-0 303.729148 441.059342)">7.2×</text>
    </g>
-   <g id="line2d_27">
-    <path d="M 102.108242 453.237656
-L 102.108242 86.643516
-" clip-path="url(#p289dedc189)" style="fill: none; stroke-dasharray: 3.7,1.6; stroke-dashoffset: 0; stroke: #444444"/>
-   </g>
    <g id="text_33">
     <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: middle" x="266.328797" y="80.643516" transform="rotate(-0 266.328797 80.643516)">Serialization</text>
    </g>
@@ -534,12 +529,12 @@ z
    </g>
    <g id="matplotlib.axis_3">
     <g id="xtick_8">
-     <g id="line2d_28">
+     <g id="line2d_27">
       <path d="M 532.657594 453.237656
 L 532.657594 86.643516
 " clip-path="url(#p599fb66b8a)" style="fill: none; stroke: #b0b0b0; stroke-opacity: 0.25; stroke-width: 0.8; stroke-linecap: square"/>
      </g>
-     <g id="line2d_29">
+     <g id="line2d_28">
       <g>
        <use xlink:href="#m0cfcb4a8f0" x="532.657594" y="453.237656" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
@@ -549,12 +544,12 @@ L 532.657594 86.643516
      </g>
     </g>
     <g id="xtick_9">
-     <g id="line2d_30">
+     <g id="line2d_29">
       <path d="M 610.400815 453.237656
 L 610.400815 86.643516
 " clip-path="url(#p599fb66b8a)" style="fill: none; stroke: #b0b0b0; stroke-opacity: 0.25; stroke-width: 0.8; stroke-linecap: square"/>
      </g>
-     <g id="line2d_31">
+     <g id="line2d_30">
       <g>
        <use xlink:href="#m0cfcb4a8f0" x="610.400815" y="453.237656" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
@@ -564,12 +559,12 @@ L 610.400815 86.643516
      </g>
     </g>
     <g id="xtick_10">
-     <g id="line2d_32">
+     <g id="line2d_31">
       <path d="M 688.144037 453.237656
 L 688.144037 86.643516
 " clip-path="url(#p599fb66b8a)" style="fill: none; stroke: #b0b0b0; stroke-opacity: 0.25; stroke-width: 0.8; stroke-linecap: square"/>
      </g>
-     <g id="line2d_33">
+     <g id="line2d_32">
       <g>
        <use xlink:href="#m0cfcb4a8f0" x="688.144037" y="453.237656" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
@@ -579,12 +574,12 @@ L 688.144037 86.643516
      </g>
     </g>
     <g id="xtick_11">
-     <g id="line2d_34">
+     <g id="line2d_33">
       <path d="M 765.887258 453.237656
 L 765.887258 86.643516
 " clip-path="url(#p599fb66b8a)" style="fill: none; stroke: #b0b0b0; stroke-opacity: 0.25; stroke-width: 0.8; stroke-linecap: square"/>
      </g>
-     <g id="line2d_35">
+     <g id="line2d_34">
       <g>
        <use xlink:href="#m0cfcb4a8f0" x="765.887258" y="453.237656" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
@@ -594,12 +589,12 @@ L 765.887258 86.643516
      </g>
     </g>
     <g id="xtick_12">
-     <g id="line2d_36">
+     <g id="line2d_35">
       <path d="M 843.630479 453.237656
 L 843.630479 86.643516
 " clip-path="url(#p599fb66b8a)" style="fill: none; stroke: #b0b0b0; stroke-opacity: 0.25; stroke-width: 0.8; stroke-linecap: square"/>
      </g>
-     <g id="line2d_37">
+     <g id="line2d_36">
       <g>
        <use xlink:href="#m0cfcb4a8f0" x="843.630479" y="453.237656" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
@@ -609,12 +604,12 @@ L 843.630479 86.643516
      </g>
     </g>
     <g id="xtick_13">
-     <g id="line2d_38">
+     <g id="line2d_37">
       <path d="M 921.373701 453.237656
 L 921.373701 86.643516
 " clip-path="url(#p599fb66b8a)" style="fill: none; stroke: #b0b0b0; stroke-opacity: 0.25; stroke-width: 0.8; stroke-linecap: square"/>
      </g>
-     <g id="line2d_39">
+     <g id="line2d_38">
       <g>
        <use xlink:href="#m0cfcb4a8f0" x="921.373701" y="453.237656" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
@@ -629,7 +624,7 @@ L 921.373701 86.643516
    </g>
    <g id="matplotlib.axis_4">
     <g id="ytick_7">
-     <g id="line2d_40">
+     <g id="line2d_39">
       <g>
        <use xlink:href="#md59b298140" x="532.657594" y="117.193027" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
@@ -639,7 +634,7 @@ L 921.373701 86.643516
      </g>
     </g>
     <g id="ytick_8">
-     <g id="line2d_41">
+     <g id="line2d_40">
       <g>
        <use xlink:href="#md59b298140" x="532.657594" y="178.292051" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
@@ -649,7 +644,7 @@ L 921.373701 86.643516
      </g>
     </g>
     <g id="ytick_9">
-     <g id="line2d_42">
+     <g id="line2d_41">
       <g>
        <use xlink:href="#md59b298140" x="532.657594" y="239.391074" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
@@ -659,7 +654,7 @@ L 921.373701 86.643516
      </g>
     </g>
     <g id="ytick_10">
-     <g id="line2d_43">
+     <g id="line2d_42">
       <g>
        <use xlink:href="#md59b298140" x="532.657594" y="300.490098" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
@@ -669,7 +664,7 @@ L 921.373701 86.643516
      </g>
     </g>
     <g id="ytick_11">
-     <g id="line2d_44">
+     <g id="line2d_43">
       <g>
        <use xlink:href="#md59b298140" x="532.657594" y="361.589121" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
@@ -679,7 +674,7 @@ L 921.373701 86.643516
      </g>
     </g>
     <g id="ytick_12">
-     <g id="line2d_45">
+     <g id="line2d_44">
       <g>
        <use xlink:href="#md59b298140" x="532.657594" y="422.688145" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
@@ -833,32 +828,32 @@ L 532.657594 445.905773
 z
 " clip-path="url(#p599fb66b8a)" style="fill: #009e73"/>
    </g>
-   <g id="line2d_46">
+   <g id="line2d_45">
     <path d="M 532.657594 147.742539
 L 925.045188 147.742539
 " clip-path="url(#p599fb66b8a)" style="fill: none; stroke: #888888; stroke-opacity: 0.3; stroke-width: 0.7; stroke-linecap: square"/>
    </g>
-   <g id="line2d_47">
+   <g id="line2d_46">
     <path d="M 532.657594 208.841563
 L 925.045188 208.841563
 " clip-path="url(#p599fb66b8a)" style="fill: none; stroke: #888888; stroke-opacity: 0.3; stroke-width: 0.7; stroke-linecap: square"/>
    </g>
-   <g id="line2d_48">
+   <g id="line2d_47">
     <path d="M 532.657594 269.940586
 L 925.045188 269.940586
 " clip-path="url(#p599fb66b8a)" style="fill: none; stroke: #888888; stroke-opacity: 0.3; stroke-width: 0.7; stroke-linecap: square"/>
    </g>
-   <g id="line2d_49">
+   <g id="line2d_48">
     <path d="M 532.657594 331.039609
 L 925.045188 331.039609
 " clip-path="url(#p599fb66b8a)" style="fill: none; stroke: #888888; stroke-opacity: 0.3; stroke-width: 0.7; stroke-linecap: square"/>
    </g>
-   <g id="line2d_50">
+   <g id="line2d_49">
     <path d="M 532.657594 392.138633
 L 925.045188 392.138633
 " clip-path="url(#p599fb66b8a)" style="fill: none; stroke: #888888; stroke-opacity: 0.3; stroke-width: 0.7; stroke-linecap: square"/>
    </g>
-   <g id="line2d_51">
+   <g id="line2d_50">
     <path d="M 532.657594 453.237656
 L 925.045188 453.237656
 " clip-path="url(#p599fb66b8a)" style="fill: none; stroke: #888888; stroke-opacity: 0.3; stroke-width: 0.7; stroke-linecap: square"/>
@@ -937,11 +932,6 @@ L 925.045188 86.643516
    <g id="text_64">
     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: start" x="619.831703" y="441.059342" transform="rotate(-0 619.831703 441.059342)">1.1×</text>
    </g>
-   <g id="line2d_52">
-    <path d="M 610.400815 453.237656
-L 610.400815 86.643516
-" clip-path="url(#p599fb66b8a)" style="fill: none; stroke-dasharray: 3.7,1.6; stroke-dashoffset: 0; stroke: #444444"/>
-   </g>
    <g id="text_65">
     <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: middle" x="728.851391" y="80.643516" transform="rotate(-0 728.851391 80.643516)">Complete formatting</text>
    </g>
@@ -950,7 +940,7 @@ L 610.400815 86.643516
    <text style="font-size: 15px; font-family: 'DejaVu Sans'; text-anchor: middle" x="468" y="22.917656" transform="rotate(-0 468 22.917656)">Python 3.13: Ratios of median times</text>
   </g>
   <g id="text_67">
-   <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: middle" x="468" y="561.6" transform="rotate(-0 468 561.6)">Dashed line: json (CPython) (1×). Descriptive ratios have no confidence intervals.</text>
+   <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: middle" x="468" y="561.6" transform="rotate(-0 468 561.6)">Speedup relative to json (CPython) (1×). Descriptive ratios have no confidence intervals.</text>
   </g>
   <g id="legend_1">
    <g id="patch_54">

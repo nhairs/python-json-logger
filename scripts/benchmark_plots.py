@@ -67,7 +67,6 @@ def make_speedup_plot(result: dict) -> Figure:
             if row % 2 == 0:
                 axis.axhspan(row - 0.5, row + 0.5, color="#000000", alpha=0.045, zorder=0)
             axis.axhline(row + 0.5, color="#888888", alpha=0.3, linewidth=0.7)
-        axis.axvline(1, color="#444444", linestyle="--", linewidth=1, zorder=3)
         axis.set_title("Serialization" if layer == "serialization" else "Complete formatting")
         axis.set_xlabel("Speedup (×) — higher is faster")
         axis.grid(axis="x", alpha=0.25)
@@ -80,7 +79,7 @@ def make_speedup_plot(result: dict) -> Figure:
     figure.text(
         0.5,
         0.025,
-        f"Dashed line: {reference} (1×). Descriptive ratios have no confidence intervals.",
+        f"Speedup relative to {reference} (1×). Descriptive ratios have no confidence intervals.",
         ha="center",
         fontsize=9,
     )
