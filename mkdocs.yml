@@ -87,7 +87,7 @@ plugins:
         python:
           paths:
             - src
-          import:
+          inventories:
             - https://docs.python.org/3/objects.inv
           #  - https://mkdocstrings.github.io/objects.inv
           #  - https://mkdocstrings.github.io/griffe/objects.inv

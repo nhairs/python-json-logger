@@ -8,7 +8,7 @@ from pathlib import Path
 from packaging.version import Version
 
 
-def documentation_version(value):
+def documentation_version(value: str) -> tuple[str, bool]:
     """Return the public documentation label and whether it is stable."""
     version = Version(value)
     if version.local is not None:
@@ -17,9 +17,9 @@ def documentation_version(value):
     return ("dev" if development else str(version)), not development
 
 
-def main():
+def main() -> None:
     """Update the local gh-pages branch without pushing partial changes."""
-    value = tomllib.loads(Path("pyproject.toml").read_text())["project"]["version"]
+    value = tomllib.loads(Path("pyproject.toml").read_text(encoding="utf-8"))["project"]["version"]
     label, stable = documentation_version(value)
     command = ["mike", "deploy", label]
     if stable:

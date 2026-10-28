@@ -36,11 +36,11 @@ jobs:
             echo 'Skipping obsolete main revision'
             exit 0
           fi
-          git push origin gh-pages:gh-pages
           git worktree add --detach "$RUNNER_TEMP/docs-history" gh-pages
           mkdir "$RUNNER_TEMP/pages"
           cp -rL "$RUNNER_TEMP/docs-history/." "$RUNNER_TEMP/pages/"
           rm "$RUNNER_TEMP/pages/.git"
+          git push origin gh-pages:gh-pages
           echo 'publish=true' >> "$GITHUB_OUTPUT"
       - uses: actions/upload-pages-artifact@v4
         if: steps.publish.outputs.publish == 'true'
