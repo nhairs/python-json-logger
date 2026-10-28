@@ -1,0 +1,39 @@
+name: Benchmark JSON formatters
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  UV_PYTHON_PREFERENCE: managed
+
+jobs:
+  benchmark:
+    name: Benchmark supported Python runtimes
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v3
+      - name: Measure formatters sequentially with tox
+        run: uvx --with tox-uv tox -m benchmark
+      - name: Collect and summarize measurements
+        if: always()
+        run: |
+          python - <<'PYTHON'
+          from pathlib import Path
+          import shutil
+          target = Path('benchmark-results')
+          target.mkdir(exist_ok=True)
+          for source in Path('.tox').glob('*-benchmark/tmp/benchmark.json'):
+              shutil.copyfile(source, target / (source.parents[1].name + '.json'))
+          PYTHON
+          python scripts/benchmark_report.py benchmark-results/*.json >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: benchmark-results
+          path: benchmark-results/*.json
+          if-no-files-found: error

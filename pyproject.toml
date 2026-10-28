@@ -41,6 +41,14 @@ Homepage = "https://nhairs.github.io/python-json-logger"
 GitHub = "https://github.com/nhairs/python-json-logger"
 
 [dependency-groups]
+benchmark-report = ["matplotlib>=3.8,<4"]
+benchmark = [
+    # pytest-benchmark 5.x uses Node._nodeid, removed in pytest 9.2.
+    "pytest<9.2",
+    "pytest-benchmark>=5.1,<6",
+    "orjson;implementation_name!='pypy'",
+    "msgspec;implementation_name!='pypy'",
+]
 dev = [
     ## Optional but required for dev
     "orjson;implementation_name!='pypy'",
@@ -76,3 +84,6 @@ pythonjsonlogger = ["py.typed"]
 
 [tool.black]
 line-length = 100
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
