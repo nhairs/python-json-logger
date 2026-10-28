@@ -7,9 +7,14 @@ import hashlib
 import json
 import math
 from pathlib import Path
+from statistics import fmean
+from textwrap import indent
 
 START = "<!-- benchmark-results:start -->"
 END = "<!-- benchmark-results:end -->"
+SUMMARY_START = "<!-- benchmark-summary:start -->"
+SUMMARY_END = "<!-- benchmark-summary:end -->"
+SERIES = ("json (CPython)", "orjson (CPython)", "msgspec (CPython)", "json (PyPy)")
 BACKENDS = ("json", "orjson", "msgspec")
 LAYERS = ("serialization", "formatting")
 WORKLOADS = ("simple", "structured", "nested", "unicode", "rich", "exception")
@@ -90,6 +95,43 @@ def comparison_groups(results: list[dict]) -> list[dict]:
                 for workload in WORKLOADS:
                     group["cases"][layer, workload, label] = cases[layer, workload, backend]
     return list(groups.values())
+
+
+def formatting_summary(groups: list[dict]) -> dict:
+    """Aggregate per-version medians and matched CPython-relative ratios.
+
+    Missing CPython references contribute timings but no speedup ratios.
+    Each metric retains its own version coverage.
+    """
+    summary = {}
+    for workload in WORKLOADS:
+        summary[workload] = {}
+        for backend in SERIES:
+            metrics = {}
+            for kind in ("times", "speedup"):
+                values = []
+                versions = []
+                for group in groups:
+                    cases = group["cases"]
+                    key = ("formatting", workload, backend)
+                    reference = ("formatting", workload, "json (CPython)")
+                    if key not in cases or (kind == "speedup" and reference not in cases):
+                        continue
+                    timing = cases[key]["median"]
+                    values.append(
+                        timing * 1e6 if kind == "times" else cases[reference]["median"] / timing
+                    )
+                    versions.append(group["python"])
+                if values:
+                    metrics[kind] = {
+                        "mean": fmean(values),
+                        "min": min(values),
+                        "max": max(values),
+                        "versions": versions,
+                    }
+            if metrics:
+                summary[workload][backend] = metrics
+    return summary
 
 
 def render(paths: list[Path], plots: str | None = None) -> str:
@@ -191,7 +233,20 @@ def render(paths: list[Path], plots: str | None = None) -> str:
         "including outliers. This does not measure between-run variation.",
         "",
     ]
-    return "\n".join(summary + sections)
+    lines = summary + sections
+    collapsed = []
+    in_table = False
+    for line in lines:
+        if line.startswith("|"):
+            if not in_table:
+                title = "Timing statistics" if "Median (µs)" in line else "Speedup values"
+                collapsed.extend([f'??? note "{title}"', ""])
+            collapsed.append(indent(line, "    "))
+            in_table = True
+        else:
+            collapsed.append(line)
+            in_table = False
+    return "\n".join(collapsed)
 
 
 def main() -> None:
@@ -225,9 +280,18 @@ def main() -> None:
         text = args.update.read_text(encoding="utf-8")
         before, rest = text.split(START, 1)
         _, after = rest.split(END, 1)
-        args.update.write_text(
-            before + START + "\n\n" + report + "\n" + END + after, encoding="utf-8"
-        )
+        text = before + START + "\n\n" + report + "\n" + END + after
+        if SUMMARY_START in text:
+            before, rest = text.split(SUMMARY_START, 1)
+            _, after = rest.split(SUMMARY_END, 1)
+            summary = (
+                f"![Complete-formatting times and speedups by workload, with mean and version ranges]"
+                f"({args.plots}/summary.svg)\n"
+                if args.plots
+                else ""
+            )
+            text = before + SUMMARY_START + "\n\n" + summary + "\n" + SUMMARY_END + after
+        args.update.write_text(text, encoding="utf-8")
     else:
         print(report)
     return
