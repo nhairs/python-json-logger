@@ -26,6 +26,7 @@ def main() -> None:
         command += ["latest", "--update-aliases"]
     subprocess.run(command, check=True)
     if stable:
+        # Mike rejects deletion of a missing version, including on release reruns.
         versions = json.loads(subprocess.check_output(["mike", "list", "--json"]))
         if any(item["version"] == "dev" for item in versions):
             subprocess.run(["mike", "delete", "dev"], check=True)
