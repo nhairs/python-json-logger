@@ -7,24 +7,20 @@ predict application throughput or handler I/O performance.
 
 ## Complete-formatting summary
 
-Complete formatting includes record processing and serialization. These results use the [committed baseline](#baseline-results), not application throughput measurements.
+These graphs summarize complete record formatting from the [baseline results](#baseline-results).
+Bars show the arithmetic mean of the per-version median operation times.
+Whiskers show the minimum–maximum of those version medians, not individual timing samples.
 
-Bars show the arithmetic mean across Python versions of each version's median operation time. Whiskers show the minimum–maximum across those versions, not individual timing samples or confidence intervals. Each version has equal weight.
-
-Speedups are calculated against CPython stdlib JSON for the same workload and Python major/minor version, then averaged across versions. They are not ratios of cross-version mean times. Only versions with a matching CPython reference contribute to speedups. Values above 1× indicate faster formatting.
-
-Version coverage differs between runtimes, so these summaries do not isolate interpreter performance. Version coverage is listed here; per-version measurements are in the baseline tables.
-
-- Timing and speedup coverage for json (CPython), orjson (CPython), msgspec (CPython): Python 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6).
-- Timing and speedup coverage for json (PyPy): Python 3.10, 3.11, 3.12 (n=3).
+Speedups average each version's ratio against CPython stdlib JSON for the same
+workload and Python major/minor version. Only versions with a matching reference
+contribute. Lower times and higher speedups indicate faster formatting.
+Each panel starts at zero and has its own scale.
 
 <!-- benchmark-summary:start -->
 
 ![Complete-formatting times and speedups by workload, with mean and version ranges](assets/benchmarking/summary.svg)
 
 <!-- benchmark-summary:end -->
-
-Timing panels: lower is faster. Speedup panels: higher is faster; the dashed line marks 1×. Each panel starts at zero and has its own scale. Open the SVG to view or share the full-size summary.
 
 ## Run benchmarks
 
