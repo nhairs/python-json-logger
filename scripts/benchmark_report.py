@@ -134,56 +134,6 @@ def formatting_summary(groups: list[dict]) -> dict:
     return summary
 
 
-def render_summary(groups: list[dict], plots: str | None = None) -> str:
-    """Render complete-formatting summaries with explicit version coverage."""
-    summary = formatting_summary(groups)
-    lines = [
-        "## Complete-formatting summary",
-        "",
-        "Complete formatting includes record processing and serialization. These results use the "
-        "[committed baseline](#baseline-results), not application throughput measurements.",
-        "",
-        "Bars show the arithmetic mean across Python versions of each version's median operation time. "
-        "Whiskers show the minimum–maximum across those versions, not individual timing samples "
-        "or confidence intervals. Each version has equal weight.",
-        "",
-        "Speedups are calculated against CPython stdlib JSON for the same workload and Python "
-        "major/minor version, then averaged across versions. They are not ratios of "
-        "cross-version mean times. Only versions with a matching CPython reference contribute "
-        "to speedups. Values above 1× indicate faster formatting.",
-        "",
-        "Version coverage differs between runtimes, so these summaries do not isolate interpreter "
-        "performance. Version coverage is listed here; per-version measurements are in the baseline tables.",
-        "",
-    ]
-    coverage = {}
-    for backend, metrics in summary[WORKLOADS[0]].items():
-        for kind, stats in metrics.items():
-            key = (kind, tuple(stats["versions"]))
-            coverage.setdefault(key, []).append(backend)
-    combined = {}
-    for (kind, versions), backends in coverage.items():
-        key = (versions, tuple(backends))
-        combined.setdefault(key, []).append("timing" if kind == "times" else "speedup")
-    for (versions, backends), kinds in combined.items():
-        label = " and ".join(kinds).capitalize()
-        lines += [
-            f"- {label} coverage for {', '.join(backends)}: "
-            f"Python {', '.join(versions)} (n={len(versions)}).",
-        ]
-    lines.append("")
-    if plots:
-        lines += [
-            f"![Complete-formatting times and speedups by workload, with mean and version ranges]({plots}/summary.svg)",
-            "",
-            "Timing panels: lower is faster. Speedup panels: higher is faster; the dashed line marks 1×. "
-            "Each panel starts at zero and has its own scale. "
-            "Open the SVG to view or share the full-size summary.",
-            "",
-        ]
-    return "\n".join(lines).rstrip() + "\n"
-
-
 def render(paths: list[Path], plots: str | None = None) -> str:
     """Render version sections comparing encoders and Python implementations."""
     results = load_results(paths)
@@ -334,7 +284,12 @@ def main() -> None:
         if SUMMARY_START in text:
             before, rest = text.split(SUMMARY_START, 1)
             _, after = rest.split(SUMMARY_END, 1)
-            summary = render_summary(comparison_groups(load_results(args.results)), args.plots)
+            summary = (
+                f"![Complete-formatting times and speedups by workload, with mean and version ranges]"
+                f"({args.plots}/summary.svg)\n"
+                if args.plots
+                else ""
+            )
             text = before + SUMMARY_START + "\n\n" + summary + "\n" + SUMMARY_END + after
         args.update.write_text(text, encoding="utf-8")
     else:

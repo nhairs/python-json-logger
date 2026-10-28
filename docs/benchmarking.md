@@ -5,8 +5,6 @@ with the opt-in benchmark suite. Measurements cover serialization and complete
 record formatting. They help you choose a backend for a workload; they do not
 predict application throughput or handler I/O performance.
 
-<!-- benchmark-summary:start -->
-
 ## Complete-formatting summary
 
 Complete formatting includes record processing and serialization. These results use the [committed baseline](#baseline-results), not application throughput measurements.
@@ -20,11 +18,13 @@ Version coverage differs between runtimes, so these summaries do not isolate int
 - Timing and speedup coverage for json (CPython), orjson (CPython), msgspec (CPython): Python 3.10, 3.11, 3.12, 3.13, 3.14, 3.15 (n=6).
 - Timing and speedup coverage for json (PyPy): Python 3.10, 3.11, 3.12 (n=3).
 
+<!-- benchmark-summary:start -->
+
 ![Complete-formatting times and speedups by workload, with mean and version ranges](assets/benchmarking/summary.svg)
 
-Timing panels: lower is faster. Speedup panels: higher is faster; the dashed line marks 1×. Each panel starts at zero and has its own scale. Open the SVG to view or share the full-size summary.
-
 <!-- benchmark-summary:end -->
+
+Timing panels: lower is faster. Speedup panels: higher is faster; the dashed line marks 1×. Each panel starts at zero and has its own scale. Open the SVG to view or share the full-size summary.
 
 ## Run benchmarks
 
