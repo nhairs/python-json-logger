@@ -138,8 +138,8 @@ If you're not familiar with code review start by reading [this guide](https://go
 
 ### Publishing releases
 
-Maintainers can follow the [release setup and recovery guide](releasing.md) to
-configure trusted publishing and prepare a release.
+Maintainers can follow the [release and recovery checklist](releasing.md) to
+prepare a release and recover failed publishing runs.
 
 ### Adding a new encoder
 
