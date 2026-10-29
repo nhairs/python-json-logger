@@ -14,7 +14,6 @@ After `pypi` approval, it publishes GitHub first, then uploads those bytes to Py
 
 For example, `v4.3.0.rc1` matches project version `4.3.0rc1` and the `4.3.0`
 changelog section. Alpha, beta, undotted suffixes, and combined suffixes are rejected.
-The workflow filter excludes `vladamir/test-the-new-thing`.
 Exact validation blocks invalid releases; it does not prevent tag creation.
 
 ```shell
@@ -64,6 +63,6 @@ uv run --python 3.12 --group dev pytest tests/test_release.py
 ```
 
 - [ ] Run lint, tests, `actionlint`, and a local build/install check.
-- [ ] Review API-facing changes separately. Unit tests check policy and local
-  files/Git; they do not prove GitHub or PyPI integration.
+- [ ] Review API-facing changes separately. Unit tests check release policy;
+  they do not prove GitHub or PyPI integration.
 - [ ] Obtain separate authorization for live releases, TestPyPI trials, or settings changes.

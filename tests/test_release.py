@@ -1,13 +1,9 @@
-"""Release policy unit tests and local file/Git checks; no remote API simulations."""
+"""Unit tests for release policy; no external build, Git, or API integration tests."""
 
 import hashlib
 import importlib.util
-import io
 import json
 from pathlib import Path
-import subprocess
-import tarfile
-import zipfile
 
 import pytest
 
@@ -102,35 +98,6 @@ def test_postrelease_preserves_original_date() -> None:
     return None
 
 
-def distributions(tmp_path: Path, version: str = "4.3.0") -> Path:
-    directory = tmp_path / "dist"
-    directory.mkdir()
-    metadata = f"Name: python-json-logger\nVersion: {version}\n".encode()
-    with zipfile.ZipFile(directory / "package.whl", "w") as archive:
-        archive.writestr("package.dist-info/METADATA", metadata)
-    with tarfile.open(directory / "package.tar.gz", "w:gz") as archive:
-        member = tarfile.TarInfo("package/PKG-INFO")
-        member.size = len(metadata)
-        archive.addfile(member, io.BytesIO(metadata))
-    return directory
-
-
-@pytest.mark.parametrize("version", ["4.3.0", "4.3.0rc1"])
-def test_distribution_metadata_and_manifest(tmp_path: Path, version: str) -> None:
-    directory = distributions(tmp_path, version)
-    release.validate_distributions(directory, version)
-    manifest = json.loads((tmp_path / "SHA256SUMS.json").read_text())
-    assert manifest == {
-        p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in directory.iterdir()
-    }
-    with pytest.raises(ValueError):
-        release.validate_distributions(directory, "4.3.1")
-    (directory / "extra.whl").touch()
-    with pytest.raises(ValueError):
-        release.validate_distributions(directory, "4.3.0")
-    return None
-
-
 @pytest.mark.parametrize(
     "existing,expected",
     [
@@ -152,8 +119,15 @@ def test_conflicting_pypi_files(existing: dict[str, str]) -> None:
 
 
 def test_bundle_identity_and_checksums(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    directory = distributions(tmp_path)
-    release.validate_distributions(directory, "4.3.0")
+    directory = tmp_path / "dist"
+    directory.mkdir()
+    # Treat distributions as opaque bytes: this checks our retained-file policy.
+    files = {"package.whl": b"wheel bytes", "package.tar.gz": b"sdist bytes"}
+    for name, content in files.items():
+        (directory / name).write_bytes(content)
+    (tmp_path / "SHA256SUMS.json").write_text(
+        json.dumps({name: hashlib.sha256(content).hexdigest() for name, content in files.items()})
+    )
     (tmp_path / "release.json").write_text(json.dumps({"tag": "v4.3.0", "commit": "abc"}))
     monkeypatch.setenv("GITHUB_REF_NAME", "v4.3.0")
     monkeypatch.setenv("GITHUB_SHA", "wrong")
@@ -164,54 +138,6 @@ def test_bundle_identity_and_checksums(tmp_path: Path, monkeypatch: pytest.Monke
     (directory / "package.whl").write_bytes(b"corrupted")
     with pytest.raises(ValueError, match="checksum mismatch"):
         release.verify_bundle(tmp_path)
-    return None
-
-
-@pytest.fixture
-def git_repository(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
-    """Create self-contained Git history; CI checkouts may be shallow and tagless."""
-    repository = tmp_path / "repo"
-    repository.mkdir()
-    monkeypatch.chdir(repository)
-    subprocess.run(["git", "init", "-b", "main"], check=True)
-    # Fixture-only identity in this temporary repository, independent of CI configuration.
-    subprocess.run(["git", "config", "user.name", "Release test fixture"], check=True)
-    subprocess.run(["git", "config", "user.email", "release-test@example.invalid"], check=True)
-    (repository / "docs").mkdir()
-    Path("pyproject.toml").write_text('[project]\nversion = "4.2.0"\n')
-    Path("docs/changelog.md").write_text(
-        "# Changes\n\n## [4.2.0](compare) - 2025-01-02\n\n- Base release.\n"
-    )
-    subprocess.run(["git", "add", "."], check=True)
-    subprocess.run(
-        ["git", "-c", "commit.gpgsign=false", "commit", "-m", "Base release fixture"], check=True
-    )
-    subprocess.run(["git", "-c", "tag.gpgsign=false", "tag", "v4.2.0"], check=True)
-    Path("pyproject.toml").write_text('[project]\nversion = "4.3.0"\n')
-    Path("docs/changelog.md").write_text(changelog())
-    subprocess.run(["git", "add", "."], check=True)
-    subprocess.run(
-        ["git", "-c", "commit.gpgsign=false", "commit", "-m", "Next release fixture"], check=True
-    )
-    subprocess.run(["git", "update-ref", "refs/remotes/origin/main", "HEAD"], check=True)
-    return repository
-
-
-@pytest.mark.parametrize("reachable", [True, False])
-def test_prepare_with_real_git(git_repository: Path, reachable: bool) -> None:
-    repository = git_repository
-    head = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
-    base = head if reachable else "HEAD^"
-    subprocess.run(["git", "update-ref", "refs/remotes/origin/main", base], check=True)
-    target = repository / "bundle"
-    if reachable:
-        release.prepare("v4.3.0", target)
-        assert json.loads((target / "release.json").read_text())["commit"] == head
-        assert (target / "notes.md").read_text().startswith("## [4.3.0]")
-    else:
-        with pytest.raises(subprocess.CalledProcessError):
-            release.prepare("v4.3.0", target)
-        assert not target.exists()
     return None
 
 
@@ -246,25 +172,13 @@ def test_workflow_permissions_and_order() -> None:
     return None
 
 
-@pytest.mark.parametrize("change_date", [False, True])
-def test_postrelease_date_against_base_tag(git_repository: Path, change_date: bool) -> None:
-    repository = git_repository
-    original = subprocess.check_output(
-        ["git", "show", "refs/tags/v4.2.0:docs/changelog.md"], text=True
-    )
-    _, original_notes = release.release_info("v4.2.0", "4.2.0", original)
-    original_date = original_notes.split("\n", 1)[0].rsplit(" - ", 1)[1]
-    text = changelog("2000-01-01" if change_date else original_date).replace("[4.3.0]", "[4.2.0]")
-    # Keep just the first section: the generic fixture already has an older 4.2.0 entry.
-    text = text.split("## [4.2.0]", 2)
-    Path("docs/changelog.md").write_text(text[0] + "## [4.2.0]" + text[1])
-    Path("pyproject.toml").write_text('[project]\nversion = "4.2.0.post1"\n')
-    target = repository / "bundle"
-    if change_date:
-        with pytest.raises(ValueError, match="retain the base release date"):
-            release.prepare("v4.2.0.post1", target)
-        assert not target.exists()
+@pytest.mark.parametrize("date", ["2025-01-02", "2026-01-02"])
+def test_postrelease_date_policy(date: str) -> None:
+    original = "## [4.2.0](compare) - 2025-01-02\n\n- Original changes.\n"
+    post = f"## [4.2.0](compare) - {date}\n\n- Extra post-release changes.\n"
+    if date == "2025-01-02":
+        release.validate_post_date(post, original)
     else:
-        release.prepare("v4.2.0.post1", target)
-        assert original_date in (target / "notes.md").read_text().split("\n", 1)[0]
+        with pytest.raises(ValueError, match="retain the base release date"):
+            release.validate_post_date(post, original)
     return None

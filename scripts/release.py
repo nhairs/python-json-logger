@@ -56,6 +56,15 @@ def release_info(tag: str, project_version: str, changelog: str) -> tuple[str, s
     return str(version), section
 
 
+def validate_post_date(notes: str, original_notes: str) -> None:
+    """Reject changing the base release date when preparing a post release."""
+    original_date = original_notes.split("\n", 1)[0].rsplit(" - ", 1)[1]
+    release_date = notes.split("\n", 1)[0].rsplit(" - ", 1)[1]
+    if release_date != original_date:
+        raise ValueError("Post release must retain the base release date")
+    return None
+
+
 def prepare(tag: str, destination: Path) -> None:
     """Validate tag ancestry and write release metadata."""
     subprocess.run(["git", "merge-base", "--is-ancestor", "HEAD", "origin/main"], check=True)
@@ -66,10 +75,7 @@ def prepare(tag: str, destination: Path) -> None:
         base = parsed.base_version
         original = run("git", "show", f"refs/tags/v{base}:docs/changelog.md")
         _, original_notes = release_info(f"v{base}", base, original)
-        original_date = original_notes.split("\n", 1)[0].rsplit(" - ", 1)[1]
-        release_date = notes.split("\n", 1)[0].rsplit(" - ", 1)[1]
-        if release_date != original_date:
-            raise ValueError("Post release must retain the base release date")
+        validate_post_date(notes, original_notes)
     destination.mkdir(parents=True, exist_ok=True)
     (destination / "notes.md").write_text(notes)
     (destination / "release.json").write_text(
