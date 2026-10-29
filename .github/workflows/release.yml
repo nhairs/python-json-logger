@@ -141,7 +141,7 @@ jobs:
           if [ "$is_draft" = true ]; then
             gh release edit "$GITHUB_REF_NAME" --draft=false --repo "$GITHUB_REPOSITORY"
           fi
-      - uses: pypa/gh-action-pypi-publish@106e0b0b7c337fa67ed433972f777c6357f78598 # v1.13.0
+      - uses: pypa/gh-action-pypi-publish@ed0c53931b1dc9bd32cbe73a98c7f6766f8a527e # v1.13.0
         if: needs.select.outputs.missing == 'true'
         with:
           packages-dir: upload/
