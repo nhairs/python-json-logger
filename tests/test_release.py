@@ -98,23 +98,54 @@ def test_postrelease_preserves_original_date() -> None:
     return None
 
 
-@pytest.mark.parametrize(
-    "existing,expected",
-    [
-        ({}, {"wheel", "sdist"}),
-        ({"wheel": "aaa"}, {"sdist"}),
-        ({"wheel": "aaa", "sdist": "bbb"}, set()),
-    ],
-)
-def test_missing_files(existing: dict[str, str], expected: set[str]) -> None:
-    assert release.missing_files({"wheel": "aaa", "sdist": "bbb"}, existing) == expected
+@pytest.mark.parametrize("existing", [{}, {"wheel": "aaa"}, {"wheel": "aaa", "sdist": "bbb"}])
+def test_any_pypi_record_blocks_new_release(existing: dict[str, str]) -> None:
+    with pytest.raises(ValueError, match="already exists"):
+        release.require_unpublished(existing)
     return None
 
 
-@pytest.mark.parametrize("existing", [{"wheel": "wrong"}, {"unexpected": "aaa"}])
-def test_conflicting_pypi_files(existing: dict[str, str]) -> None:
-    with pytest.raises(ValueError, match="conflict"):
-        release.missing_files({"wheel": "aaa", "sdist": "bbb"}, existing)
+def test_absent_version_is_eligible() -> None:
+    release.require_unpublished(None)
+    return None
+
+
+@pytest.mark.parametrize(
+    "existing", [None, {}, {"wheel": "aaa"}, {"wheel": "wrong", "sdist": "bbb"}]
+)
+def test_finalize_requires_complete_matching_publication(existing: dict[str, str] | None) -> None:
+    with pytest.raises(ValueError, match="complete release manifest"):
+        release.require_published({"wheel": "aaa", "sdist": "bbb"}, existing)
+    return None
+
+
+def test_complete_publication_can_finalize() -> None:
+    release.require_published({"wheel": "aaa", "sdist": "bbb"}, {"wheel": "aaa", "sdist": "bbb"})
+    return None
+
+
+@pytest.mark.parametrize("commit,expected", [("abc", "update"), ("def", "replace")])
+def test_draft_commit_policy(commit: str, expected: str) -> None:
+    assert release.draft_action({"draft": True, "target_commitish": commit}, "abc") == expected
+    return None
+
+
+def test_public_release_requires_owner_cleanup() -> None:
+    assert release.draft_action(None, "abc") == "create"
+    with pytest.raises(ValueError, match="owner cleanup"):
+        release.draft_action({"draft": False, "target_commitish": "abc"}, "abc")
+    return None
+
+
+@pytest.mark.parametrize("kind,current", [("commit", "old"), ("tree", "approved")])
+def test_stale_run_cannot_publish(kind: str, current: str) -> None:
+    with pytest.raises(ValueError, match="stale run"):
+        release.require_current_commit(kind, current, "approved")
+    return None
+
+
+def test_live_source_matches_approval() -> None:
+    release.require_current_commit("commit", "approved", "approved")
     return None
 
 
@@ -152,23 +183,47 @@ def test_workflow_permissions_and_order() -> None:
     for job, dependency in (
         ("ci", "validate"),
         ("draft", "build"),
-        ("select", "draft"),
-        ("publish", "select"),
     ):
         assert jobs[job]["needs"] == dependency
     for name, job in jobs.items():
         permissions = job.get("permissions", {})
-        assert (permissions.get("contents") == "write") == (name in ("draft", "publish"))
+        assert (permissions.get("contents") == "write") == (name in ("draft", "finalize"))
         assert (permissions.get("id-token") == "write") == (name == "publish")
         for step in job.get("steps", []):
             if "uses" in step:
                 assert len(step["uses"].split("@")[1]) == 40
     assert jobs["publish"]["environment"]["name"] == "pypi"
     assert not any("scripts/" in step.get("run", "") for step in jobs["publish"]["steps"])
+    assert jobs["publish"]["needs"] == ["build", "draft"]
+    assert jobs["finalize"]["needs"] == ["build", "publish"]
+    assert "needs.publish.outputs.uploaded == 'success'" in jobs["finalize"]["if"]
+    assert workflow["concurrency"]["cancel-in-progress"] == "false"
+    assert jobs["ci"]["needs"] == "validate"
+    assert "eligible" in jobs["validate"]["steps"][-1]["run"]
+    build = jobs["build"]["steps"]
+    assert not any("recover" in step.get("run", "") for step in build)
+    assert any("python -m build" in step.get("run", "") for step in build)
+    assert build[-1]["with"]["name"] == "release-bundle-${{ github.run_attempt }}"
+    assert "select" not in jobs
+    for name in ("draft", "publish", "finalize"):
+        download = next(s for s in jobs[name]["steps"] if "download-artifact" in s.get("uses", ""))
+        assert download["with"]["artifact-ids"] == "${{ needs.build.outputs.bundle-id }}"
     steps = jobs["publish"]["steps"]
-    assert "gh release edit" in steps[-2]["run"]
-    assert "pypa/gh-action-pypi-publish@" in steps[-1]["uses"]
-    assert not any("checkout" in step.get("uses", "") for step in jobs["publish"]["steps"])
+    assert not any("checkout" in step.get("uses", "") for step in steps)
+    assert not any("gh release edit" in step.get("run", "") for step in steps)
+    preflight = next(s for s in steps if s.get("id") == "preflight")
+    assert "git/ref/tags" in preflight["run"]
+    assert '"$status" != 404' in preflight["run"]
+    assert "sha256sum --check" in preflight["run"]
+    upload = next(s for s in steps if s.get("id") == "upload")
+    assert "pypa/gh-action-pypi-publish@" in upload["uses"]
+    assert upload["with"]["packages-dir"] == "bundle/dist/"
+    evidence = steps[-2]
+    assert evidence["if"] == "always()"
+    assert "*.publish.attestation" in evidence["run"]
+    assert "attestation_status" in evidence["run"]
+    assert steps[-1]["if"] == "always()"
+    assert steps[-1]["with"]["retention-days"] == "90"
     return None
 
 

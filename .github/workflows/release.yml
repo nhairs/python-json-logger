@@ -20,14 +20,18 @@ jobs:
         with:
           python-version: '3.12'
       - run: python -m pip install packaging
-      - run: python scripts/release.py prepare
+      - name: Check new-release eligibility before lint and tests
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python scripts/release.py prepare
+          python scripts/release.py eligible
   ci:
     needs: validate
     uses: ./.github/workflows/test-suite.yml
   build:
-    permissions:
-      contents: read
-      actions: read
+    outputs:
+      bundle-id: ${{ steps.bundle.outputs.artifact-id }}
     needs: [validate, ci]
     runs-on: ubuntu-latest
     steps:
@@ -39,35 +43,19 @@ jobs:
         with:
           python-version: '3.12'
       - run: python -m pip install build packaging twine
-      - name: Recover retained artifacts before considering a build
-        id: recover
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: python scripts/release.py recover
-      - name: Refuse to rebuild an existing release
-        if: steps.recover.outputs.recovered != 'true'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
+      - run: |
           python scripts/release.py prepare
-          python scripts/release.py guard
-      - if: steps.recover.outputs.recovered != 'true'
-        run: |
           python -m build --outdir bundle/dist
           python scripts/release.py validate
           python -m twine check bundle/dist/*
           python -m venv "$RUNNER_TEMP/release-install"
           "$RUNNER_TEMP/release-install/bin/python" -m pip install --no-deps bundle/dist/*.whl
           "$RUNNER_TEMP/release-install/bin/python" -I scripts/release_smoke.py
-      - name: Verify bundle identity and checksums
-        run: python scripts/release.py verify
-      # Re-retain official release recovery for downstream jobs. An available
-      # original artifact is never replaced; overwrite only clears expired entries.
+          python scripts/release.py verify
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        if: steps.recover.outputs.retained != 'true'
+        id: bundle
         with:
-          name: release-bundle
-          overwrite: true
+          name: release-bundle-${{ github.run_attempt }}
           path: bundle/
           if-no-files-found: error
           retention-days: 90
@@ -86,16 +74,112 @@ jobs:
       - run: python -m pip install packaging
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
-          name: release-bundle
+          artifact-ids: ${{ needs.build.outputs.bundle-id }}
+          merge-multiple: true
           path: bundle
       - run: python scripts/release.py stage
         env:
           GH_TOKEN: ${{ github.token }}
-  select:
-    needs: draft
-    runs-on: ubuntu-latest
+  publish:
     outputs:
-      missing: ${{ steps.files.outputs.missing }}
+      uploaded: ${{ steps.upload.outcome }}
+    needs: [build, draft]
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/python-json-logger
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          artifact-ids: ${{ needs.build.outputs.bundle-id }}
+          merge-multiple: true
+          path: bundle
+      # No checkout or repository code in the credential-bearing job.
+      - name: Recheck approved source, draft, bytes and PyPI absence
+        id: preflight
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          jq -e --arg tag "$GITHUB_REF_NAME" --arg sha "$GITHUB_SHA" --arg run "$GITHUB_RUN_ID" \
+            '.tag == $tag and .commit == $sha and .run_id == $run' bundle/release.json
+          object=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$GITHUB_REF_NAME" --jq '.object')
+          while [ "$(jq -r .type <<< "$object")" = tag ]; do
+            object=$(gh api "repos/$GITHUB_REPOSITORY/git/tags/$(jq -r .sha <<< "$object")" --jq '.object')
+          done
+          test "$(jq -r .type <<< "$object")" = commit
+          test "$(jq -r .sha <<< "$object")" = "$GITHUB_SHA"
+          jq -e 'length == 2 and ([keys[] | select(endswith(".whl"))] | length) == 1 and
+            ([keys[] | select(endswith(".tar.gz"))] | length) == 1 and
+            all(keys[]; test("^[A-Za-z0-9_.+-]+$")) and
+            all(.[]; test("^[a-f0-9]{64}$"))' bundle/SHA256SUMS.json
+          test "$(find bundle/dist -mindepth 1 -maxdepth 1 | wc -l)" -eq 2
+          jq -r 'to_entries[] | "\(.value)  \(.key)"' bundle/SHA256SUMS.json > "$RUNNER_TEMP/checksums"
+          (cd bundle/dist && sha256sum --check "$RUNNER_TEMP/checksums")
+          draft=$(gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" \
+            --json isDraft,targetCommitish,body,isPrerelease,assets)
+          jq -e --arg sha "$GITHUB_SHA" --rawfile notes bundle/notes.md \
+            --slurpfile info bundle/release.json \
+            '.isDraft and .targetCommitish == $sha and .body == $notes and
+            .isPrerelease == $info[0].prerelease' <<< "$draft"
+          jq -e --slurpfile manifest bundle/SHA256SUMS.json \
+            '([.assets[].name] | sort) == (($manifest[0] | keys) + ["release.json", "SHA256SUMS.json"] | sort)' <<< "$draft"
+          mkdir "$RUNNER_TEMP/draft"
+          gh release download "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --dir "$RUNNER_TEMP/draft"
+          cmp bundle/release.json "$RUNNER_TEMP/draft/release.json"
+          cmp bundle/SHA256SUMS.json "$RUNNER_TEMP/draft/SHA256SUMS.json"
+          for file in bundle/dist/*; do cmp "$file" "$RUNNER_TEMP/draft/$(basename "$file")"; done
+          version=$(jq -r .version bundle/release.json)
+          status=$(curl --silent --show-error --connect-timeout 10 --max-time 30 --output "$RUNNER_TEMP/pypi.json" --write-out '%{http_code}' \
+            "https://pypi.org/pypi/python-json-logger/$version/json")
+          if [ "$status" != 404 ]; then
+            echo "Target PyPI version is not absent (HTTP $status); stop and recover manually."
+            exit 1
+          fi
+      - uses: pypa/gh-action-pypi-publish@ed0c53931b1dc9bd32cbe73a98c7f6766f8a527e # v1.13.0
+        id: upload
+        with:
+          packages-dir: bundle/dist/
+      - name: Retain publication evidence even after failure
+        if: always()
+        env:
+          BUNDLE_ID: ${{ needs.build.outputs.bundle-id }}
+          PREFLIGHT: ${{ steps.preflight.outcome }}
+          UPLOAD: ${{ steps.upload.outcome }}
+        shell: bash
+        run: |
+          mkdir -p evidence/attestations
+          cp bundle/release.json bundle/SHA256SUMS.json evidence/ 2>/dev/null || true
+          find bundle/dist -maxdepth 1 -name '*.publish.attestation' -exec cp {} evidence/attestations/ \; 2>/dev/null || true
+          count=$(find evidence/attestations -type f | wc -l)
+          if [ "$count" -gt 0 ]; then
+            (cd evidence && sha256sum attestations/* > attestation-checksums.txt)
+          fi
+          jq -n --arg run "$GITHUB_RUN_ID" --arg attempt "$GITHUB_RUN_ATTEMPT" \
+            --arg bundle "$BUNDLE_ID" --arg preflight "$PREFLIGHT" --arg upload "$UPLOAD" \
+            --argjson attestations "$count" \
+            '{run_id:$run, run_attempt:$attempt, bundle_artifact_id:$bundle,
+              preflight:$preflight, upload:$upload, attestation_count:$attestations,
+              attestation_status:(if $attestations == 0 then "none generated or available" else "retained" end)}' \
+            > evidence/publication.json
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          # A failed-job rerun may reuse a successful build's earlier bundle ID.
+          name: publication-evidence-${{ github.run_attempt }}
+          path: evidence/
+          if-no-files-found: error
+          retention-days: 90
+  finalize:
+    if: ${{ !cancelled() && needs.publish.outputs.uploaded == 'success' }}
+    needs: [build, publish]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
@@ -106,42 +190,29 @@ jobs:
       - run: python -m pip install packaging
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
-          name: release-bundle
+          artifact-ids: ${{ needs.build.outputs.bundle-id }}
+          merge-multiple: true
           path: bundle
-      - name: Verify retained bytes and select missing PyPI files
-        id: files
-        run: python scripts/release.py select
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        if: steps.files.outputs.missing == 'true'
-        with:
-          name: pypi-upload-${{ github.run_attempt }}
-          path: upload/
-          if-no-files-found: error
-          retention-days: 90
-  publish:
-    needs: select
-    runs-on: ubuntu-latest
-    environment:
-      name: pypi
-      url: https://pypi.org/p/python-json-logger
-    permissions:
-      contents: write
-      id-token: write
-    steps:
-      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
-        if: needs.select.outputs.missing == 'true'
-        with:
-          name: pypi-upload-${{ github.run_attempt }}
-          path: upload
-      - name: Publish the verified GitHub release before uploading to PyPI
+      - name: Verify complete PyPI publication and publish the original GitHub draft
+        id: finalize
         env:
           GH_TOKEN: ${{ github.token }}
+        run: python scripts/release.py finalize
+      - name: Record finalization outcome
+        if: always()
+        env:
+          BUNDLE_ID: ${{ needs.build.outputs.bundle-id }}
+          FINALIZE: ${{ steps.finalize.outcome }}
         run: |
-          is_draft=$(gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --json isDraft --jq .isDraft)
-          if [ "$is_draft" = true ]; then
-            gh release edit "$GITHUB_REF_NAME" --draft=false --repo "$GITHUB_REPOSITORY"
-          fi
-      - uses: pypa/gh-action-pypi-publish@ed0c53931b1dc9bd32cbe73a98c7f6766f8a527e # v1.13.0
-        if: needs.select.outputs.missing == 'true'
+          mkdir -p evidence
+          jq -n --arg run "$GITHUB_RUN_ID" --arg attempt "$GITHUB_RUN_ATTEMPT" \
+            --arg bundle "$BUNDLE_ID" --arg finalize "$FINALIZE" \
+            '{run_id:$run, run_attempt:$attempt, bundle_artifact_id:$bundle, finalize:$finalize}' \
+            > evidence/finalization.json
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
         with:
-          packages-dir: upload/
+          name: finalization-evidence-${{ github.run_attempt }}
+          path: evidence/
+          if-no-files-found: error
+          retention-days: 90

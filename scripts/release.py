@@ -8,7 +8,6 @@ import json
 import os
 from pathlib import Path
 import re
-import shutil
 import subprocess
 import tarfile
 import tomllib
@@ -85,6 +84,8 @@ def prepare(tag: str, destination: Path) -> None:
                 "version": version,
                 "commit": run("git", "rev-parse", "HEAD"),
                 "prerelease": Version(version).is_prerelease,
+                "run_id": os.environ["GITHUB_RUN_ID"],
+                "run_attempt": os.environ["GITHUB_RUN_ATTEMPT"],
             }
         )
     )
@@ -145,7 +146,7 @@ class GitHub:
         )
         try:
             with urllib.request.urlopen(request, timeout=30) as response:
-                return json.load(response)
+                return None if response.status == 204 else json.load(response)
         except urllib.error.HTTPError as error:
             if error.code == 404 and method is None and data is None:
                 return None
@@ -169,57 +170,79 @@ class GitHub:
         return matches[0] if matches else None
 
 
-def stage(bundle: Path, api: GitHub) -> None:
-    """Stage exact assets; reuse matching published releases without modifying them."""
+def draft_action(release: dict | None, commit: str) -> str:
+    """Choose draft replacement without ever modifying a public release."""
+    if release is None:
+        return "create"
+    if not release["draft"]:
+        raise ValueError("Published GitHub release requires owner cleanup")
+    return "update" if release["target_commitish"] == commit else "replace"
+
+
+def live_tag(api: GitHub) -> None:
+    """Resolve lightweight or annotated live tags and reject stale runs."""
+    ref = api.request(f'/git/ref/tags/{os.environ["GITHUB_REF_NAME"]}')
+    if ref is None:
+        raise ValueError("Release tag was deleted")
+    obj = ref["object"]
+    while obj["type"] == "tag":
+        obj = api.request(f'/git/tags/{obj["sha"]}')["object"]
+    require_current_commit(obj["type"], obj["sha"], os.environ["GITHUB_SHA"])
+    return None
+
+
+def require_current_commit(kind: str, current: str, expected: str) -> None:
+    """Reject approvals for moved tags or tags pointing at non-commits."""
+    if kind != "commit" or current != expected:
+        raise ValueError("Release tag moved; cancel this stale run")
+    return None
+
+
+def eligible(bundle: Path, api: GitHub) -> None:
+    """Reject any existing target PyPI version before expensive checks."""
     info = json.loads((bundle / "release.json").read_text())
-    notes = (bundle / "notes.md").read_text()
+    require_unpublished(pypi_files(info["version"]))
+    draft_action(api.find_release(info["tag"]), info["commit"])
+    live_tag(api)
+    return None
+
+
+def stage(bundle: Path, api: GitHub) -> None:
+    """Replace all draft assets, recreating the draft when its commit changed."""
+    eligible(bundle, api)
+    info = json.loads((bundle / "release.json").read_text())
     manifest = verify_bundle(bundle)
-    assets = {name: (bundle / "dist" / name).read_bytes() for name in manifest}
-    assets["SHA256SUMS.json"] = (bundle / "SHA256SUMS.json").read_bytes()
-    assets["release.json"] = (bundle / "release.json").read_bytes()
     release = api.find_release(info["tag"])
+    action = draft_action(release, info["commit"])
+    if action == "replace":
+        assert release is not None
+        api.request(f'/releases/{release["id"]}', method="DELETE")
+        release = None
     expected = {
         "tag_name": info["tag"],
         "target_commitish": info["commit"],
         "name": info["tag"][1:],
-        "body": notes,
+        "body": (bundle / "notes.md").read_text(),
         "prerelease": info["prerelease"],
+        "draft": True,
     }
     if release is None:
-        release = api.request("/releases", expected | {"draft": True})
-    elif any(release[key] != value for key, value in expected.items()):
-        raise ValueError("Existing release does not match this bundle")
-    existing = api.request(f'/releases/{release["id"]}/assets?per_page=100')
-    if any(asset["name"] not in assets for asset in existing):
-        raise ValueError("Unexpected release assets")
-    missing = []
-    for name, content in assets.items():
-        found = [a for a in existing if a["name"] == name]
-        if found:
-            # Download through the authenticated API, including private draft assets.
-            result = subprocess.check_output(
-                [
-                    "gh",
-                    "api",
-                    "-H",
-                    "Accept: application/octet-stream",
-                    f'/repos/{os.environ["GITHUB_REPOSITORY"]}/releases/assets/{found[0]["id"]}',
-                ]
-            )
-            if result != content:
-                raise ValueError(f"Conflicting release asset: {name}")
-        else:
-            missing.append(name)
-    if not release["draft"] and missing:
-        raise ValueError("Published GitHub release has missing assets")
-    for name in missing:
+        release = api.request("/releases", expected)
+    else:
+        api.request(f'/releases/{release["id"]}', expected, method="PATCH")
+        for asset in api.request(f'/releases/{release["id"]}/assets?per_page=100'):
+            api.request(f'/releases/assets/{asset["id"]}', method="DELETE")
+    for path in [bundle / "dist" / name for name in manifest] + [
+        bundle / "SHA256SUMS.json",
+        bundle / "release.json",
+    ]:
         subprocess.run(
             [
                 "gh",
                 "release",
                 "upload",
                 info["tag"],
-                str(bundle / ("dist/" + name if name in manifest else name)),
+                str(path),
                 "--repo",
                 os.environ["GITHUB_REPOSITORY"],
             ],
@@ -228,7 +251,7 @@ def stage(bundle: Path, api: GitHub) -> None:
     return None
 
 
-def pypi_files(version: str) -> dict[str, str]:
+def pypi_files(version: str) -> dict[str, str] | None:
     """Read published hashes; only HTTP 404 means that a version is absent."""
     try:
         with urllib.request.urlopen(
@@ -239,15 +262,22 @@ def pypi_files(version: str) -> dict[str, str]:
             }
     except urllib.error.HTTPError as error:
         if error.code == 404:
-            return {}
+            return None
         raise
 
 
-def missing_files(manifest: dict[str, str], existing: dict[str, str]) -> set[str]:
-    """Select missing filenames only after every existing filename and hash matches."""
-    if any(name not in manifest or manifest[name] != digest for name, digest in existing.items()):
-        raise ValueError("PyPI files conflict with retained manifest")
-    return set(manifest) - set(existing)
+def require_unpublished(existing: dict[str, str] | None) -> None:
+    """Even an empty or yanked version record blocks ordinary publishing."""
+    if existing is not None:
+        raise ValueError("PyPI version already exists; recover original bytes manually")
+    return None
+
+
+def require_published(manifest: dict[str, str], existing: dict[str, str] | None) -> None:
+    """Finalize only an exact, complete publication of the approved bundle."""
+    if existing != manifest:
+        raise ValueError("PyPI files do not match the complete release manifest")
+    return None
 
 
 def verify_bundle(bundle: Path) -> dict[str, str]:
@@ -272,160 +302,40 @@ def verify_bundle(bundle: Path) -> dict[str, str]:
     return manifest
 
 
-def output(name: str, value: bool) -> None:
-    """Set a boolean GitHub Actions step output."""
-    with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as stream:
-        stream.write(f"{name}={str(value).lower()}\n")
-    return None
-
-
-def recover(bundle: Path, api: GitHub) -> None:
-    """Recover this run's artifact, falling back to verified official release assets."""
-    run_id = os.environ["GITHUB_RUN_ID"]
-    artifacts = []
-    page = 1
-    while True:
-        entries = api.request(f"/actions/runs/{run_id}/artifacts?per_page=100&page={page}")[
-            "artifacts"
-        ]
-        artifacts.extend(a for a in entries if a["name"] == "release-bundle")
-        if len(entries) < 100:
-            break
-        page += 1
-    if len(artifacts) > 1:
-        raise ValueError("Ambiguous bundle; recover manually")
-    if not artifacts or artifacts[0]["expired"]:
-        recovered = recover_published(bundle, api)
-        if not recovered and artifacts:
-            raise ValueError("Expired bundle without an official release; recover manually")
-        output("recovered", recovered)
-        output("retained", False)
-        return None
-    if artifacts:
-        subprocess.run(
-            ["gh", "run", "download", run_id, "-n", "release-bundle", "-D", str(bundle)], check=True
-        )
-    output("recovered", bool(artifacts))
-    output("retained", bool(artifacts))
-    return None
-
-
-def recover_published(bundle: Path, api: GitHub) -> bool:
-    """Restore original bytes from a matching official release, never rebuild them."""
-    tag = os.environ["GITHUB_REF_NAME"]
-    published = api.request(f"/releases/tags/{tag}")
-    if published is None:
-        return False
-    if published["draft"]:
-        raise ValueError("Expected a published release for public artifact recovery")
-    prepare(tag, bundle)
-    info = json.loads((bundle / "release.json").read_text())
-    notes = (bundle / "notes.md").read_text()
-    expected = {
-        "tag_name": tag,
-        "target_commitish": info["commit"],
-        "name": tag[1:],
-        "body": notes,
-        "prerelease": info["prerelease"],
-    }
-    if any(published[key] != value for key, value in expected.items()):
-        raise ValueError("Published release differs from the tagged source")
-    # Retain the exact metadata asset rather than reserializing it on recovery.
-    (bundle / "release.json").unlink()
-    subprocess.run(
-        [
-            "gh",
-            "release",
-            "download",
-            tag,
-            "--pattern",
-            "release.json",
-            "--pattern",
-            "SHA256SUMS.json",
-            "--dir",
-            str(bundle),
-            "--repo",
-            os.environ["GITHUB_REPOSITORY"],
-        ],
-        check=True,
-    )
-    if json.loads((bundle / "release.json").read_text()) != info:
-        raise ValueError("Published release metadata differs from the tagged source")
-    manifest = json.loads((bundle / "SHA256SUMS.json").read_text())
-    if len(manifest) != 2 or any(Path(name).name != name for name in manifest):
-        raise ValueError("Invalid published distribution manifest")
-    names = {a["name"] for a in api.request(f'/releases/{published["id"]}/assets?per_page=100')}
-    if names != set(manifest) | {"release.json", "SHA256SUMS.json"}:
-        raise ValueError("Unexpected published release assets")
-    destination = bundle / "dist"
-    destination.mkdir()
-    for name in manifest:
-        subprocess.run(
-            [
-                "gh",
-                "release",
-                "download",
-                tag,
-                "--pattern",
-                name,
-                "--dir",
-                str(destination),
-                "--repo",
-                os.environ["GITHUB_REPOSITORY"],
-            ],
-            check=True,
-        )
-    verify_bundle(bundle)
-    return True
-
-
-def guard_rebuild(bundle: Path, api: GitHub) -> None:
-    """Refuse rebuilding a previous release when its retained bytes are unavailable."""
-    info = json.loads((bundle / "release.json").read_text())
-    run_id = os.environ["GITHUB_RUN_ID"]
-    page = 1
-    while True:
-        runs = api.request(
-            f"/actions/workflows/release.yml/runs?event=push&per_page=100&page={page}"
-        )["workflow_runs"]
-        if any(str(r["id"]) != run_id and r["head_branch"] == info["tag"] for r in runs):
-            raise ValueError("Previous run for this tag: recover the original run")
-        if len(runs) < 100:
-            break
-        page += 1
-    page = 1
-    while True:
-        jobs = api.request(f"/actions/runs/{run_id}/jobs?filter=all&per_page=100&page={page}")[
-            "jobs"
-        ]
-        if any(
-            (j["name"] == "build" and j["conclusion"] == "success")
-            or (
-                j["name"] == "draft"
-                and j["started_at"] is not None
-                and j["conclusion"] != "skipped"
-            )
-            for j in jobs
-        ):
-            raise ValueError("Previous bundle unavailable after build/staging: recover manually")
-        if len(jobs) < 100:
-            break
-        page += 1
-    if api.request("/releases/tags/" + info["tag"]) is not None or pypi_files(info["version"]):
-        raise ValueError("Existing release: restore retained artifacts manually")
-    return None
-
-
-def select_upload(bundle: Path) -> None:
-    """Verify and copy missing files in a read-only job before the approval gate."""
+def finalize(bundle: Path, api: GitHub) -> None:
+    """Publish only the original draft after verifying every public PyPI hash."""
     manifest = verify_bundle(bundle)
     info = json.loads((bundle / "release.json").read_text())
-    missing = missing_files(manifest, pypi_files(info["version"]))
-    destination = Path("upload")
-    destination.mkdir()
-    for name in missing:
-        shutil.copyfile(bundle / "dist" / name, destination / name)
-    output("missing", bool(missing))
+    live_tag(api)
+    require_published(manifest, pypi_files(info["version"]))
+    release = api.find_release(info["tag"])
+    if release is None or release["target_commitish"] != info["commit"]:
+        raise ValueError("Missing or changed release draft")
+    # Compare downloaded assets byte for byte, including attempt identity.
+    assets = api.request(f'/releases/{release["id"]}/assets?per_page=100')
+    expected = set(manifest) | {"release.json", "SHA256SUMS.json"}
+    if {a["name"] for a in assets} != expected:
+        raise ValueError("Unexpected release assets")
+    for asset in assets:
+        content = subprocess.check_output(
+            [
+                "gh",
+                "api",
+                "-H",
+                "Accept: application/octet-stream",
+                f'/repos/{os.environ["GITHUB_REPOSITORY"]}/releases/assets/{asset["id"]}',
+            ]
+        )
+        name = asset["name"]
+        path = bundle / "dist" / name if name in manifest else bundle / name
+        if content != path.read_bytes():
+            raise ValueError("Draft assets differ from approved bundle")
+    if release["body"] != (bundle / "notes.md").read_text() or (
+        release["prerelease"] != info["prerelease"]
+    ):
+        raise ValueError("Release metadata differs from approved bundle")
+    if release["draft"]:
+        api.request(f'/releases/{release["id"]}', {"draft": False}, method="PATCH")
     return None
 
 
@@ -434,15 +344,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "command",
-        choices=[
-            "prepare",
-            "validate",
-            "stage",
-            "recover",
-            "guard",
-            "verify",
-            "select",
-        ],
+        choices=["prepare", "eligible", "validate", "stage", "verify", "finalize"],
     )
     parser.add_argument("--bundle", type=Path, default=Path("bundle"))
     args = parser.parse_args()
@@ -453,14 +355,12 @@ def main() -> None:
         validate_distributions(args.bundle / "dist", info["version"])
     elif args.command == "stage":
         stage(args.bundle, GitHub())
-    elif args.command == "recover":
-        recover(args.bundle, GitHub())
-    elif args.command == "guard":
-        guard_rebuild(args.bundle, GitHub())
+    elif args.command == "eligible":
+        eligible(args.bundle, GitHub())
     elif args.command == "verify":
         verify_bundle(args.bundle)
     else:
-        select_upload(args.bundle)
+        finalize(args.bundle, GitHub())
     return None
 
 
