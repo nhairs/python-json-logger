@@ -167,21 +167,42 @@ def test_bundle_identity_and_checksums(tmp_path: Path, monkeypatch: pytest.Monke
     return None
 
 
-@pytest.mark.parametrize("reachable", [True, False])
-def test_prepare_with_real_git(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, reachable: bool
-) -> None:
+@pytest.fixture
+def git_repository(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
+    """Create self-contained Git history; CI checkouts may be shallow and tagless."""
     repository = tmp_path / "repo"
-    subprocess.run(
-        ["git", "clone", "--shared", "--no-checkout", str(ROOT), str(repository)], check=True
-    )
-    head = subprocess.check_output(["git", "-C", str(ROOT), "rev-parse", "HEAD"], text=True).strip()
-    subprocess.run(["git", "-C", str(repository), "checkout", "--detach", head], check=True)
+    repository.mkdir()
     monkeypatch.chdir(repository)
-    base = head if reachable else head + "^"
-    subprocess.run(["git", "update-ref", "refs/remotes/origin/main", base], check=True)
+    subprocess.run(["git", "init", "-b", "main"], check=True)
+    # Fixture-only identity in this temporary repository, independent of CI configuration.
+    subprocess.run(["git", "config", "user.name", "Release test fixture"], check=True)
+    subprocess.run(["git", "config", "user.email", "release-test@example.invalid"], check=True)
+    (repository / "docs").mkdir()
+    Path("pyproject.toml").write_text('[project]\nversion = "4.2.0"\n')
+    Path("docs/changelog.md").write_text(
+        "# Changes\n\n## [4.2.0](compare) - 2025-01-02\n\n- Base release.\n"
+    )
+    subprocess.run(["git", "add", "."], check=True)
+    subprocess.run(
+        ["git", "-c", "commit.gpgsign=false", "commit", "-m", "Base release fixture"], check=True
+    )
+    subprocess.run(["git", "-c", "tag.gpgsign=false", "tag", "v4.2.0"], check=True)
     Path("pyproject.toml").write_text('[project]\nversion = "4.3.0"\n')
     Path("docs/changelog.md").write_text(changelog())
+    subprocess.run(["git", "add", "."], check=True)
+    subprocess.run(
+        ["git", "-c", "commit.gpgsign=false", "commit", "-m", "Next release fixture"], check=True
+    )
+    subprocess.run(["git", "update-ref", "refs/remotes/origin/main", "HEAD"], check=True)
+    return repository
+
+
+@pytest.mark.parametrize("reachable", [True, False])
+def test_prepare_with_real_git(git_repository: Path, reachable: bool) -> None:
+    repository = git_repository
+    head = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
+    base = head if reachable else "HEAD^"
+    subprocess.run(["git", "update-ref", "refs/remotes/origin/main", base], check=True)
     target = repository / "bundle"
     if reachable:
         release.prepare("v4.3.0", target)
@@ -226,13 +247,8 @@ def test_workflow_permissions_and_order() -> None:
 
 
 @pytest.mark.parametrize("change_date", [False, True])
-def test_postrelease_date_against_base_tag(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, change_date: bool
-) -> None:
-    repository = tmp_path / "repo"
-    subprocess.run(["git", "clone", "--shared", str(ROOT), str(repository)], check=True)
-    monkeypatch.chdir(repository)
-    subprocess.run(["git", "update-ref", "refs/remotes/origin/main", "HEAD"], check=True)
+def test_postrelease_date_against_base_tag(git_repository: Path, change_date: bool) -> None:
+    repository = git_repository
     original = subprocess.check_output(
         ["git", "show", "refs/tags/v4.2.0:docs/changelog.md"], text=True
     )
