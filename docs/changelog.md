@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [4.3.0](https://github.com/nhairs/python-json-logger/compare/v4.2.0...v4.3.0) - UNRELEASED
 
 ### Added
-- CI: Publish verified GitHub releases before uploading the same distributions through an approved PyPI trusted publisher.
+- CI: Use trusted publishing to create PyPI and GitHub releases.
 - Documentation: Quickstart examples are tested to ensure the sample output matches reality.
 - Add support for Python 3.15, PyPy 3.12
 
