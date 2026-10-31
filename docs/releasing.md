@@ -50,7 +50,8 @@ The approved job uses OIDC to upload the complete distribution set. It checks ou
 only `scripts/release.py` at the run's commit without persisting checkout credentials.
 The shared Python checks run with isolation enabled and use only the standard
 library. A separate finalization job verifies both PyPI filenames and hashes before
-publishing the original draft.
+publishing the original draft. The approved job needs `contents: write` because
+GitHub requires push access to list draft releases and inspect their assets.
 Keep the Trusted Publisher repository, workflow filename `release.yml`, and
 `pypi` environment unchanged.
 

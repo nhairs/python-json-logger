@@ -89,7 +89,8 @@ jobs:
       name: pypi
       url: https://pypi.org/p/python-json-logger
     permissions:
-      contents: read
+      # GitHub only lists draft releases for callers with push access.
+      contents: write
       id-token: write
     steps:
       # Only the reviewed release helper is needed; preflight uses no third-party packages.
