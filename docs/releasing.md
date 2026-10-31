@@ -39,18 +39,25 @@ Every build attempt creates fresh distributions. Staging replaces all assets on 
 same-commit draft, or deletes and recreates a draft for a different commit. Cleanup
 happens after checks and build succeed. Public releases are never replaced.
 
-After approval, publication readiness repeats the same version-eligibility policy:
-the live tag must still match, GitHub must remain unpublished, and PyPI must have
-no version record. It also verifies the built bundle's identity and checksums and
-compares every draft asset against that bundle. The early check allows no draft
-or an obsolete draft; readiness requires the exact staged build. PyPI absence is
-checked last, after the asset comparison.
+After approval, publication readiness verifies the built bundle's identity and
+checksums, then repeats the version-eligibility policy. PyPI absence is the first
+eligibility check: an existing version stops the run before tag or GitHub checks,
+without suggesting cleanup of a completed release. Then the live tag must still
+match and GitHub must remain unpublished.
+
+Readiness also compares every draft asset against the approved bundle. The early
+check allows no draft or an obsolete draft; readiness requires the exact staged
+build. Eligibility is rechecked after asset comparison, immediately before upload.
 
 The approved job uses OIDC to upload the complete distribution set. It checks out
 only `scripts/release.py` at the run's commit without persisting checkout credentials.
 The shared Python checks run with isolation enabled and use only the standard
 library. A separate finalization job verifies both PyPI filenames and hashes before
-publishing the original draft. The approved job needs `contents: write` because
+publishing the original draft. It waits up to five minutes for absent or incomplete
+PyPI JSON metadata to expose both uploaded files. Any unexpected filename or
+conflicting hash stops finalization immediately. API/network failures also stop
+the job; they are not treated as missing metadata.
+The approved job needs `contents: write` because
 GitHub requires push access to list draft releases and inspect their assets.
 Keep the Trusted Publisher repository, workflow filename `release.yml`, and
 `pypi` environment unchanged.
@@ -76,7 +83,9 @@ Any accepted file freezes the version's source and distribution bytes. Normal
 attempts stop rather than rebuild, select missing files, or use `skip-existing`.
 Deleting a PyPI version does not guarantee its filenames can be uploaded again.
 
-If the PyPI step succeeded but GitHub finalization failed:
+After a successful PyPI step and failed GitHub finalization, retry only finalization.
+If PyPI metadata is still incomplete after the bounded wait, the error reports
+the expected and observed files. Wait for metadata to settle before retrying.
 
 1. Select **Re-run failed jobs** on the original run. This reruns finalization
    with the original build artifact ID without uploading to PyPI again.

@@ -10,6 +10,7 @@ from pathlib import Path
 import re
 import subprocess
 import tarfile
+import time
 import tomllib
 from typing import Any
 import urllib.error
@@ -200,16 +201,19 @@ def live_tag(api: GitHub) -> None:
 def require_current_commit(kind: str, current: str, expected: str) -> None:
     """Reject approvals for moved tags or tags pointing at non-commits."""
     if kind != "commit" or current != expected:
-        raise ValueError("Release tag moved; cancel this stale run")
+        raise ValueError(
+            f"Release tag no longer points to this run's commit: expected commit {expected}, "
+            f"found {kind} {current}. Cancel this stale run; use the run for the current tag."
+        )
     return None
 
 
 def eligible(bundle: Path, api: GitHub) -> None:
     """Reject any existing target PyPI version before expensive checks."""
     info = json.loads((bundle / "release.json").read_text())
+    require_unpublished(info["version"], pypi_files(info["version"]))
     live_tag(api)
     draft_action(api.find_release(info["tag"]), info["commit"])
-    require_unpublished(pypi_files(info["version"]))
     return None
 
 
@@ -257,11 +261,11 @@ def stage(bundle: Path, api: GitHub) -> None:
     return None
 
 
-def pypi_files(version: str) -> dict[str, str] | None:
+def pypi_files(version: str, timeout: float = 30) -> dict[str, str] | None:
     """Read published hashes; only HTTP 404 means that a version is absent."""
     try:
         with urllib.request.urlopen(
-            f"https://pypi.org/pypi/python-json-logger/{version}/json", timeout=30
+            f"https://pypi.org/pypi/python-json-logger/{version}/json", timeout=timeout
         ) as response:
             return {
                 item["filename"]: item["digests"]["sha256"] for item in json.load(response)["urls"]
@@ -272,18 +276,48 @@ def pypi_files(version: str) -> dict[str, str] | None:
         raise
 
 
-def require_unpublished(existing: dict[str, str] | None) -> None:
+def require_unpublished(version: str, existing: dict[str, str] | None) -> None:
     """Even an empty or yanked version record blocks ordinary publishing."""
     if existing is not None:
-        raise ValueError("PyPI version already exists; recover original bytes manually")
+        raise ValueError(
+            f"PyPI version {version} already exists; refusing a new release. "
+            "Do not rebuild or reupload this version."
+        )
     return None
 
 
-def require_published(manifest: dict[str, str], existing: dict[str, str] | None) -> None:
-    """Finalize only an exact, complete publication of the approved bundle."""
-    if existing != manifest:
-        raise ValueError("PyPI files do not match the complete release manifest")
-    return None
+def publication_complete(manifest: dict[str, str], existing: dict[str, str] | None) -> bool:
+    """Wait for missing metadata, but reject any conflicting public file immediately."""
+    if existing is None:
+        return False
+    if any(manifest.get(name) != digest for name, digest in existing.items()):
+        raise ValueError(
+            f"PyPI files conflict with the release manifest: expected {manifest}, observed {existing}"
+        )
+    return existing == manifest
+
+
+def wait_for_publication(version: str, manifest: dict[str, str]) -> None:
+    """Allow up to five minutes for newly uploaded files to appear in the JSON API."""
+    deadline = time.monotonic() + 300
+    existing = None
+    while (remaining := deadline - time.monotonic()) > 0:
+        existing = pypi_files(version, timeout=min(30, remaining))
+        if publication_complete(manifest, existing):
+            return None
+        remaining = deadline - time.monotonic()
+        if remaining > 0:
+            print(
+                f"Waiting for PyPI metadata ({remaining:.0f}s remaining): "
+                f"expected {sorted(manifest)}, observed {existing}",
+                flush=True,
+            )
+            time.sleep(min(10, remaining))
+    raise ValueError(
+        "Timed out waiting for complete PyPI metadata: "
+        f"expected {manifest}, observed {existing}. "
+        "Re-run failed finalization with the original bundle; do not rebuild or reupload."
+    )
 
 
 def verify_bundle(bundle: Path) -> dict[str, str]:
@@ -315,8 +349,17 @@ def verify_release(bundle: Path, api: GitHub, manifest: dict[str, str]) -> dict:
     """Verify exact GitHub release source, metadata and assets against the bundle."""
     info = json.loads((bundle / "release.json").read_text())
     release = api.find_release(info["tag"])
-    if release is None or release["target_commitish"] != info["commit"]:
-        raise ValueError("Missing or changed release draft")
+    if release is None:
+        raise ValueError(
+            f"Cannot find GitHub release for {info['tag']}. "
+            "The release may be absent, or the token may lack push access to view drafts."
+        )
+    if release["target_commitish"] != info["commit"]:
+        raise ValueError(
+            f"GitHub release source mismatch for {info['tag']}: "
+            f"bundle commit {info['commit']}, release target {release['target_commitish']}. "
+            "Use the run and bundle for the current release source."
+        )
     # Compare downloaded assets byte for byte, including attempt identity.
     assets = api.request(f'/releases/{release["id"]}/assets?per_page=100')
     expected = set(manifest) | {"release.json", "SHA256SUMS.json"}
@@ -346,10 +389,10 @@ def verify_release(bundle: Path, api: GitHub, manifest: dict[str, str]) -> dict:
 def preflight(bundle: Path, api: GitHub) -> None:
     """Recheck approved bytes and identities immediately before the PyPI upload."""
     manifest = verify_bundle(bundle)
+    # PyPI publication is the first eligibility gate, including for superseded runs.
+    eligible(bundle, api)
     verify_release(bundle, api, manifest)
-    # Repeat the same eligibility policy after approval, checking PyPI last.
-    # Early eligibility allows no draft or an obsolete draft; readiness also
-    # requires the exact approved source, metadata and distribution bytes above.
+    # Repeat after potentially slow asset downloads, immediately before upload.
     eligible(bundle, api)
     return None
 
@@ -359,7 +402,9 @@ def finalize(bundle: Path, api: GitHub) -> None:
     manifest = verify_bundle(bundle)
     live_tag(api)
     info = json.loads((bundle / "release.json").read_text())
-    require_published(manifest, pypi_files(info["version"]))
+    wait_for_publication(info["version"], manifest)
+    # Metadata visibility may take minutes; do not rely on the earlier tag check.
+    live_tag(api)
     release = verify_release(bundle, api, manifest)
     if release["draft"]:
         api.request(f'/releases/{release["id"]}', {"draft": False}, method="PATCH")

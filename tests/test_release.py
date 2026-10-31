@@ -100,27 +100,36 @@ def test_postrelease_preserves_original_date() -> None:
 
 @pytest.mark.parametrize("existing", [{}, {"wheel": "aaa"}, {"wheel": "aaa", "sdist": "bbb"}])
 def test_any_pypi_record_blocks_new_release(existing: dict[str, str]) -> None:
-    with pytest.raises(ValueError, match="already exists"):
-        release.require_unpublished(existing)
+    with pytest.raises(ValueError, match=r"PyPI version 4\.3\.0\.dev3 already exists"):
+        release.require_unpublished("4.3.0.dev3", existing)
     return None
 
 
 def test_absent_version_is_eligible() -> None:
-    release.require_unpublished(None)
+    release.require_unpublished("4.3.0.dev3", None)
+    return None
+
+
+@pytest.mark.parametrize("existing", [None, {}, {"wheel": "aaa"}])
+def test_finalization_waits_for_missing_metadata(existing: dict[str, str] | None) -> None:
+    assert not release.publication_complete({"wheel": "aaa", "sdist": "bbb"}, existing)
     return None
 
 
 @pytest.mark.parametrize(
-    "existing", [None, {}, {"wheel": "aaa"}, {"wheel": "wrong", "sdist": "bbb"}]
+    "existing",
+    [{"wheel": "wrong"}, {"wheel": "wrong", "sdist": "bbb"}, {"extra": "ccc"}],
 )
-def test_finalize_requires_complete_matching_publication(existing: dict[str, str] | None) -> None:
-    with pytest.raises(ValueError, match="complete release manifest"):
-        release.require_published({"wheel": "aaa", "sdist": "bbb"}, existing)
+def test_finalization_rejects_conflicting_publication(existing: dict[str, str]) -> None:
+    with pytest.raises(ValueError, match="conflict.*expected.*observed"):
+        release.publication_complete({"wheel": "aaa", "sdist": "bbb"}, existing)
     return None
 
 
 def test_complete_publication_can_finalize() -> None:
-    release.require_published({"wheel": "aaa", "sdist": "bbb"}, {"wheel": "aaa", "sdist": "bbb"})
+    assert release.publication_complete(
+        {"wheel": "aaa", "sdist": "bbb"}, {"wheel": "aaa", "sdist": "bbb"}
+    )
     return None
 
 
@@ -139,8 +148,10 @@ def test_public_release_requires_owner_cleanup() -> None:
 
 @pytest.mark.parametrize("kind,current", [("commit", "old"), ("tree", "approved")])
 def test_stale_run_cannot_publish(kind: str, current: str) -> None:
-    with pytest.raises(ValueError, match="stale run"):
+    with pytest.raises(ValueError, match="stale run") as error:
         release.require_current_commit(kind, current, "approved")
+    assert "expected commit approved" in str(error.value)
+    assert f"found {kind} {current}" in str(error.value)
     return None
 
 
