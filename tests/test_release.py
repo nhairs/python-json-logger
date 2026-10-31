@@ -188,33 +188,47 @@ def test_workflow_permissions_and_order() -> None:
     assert workflow["permissions"] == {"contents": "read"}
     jobs = workflow["jobs"]
     for job, dependency in (
-        ("ci", "validate"),
-        ("draft", "build"),
+        ("lint-and-test", "check-release-version-eligibility"),
+        ("stage-github-draft", "build-and-verify-release-bundle"),
     ):
         assert jobs[job]["needs"] == dependency
     for name, job in jobs.items():
         permissions = job.get("permissions", {})
-        assert (permissions.get("contents") == "write") == (name in ("draft", "finalize"))
-        assert (permissions.get("id-token") == "write") == (name == "publish")
+        assert (permissions.get("contents") == "write") == (
+            name in ("stage-github-draft", "verify-and-publish-github-release")
+        )
+        assert (permissions.get("id-token") == "write") == (name == "publish-to-pypi")
         for step in job.get("steps", []):
             if "uses" in step:
                 assert len(step["uses"].split("@")[1]) == 40
-    assert jobs["publish"]["environment"]["name"] == "pypi"
-    assert jobs["publish"]["needs"] == ["build", "draft"]
-    assert jobs["finalize"]["needs"] == ["build", "publish"]
-    assert "needs.publish.outputs.uploaded == 'success'" in jobs["finalize"]["if"]
+    assert jobs["publish-to-pypi"]["environment"]["name"] == "pypi"
+    assert jobs["publish-to-pypi"]["needs"] == [
+        "build-and-verify-release-bundle",
+        "stage-github-draft",
+    ]
+    assert jobs["verify-and-publish-github-release"]["needs"] == [
+        "build-and-verify-release-bundle",
+        "publish-to-pypi",
+    ]
+    assert (
+        "needs.publish-to-pypi.outputs.uploaded == 'success'"
+        in jobs["verify-and-publish-github-release"]["if"]
+    )
     assert workflow["concurrency"]["cancel-in-progress"] == "false"
-    assert jobs["ci"]["needs"] == "validate"
-    assert "eligible" in jobs["validate"]["steps"][-1]["run"]
-    build = jobs["build"]["steps"]
+    assert jobs["lint-and-test"]["needs"] == "check-release-version-eligibility"
+    assert "eligible" in jobs["check-release-version-eligibility"]["steps"][-1]["run"]
+    build = jobs["build-and-verify-release-bundle"]["steps"]
     assert not any("recover" in step.get("run", "") for step in build)
     assert any("python -m build" in step.get("run", "") for step in build)
     assert build[-1]["with"]["name"] == "release-bundle-${{ github.run_attempt }}"
     assert "select" not in jobs
-    for name in ("draft", "publish", "finalize"):
+    for name in ("stage-github-draft", "publish-to-pypi", "verify-and-publish-github-release"):
         download = next(s for s in jobs[name]["steps"] if "download-artifact" in s.get("uses", ""))
-        assert download["with"]["artifact-ids"] == "${{ needs.build.outputs.bundle-id }}"
-    steps = jobs["publish"]["steps"]
+        assert (
+            download["with"]["artifact-ids"]
+            == "${{ needs.build-and-verify-release-bundle.outputs.bundle-id }}"
+        )
+    steps = jobs["publish-to-pypi"]["steps"]
     checkout = next(s for s in steps if "checkout" in s.get("uses", ""))
     assert checkout["with"] == {
         "ref": "${{ github.sha }}",
