@@ -1170,7 +1170,8 @@ checked last, after the asset comparison.</p>
 only <code>scripts/release.py</code> at the run's commit without persisting checkout credentials.
 The shared Python checks run with isolation enabled and use only the standard
 library. A separate finalization job verifies both PyPI filenames and hashes before
-publishing the original draft.
+publishing the original draft. The approved job needs <code>contents: write</code> because
+GitHub requires push access to list draft releases and inspect their assets.
 Keep the Trusted Publisher repository, workflow filename <code>release.yml</code>, and
 <code>pypi</code> environment unchanged.</p>
 <h2 id="recover-before-any-pypi-upload">Recover before any PyPI upload<a class="headerlink" href="#recover-before-any-pypi-upload" title="Permanent link">🔗</a></h2>
