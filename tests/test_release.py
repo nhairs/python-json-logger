@@ -237,3 +237,24 @@ def test_postrelease_date_policy(date: str) -> None:
         with pytest.raises(ValueError, match="retain the base release date"):
             release.validate_post_date(post, original)
     return None
+
+
+@pytest.mark.parametrize("outcome", ["success", "failure", "skipped"])
+def test_finalization_evidence(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, outcome: str
+) -> None:
+    for key, value in {
+        "GITHUB_RUN_ID": "123",
+        "GITHUB_RUN_ATTEMPT": "2",
+        "BUNDLE_ID": "original-build-id",
+        "FINALIZE": outcome,
+    }.items():
+        monkeypatch.setenv(key, value)
+    release.record_finalization(tmp_path / "evidence")
+    assert json.loads((tmp_path / "evidence/finalization.json").read_text()) == {
+        "run_id": "123",
+        "run_attempt": "2",
+        "bundle_artifact_id": "original-build-id",
+        "finalize": outcome,
+    }
+    return None

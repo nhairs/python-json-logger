@@ -203,12 +203,7 @@ jobs:
         env:
           BUNDLE_ID: ${{ needs.build.outputs.bundle-id }}
           FINALIZE: ${{ steps.finalize.outcome }}
-        run: |
-          mkdir -p evidence
-          jq -n --arg run "$GITHUB_RUN_ID" --arg attempt "$GITHUB_RUN_ATTEMPT" \
-            --arg bundle "$BUNDLE_ID" --arg finalize "$FINALIZE" \
-            '{run_id:$run, run_attempt:$attempt, bundle_artifact_id:$bundle, finalize:$finalize}' \
-            > evidence/finalization.json
+        run: python scripts/release.py record-finalization
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always()
         with:

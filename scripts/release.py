@@ -339,12 +339,38 @@ def finalize(bundle: Path, api: GitHub) -> None:
     return None
 
 
+def record_finalization(destination: Path) -> None:
+    """Retain finalization outcome even when the verification/publish step fails."""
+    destination.mkdir(parents=True, exist_ok=True)
+    (destination / "finalization.json").write_text(
+        json.dumps(
+            {
+                "run_id": os.environ["GITHUB_RUN_ID"],
+                "run_attempt": os.environ["GITHUB_RUN_ATTEMPT"],
+                "bundle_artifact_id": os.environ["BUNDLE_ID"],
+                "finalize": os.environ["FINALIZE"],
+            },
+            indent=2,
+        )
+        + "\n"
+    )
+    return None
+
+
 def main() -> None:
     """Run a release command without embedding Python programs in workflow YAML."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "command",
-        choices=["prepare", "eligible", "validate", "stage", "verify", "finalize"],
+        choices=[
+            "prepare",
+            "eligible",
+            "validate",
+            "stage",
+            "verify",
+            "finalize",
+            "record-finalization",
+        ],
     )
     parser.add_argument("--bundle", type=Path, default=Path("bundle"))
     args = parser.parse_args()
@@ -359,8 +385,10 @@ def main() -> None:
         eligible(args.bundle, GitHub())
     elif args.command == "verify":
         verify_bundle(args.bundle)
-    else:
+    elif args.command == "finalize":
         finalize(args.bundle, GitHub())
+    else:
+        record_finalization(Path("evidence"))
     return None
 
 
