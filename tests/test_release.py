@@ -216,7 +216,10 @@ def test_workflow_permissions_and_order() -> None:
     )
     assert workflow["concurrency"]["cancel-in-progress"] == "false"
     assert jobs["lint-and-test"]["needs"] == "check-release-version-eligibility"
-    assert "eligible" in jobs["check-release-version-eligibility"]["steps"][-1]["run"]
+    assert (
+        "check-release-version-eligibility"
+        in jobs["check-release-version-eligibility"]["steps"][-1]["run"]
+    )
     build = jobs["build-and-verify-release-bundle"]["steps"]
     assert not any("recover" in step.get("run", "") for step in build)
     assert any("python -m build" in step.get("run", "") for step in build)
@@ -239,7 +242,7 @@ def test_workflow_permissions_and_order() -> None:
     assert not any("pip install" in s.get("run", "") for s in steps)
     assert not any("gh release edit" in step.get("run", "") for step in steps)
     preflight = next(s for s in steps if s.get("id") == "preflight")
-    assert preflight["run"] == "python -I scripts/release.py preflight"
+    assert preflight["run"] == "python -I scripts/release.py check-pypi-publication-readiness"
     upload = next(s for s in steps if s.get("id") == "upload")
     assert "pypa/gh-action-pypi-publish@" in upload["uses"]
     assert upload["with"]["packages-dir"] == "bundle/dist/"

@@ -392,32 +392,32 @@ def main() -> None:
     parser.add_argument(
         "command",
         choices=[
-            "prepare",
-            "eligible",
-            "validate",
-            "stage",
-            "verify",
-            "finalize",
-            "preflight",
-            "record-finalization",
+            "prepare-release-metadata",
+            "check-release-version-eligibility",
+            "validate-distributions",
+            "stage-github-draft",
+            "verify-release-bundle",
+            "verify-and-publish-github-release",
+            "check-pypi-publication-readiness",
+            "record-github-finalization-outcome",
         ],
     )
     parser.add_argument("--bundle", type=Path, default=Path("bundle"))
     args = parser.parse_args()
-    if args.command == "prepare":
+    if args.command == "prepare-release-metadata":
         prepare(os.environ["GITHUB_REF_NAME"], args.bundle)
-    elif args.command == "validate":
+    elif args.command == "validate-distributions":
         info = json.loads((args.bundle / "release.json").read_text())
         validate_distributions(args.bundle / "dist", info["version"])
-    elif args.command == "stage":
+    elif args.command == "stage-github-draft":
         stage(args.bundle, GitHub())
-    elif args.command == "eligible":
+    elif args.command == "check-release-version-eligibility":
         eligible(args.bundle, GitHub())
-    elif args.command == "verify":
+    elif args.command == "verify-release-bundle":
         verify_bundle(args.bundle)
-    elif args.command == "preflight":
+    elif args.command == "check-pypi-publication-readiness":
         preflight(args.bundle, GitHub())
-    elif args.command == "finalize":
+    elif args.command == "verify-and-publish-github-release":
         finalize(args.bundle, GitHub())
     else:
         record_finalization(Path("evidence"))

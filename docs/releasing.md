@@ -107,6 +107,22 @@ The publishing action generates fresh attestations and rejects pre-existing
 attestation files when generation is enabled. Preserve evidence for investigation
 and future recovery rather than assuming it can be submitted by a local upload.
 
+## Release helper commands
+
+The workflow uses these `scripts/release.py` commands. Each command performs one
+release operation; job names describe the surrounding pipeline stage.
+
+| Command | Operation |
+| --- | --- |
+| `prepare-release-metadata` | Check tag/version, ancestry, changelog and release date; write metadata and notes. |
+| `check-release-version-eligibility` | Require PyPI absence, an unpublished GitHub release, and the current source tag. |
+| `validate-distributions` | Validate wheel/sdist metadata and write distribution checksums. |
+| `verify-release-bundle` | Check bundle tag, commit, workflow run, filenames and distribution hashes. |
+| `stage-github-draft` | Recheck eligibility and stage the complete draft asset set. |
+| `check-pypi-publication-readiness` | Recheck the approved bundle, live tag, draft assets and PyPI absence. |
+| `verify-and-publish-github-release` | Verify complete PyPI hashes and original draft assets, then publish GitHub. |
+| `record-github-finalization-outcome` | Record the finalization result and original bundle reference. |
+
 ## Validate workflow changes
 
 ```shell
