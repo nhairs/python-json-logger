@@ -8,7 +8,7 @@ concurrency:
   group: release-${{ github.ref }}
   cancel-in-progress: false
 jobs:
-  validate:
+  check-release-version-eligibility:
     if: github.repository == 'nhairs/python-json-logger'
     runs-on: ubuntu-latest
     steps:
@@ -20,15 +20,19 @@ jobs:
         with:
           python-version: '3.12'
       - run: python -m pip install packaging
-      - run: python scripts/release.py prepare
-  ci:
-    needs: validate
+      - name: Check new-release eligibility before lint and tests
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python scripts/release.py prepare-release-metadata
+          python scripts/release.py check-release-version-eligibility
+  lint-and-test:
+    needs: check-release-version-eligibility
     uses: ./.github/workflows/test-suite.yml
-  build:
-    permissions:
-      contents: read
-      actions: read
-    needs: [validate, ci]
+  build-and-verify-release-bundle:
+    outputs:
+      bundle-id: ${{ steps.bundle.outputs.artifact-id }}
+    needs: [check-release-version-eligibility, lint-and-test]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
@@ -39,40 +43,24 @@ jobs:
         with:
           python-version: '3.12'
       - run: python -m pip install build packaging twine
-      - name: Recover retained artifacts before considering a build
-        id: recover
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: python scripts/release.py recover
-      - name: Refuse to rebuild an existing release
-        if: steps.recover.outputs.recovered != 'true'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          python scripts/release.py prepare
-          python scripts/release.py guard
-      - if: steps.recover.outputs.recovered != 'true'
-        run: |
+      - run: |
+          python scripts/release.py prepare-release-metadata
           python -m build --outdir bundle/dist
-          python scripts/release.py validate
+          python scripts/release.py validate-distributions
           python -m twine check bundle/dist/*
           python -m venv "$RUNNER_TEMP/release-install"
           "$RUNNER_TEMP/release-install/bin/python" -m pip install --no-deps bundle/dist/*.whl
           "$RUNNER_TEMP/release-install/bin/python" -I scripts/release_smoke.py
-      - name: Verify bundle identity and checksums
-        run: python scripts/release.py verify
-      # Re-retain official release recovery for downstream jobs. An available
-      # original artifact is never replaced; overwrite only clears expired entries.
+          python scripts/release.py verify-release-bundle
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        if: steps.recover.outputs.retained != 'true'
+        id: bundle
         with:
-          name: release-bundle
-          overwrite: true
+          name: release-bundle-${{ github.run_attempt }}
           path: bundle/
           if-no-files-found: error
           retention-days: 90
-  draft:
-    needs: build
+  stage-github-draft:
+    needs: build-and-verify-release-bundle
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -86,62 +74,112 @@ jobs:
       - run: python -m pip install packaging
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
-          name: release-bundle
+          artifact-ids: ${{ needs.build-and-verify-release-bundle.outputs.bundle-id }}
+          merge-multiple: true
           path: bundle
-      - run: python scripts/release.py stage
+      - run: python scripts/release.py stage-github-draft
         env:
           GH_TOKEN: ${{ github.token }}
-  select:
-    needs: draft
-    runs-on: ubuntu-latest
+  publish-to-pypi:
     outputs:
-      missing: ${{ steps.files.outputs.missing }}
-    steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-        with:
-          persist-credentials: false
-      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
-        with:
-          python-version: '3.12'
-      - run: python -m pip install packaging
-      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
-        with:
-          name: release-bundle
-          path: bundle
-      - name: Verify retained bytes and select missing PyPI files
-        id: files
-        run: python scripts/release.py select
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        if: steps.files.outputs.missing == 'true'
-        with:
-          name: pypi-upload-${{ github.run_attempt }}
-          path: upload/
-          if-no-files-found: error
-          retention-days: 90
-  publish:
-    needs: select
+      uploaded: ${{ steps.upload.outcome }}
+    needs: [build-and-verify-release-bundle, stage-github-draft]
     runs-on: ubuntu-latest
     environment:
       name: pypi
       url: https://pypi.org/p/python-json-logger
     permissions:
-      contents: write
+      contents: read
       id-token: write
     steps:
-      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
-        if: needs.select.outputs.missing == 'true'
+      # Only the reviewed release helper is needed; preflight uses no third-party packages.
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
-          name: pypi-upload-${{ github.run_attempt }}
-          path: upload
-      - name: Publish the verified GitHub release before uploading to PyPI
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          sparse-checkout: scripts/release.py
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          artifact-ids: ${{ needs.build-and-verify-release-bundle.outputs.bundle-id }}
+          merge-multiple: true
+          path: bundle
+      - name: Recheck approved source, draft, bytes and PyPI absence
+        id: preflight
         env:
           GH_TOKEN: ${{ github.token }}
-        run: |
-          is_draft=$(gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --json isDraft --jq .isDraft)
-          if [ "$is_draft" = true ]; then
-            gh release edit "$GITHUB_REF_NAME" --draft=false --repo "$GITHUB_REPOSITORY"
-          fi
+        run: python -I scripts/release.py check-pypi-publication-readiness
       - uses: pypa/gh-action-pypi-publish@ed0c53931b1dc9bd32cbe73a98c7f6766f8a527e # v1.13.0
-        if: needs.select.outputs.missing == 'true'
+        id: upload
         with:
-          packages-dir: upload/
+          packages-dir: bundle/dist/
+      - name: Retain publication evidence even after failure
+        if: always()
+        env:
+          BUNDLE_ID: ${{ needs.build-and-verify-release-bundle.outputs.bundle-id }}
+          PREFLIGHT: ${{ steps.preflight.outcome }}
+          UPLOAD: ${{ steps.upload.outcome }}
+        shell: bash
+        run: |
+          mkdir -p evidence/attestations
+          cp bundle/release.json bundle/SHA256SUMS.json evidence/ 2>/dev/null || true
+          find bundle/dist -maxdepth 1 -name '*.publish.attestation' -exec cp {} evidence/attestations/ \; 2>/dev/null || true
+          count=$(find evidence/attestations -type f | wc -l)
+          if [ "$count" -gt 0 ]; then
+            (cd evidence && sha256sum attestations/* > attestation-checksums.txt)
+          fi
+          jq -n --arg run "$GITHUB_RUN_ID" --arg attempt "$GITHUB_RUN_ATTEMPT" \
+            --arg bundle "$BUNDLE_ID" --arg preflight "$PREFLIGHT" --arg upload "$UPLOAD" \
+            --argjson attestations "$count" \
+            '{run_id:$run, run_attempt:$attempt, bundle_artifact_id:$bundle,
+              preflight:$preflight, upload:$upload, attestation_count:$attestations,
+              attestation_status:(if $attestations == 0 then "none generated or available" else "retained" end)}' \
+            > evidence/publication.json
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          # A failed-job rerun may reuse a successful build's earlier bundle ID.
+          name: publication-evidence-${{ github.run_attempt }}
+          path: evidence/
+          if-no-files-found: error
+          retention-days: 90
+  verify-and-publish-github-release:
+    if: ${{ !cancelled() && needs.publish-to-pypi.outputs.uploaded == 'success' }}
+    needs: [build-and-verify-release-bundle, publish-to-pypi]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install packaging
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          artifact-ids: ${{ needs.build-and-verify-release-bundle.outputs.bundle-id }}
+          merge-multiple: true
+          path: bundle
+      - name: Verify complete PyPI publication and publish the original GitHub draft
+        id: finalize
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python scripts/release.py verify-and-publish-github-release
+      - name: Record finalization outcome
+        if: always()
+        env:
+          BUNDLE_ID: ${{ needs.build-and-verify-release-bundle.outputs.bundle-id }}
+          FINALIZE: ${{ steps.finalize.outcome }}
+        run: python scripts/release.py record-github-finalization-outcome
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: finalization-evidence-${{ github.run_attempt }}
+          path: evidence/
+          if-no-files-found: error
+          retention-days: 90

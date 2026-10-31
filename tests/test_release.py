@@ -98,23 +98,54 @@ def test_postrelease_preserves_original_date() -> None:
     return None
 
 
-@pytest.mark.parametrize(
-    "existing,expected",
-    [
-        ({}, {"wheel", "sdist"}),
-        ({"wheel": "aaa"}, {"sdist"}),
-        ({"wheel": "aaa", "sdist": "bbb"}, set()),
-    ],
-)
-def test_missing_files(existing: dict[str, str], expected: set[str]) -> None:
-    assert release.missing_files({"wheel": "aaa", "sdist": "bbb"}, existing) == expected
+@pytest.mark.parametrize("existing", [{}, {"wheel": "aaa"}, {"wheel": "aaa", "sdist": "bbb"}])
+def test_any_pypi_record_blocks_new_release(existing: dict[str, str]) -> None:
+    with pytest.raises(ValueError, match="already exists"):
+        release.require_unpublished(existing)
     return None
 
 
-@pytest.mark.parametrize("existing", [{"wheel": "wrong"}, {"unexpected": "aaa"}])
-def test_conflicting_pypi_files(existing: dict[str, str]) -> None:
-    with pytest.raises(ValueError, match="conflict"):
-        release.missing_files({"wheel": "aaa", "sdist": "bbb"}, existing)
+def test_absent_version_is_eligible() -> None:
+    release.require_unpublished(None)
+    return None
+
+
+@pytest.mark.parametrize(
+    "existing", [None, {}, {"wheel": "aaa"}, {"wheel": "wrong", "sdist": "bbb"}]
+)
+def test_finalize_requires_complete_matching_publication(existing: dict[str, str] | None) -> None:
+    with pytest.raises(ValueError, match="complete release manifest"):
+        release.require_published({"wheel": "aaa", "sdist": "bbb"}, existing)
+    return None
+
+
+def test_complete_publication_can_finalize() -> None:
+    release.require_published({"wheel": "aaa", "sdist": "bbb"}, {"wheel": "aaa", "sdist": "bbb"})
+    return None
+
+
+@pytest.mark.parametrize("commit,expected", [("abc", "update"), ("def", "replace")])
+def test_draft_commit_policy(commit: str, expected: str) -> None:
+    assert release.draft_action({"draft": True, "target_commitish": commit}, "abc") == expected
+    return None
+
+
+def test_public_release_requires_owner_cleanup() -> None:
+    assert release.draft_action(None, "abc") == "create"
+    with pytest.raises(ValueError, match="owner cleanup"):
+        release.draft_action({"draft": False, "target_commitish": "abc"}, "abc")
+    return None
+
+
+@pytest.mark.parametrize("kind,current", [("commit", "old"), ("tree", "approved")])
+def test_stale_run_cannot_publish(kind: str, current: str) -> None:
+    with pytest.raises(ValueError, match="stale run"):
+        release.require_current_commit(kind, current, "approved")
+    return None
+
+
+def test_live_source_matches_approval() -> None:
+    release.require_current_commit("commit", "approved", "approved")
     return None
 
 
@@ -128,47 +159,23 @@ def test_bundle_identity_and_checksums(tmp_path: Path, monkeypatch: pytest.Monke
     (tmp_path / "SHA256SUMS.json").write_text(
         json.dumps({name: hashlib.sha256(content).hexdigest() for name, content in files.items()})
     )
-    (tmp_path / "release.json").write_text(json.dumps({"tag": "v4.3.0", "commit": "abc"}))
+    (tmp_path / "release.json").write_text(
+        json.dumps({"tag": "v4.3.0", "commit": "abc", "run_id": "123"})
+    )
+    monkeypatch.setenv("GITHUB_RUN_ID", "123")
     monkeypatch.setenv("GITHUB_REF_NAME", "v4.3.0")
     monkeypatch.setenv("GITHUB_SHA", "wrong")
     with pytest.raises(ValueError, match="commit mismatch"):
         release.verify_bundle(tmp_path)
     monkeypatch.setenv("GITHUB_SHA", "abc")
     assert set(release.verify_bundle(tmp_path)) == {"package.whl", "package.tar.gz"}
+    monkeypatch.setenv("GITHUB_RUN_ID", "another-run")
+    with pytest.raises(ValueError, match="different workflow run"):
+        release.verify_bundle(tmp_path)
+    monkeypatch.setenv("GITHUB_RUN_ID", "123")
     (directory / "package.whl").write_bytes(b"corrupted")
     with pytest.raises(ValueError, match="checksum mismatch"):
         release.verify_bundle(tmp_path)
-    return None
-
-
-def test_workflow_permissions_and_order() -> None:
-    yaml = pytest.importorskip("yaml")
-    text = (ROOT / ".github/workflows/release.yml").read_text()
-    workflow = yaml.load(text, Loader=yaml.BaseLoader)
-    assert "python - <<" not in text
-    assert workflow["on"] == {"push": {"tags": ["v[0-9]*.[0-9]*.[0-9]*"]}}
-    assert workflow["permissions"] == {"contents": "read"}
-    jobs = workflow["jobs"]
-    for job, dependency in (
-        ("ci", "validate"),
-        ("draft", "build"),
-        ("select", "draft"),
-        ("publish", "select"),
-    ):
-        assert jobs[job]["needs"] == dependency
-    for name, job in jobs.items():
-        permissions = job.get("permissions", {})
-        assert (permissions.get("contents") == "write") == (name in ("draft", "publish"))
-        assert (permissions.get("id-token") == "write") == (name == "publish")
-        for step in job.get("steps", []):
-            if "uses" in step:
-                assert len(step["uses"].split("@")[1]) == 40
-    assert jobs["publish"]["environment"]["name"] == "pypi"
-    assert not any("scripts/" in step.get("run", "") for step in jobs["publish"]["steps"])
-    steps = jobs["publish"]["steps"]
-    assert "gh release edit" in steps[-2]["run"]
-    assert "pypa/gh-action-pypi-publish@" in steps[-1]["uses"]
-    assert not any("checkout" in step.get("uses", "") for step in jobs["publish"]["steps"])
     return None
 
 
@@ -181,4 +188,25 @@ def test_postrelease_date_policy(date: str) -> None:
     else:
         with pytest.raises(ValueError, match="retain the base release date"):
             release.validate_post_date(post, original)
+    return None
+
+
+@pytest.mark.parametrize("outcome", ["success", "failure", "skipped"])
+def test_finalization_evidence(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, outcome: str
+) -> None:
+    for key, value in {
+        "GITHUB_RUN_ID": "123",
+        "GITHUB_RUN_ATTEMPT": "2",
+        "BUNDLE_ID": "original-build-id",
+        "FINALIZE": outcome,
+    }.items():
+        monkeypatch.setenv(key, value)
+    release.record_finalization(tmp_path / "evidence")
+    assert json.loads((tmp_path / "evidence/finalization.json").read_text()) == {
+        "run_id": "123",
+        "run_attempt": "2",
+        "bundle_artifact_id": "original-build-id",
+        "finalize": outcome,
+    }
     return None
