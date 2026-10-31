@@ -115,7 +115,7 @@ release operation; job names describe the surrounding pipeline stage.
 | Command | Operation |
 | --- | --- |
 | `prepare-release-metadata` | Check tag/version, ancestry, changelog and release date; write metadata and notes. |
-| `check-release-version-eligibility` | Require PyPI absence, an unpublished GitHub release, and the current source tag. |
+| `check-release-version-eligibility` | Require PyPI absence and the current source tag; reject public GitHub releases. |
 | `validate-distributions` | Validate wheel/sdist metadata and write distribution checksums. |
 | `verify-release-bundle` | Check bundle tag, commit, workflow run, filenames and distribution hashes. |
 | `stage-github-draft` | Recheck eligibility and stage the complete draft asset set. |
