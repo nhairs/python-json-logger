@@ -39,12 +39,18 @@ Every build attempt creates fresh distributions. Staging replaces all assets on 
 same-commit draft, or deletes and recreates a draft for a different commit. Cleanup
 happens after checks and build succeed. Public releases are never replaced.
 
-The approved job checks the live tag, source identity, bundle checksums, draft
-assets, and PyPI absence again. It uses OIDC to upload the complete distribution
-set using shared checks in `scripts/release.py`. The approved job checks out only
-that script at the run's commit, without persisting checkout credentials. Preflight
-runs with Python isolation enabled and uses only the standard library. A separate
-finalization job verifies both PyPI filenames and hashes before publishing the original draft.
+After approval, publication readiness repeats the same version-eligibility policy:
+the live tag must still match, GitHub must remain unpublished, and PyPI must have
+no version record. It also verifies the built bundle's identity and checksums and
+compares every draft asset against that bundle. The early check allows no draft
+or an obsolete draft; readiness requires the exact staged build. PyPI absence is
+checked last, after the asset comparison.
+
+The approved job uses OIDC to upload the complete distribution set. It checks out
+only `scripts/release.py` at the run's commit without persisting checkout credentials.
+The shared Python checks run with isolation enabled and use only the standard
+library. A separate finalization job verifies both PyPI filenames and hashes before
+publishing the original draft.
 Keep the Trusted Publisher repository, workflow filename `release.yml`, and
 `pypi` environment unchanged.
 

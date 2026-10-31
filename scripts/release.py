@@ -207,9 +207,9 @@ def require_current_commit(kind: str, current: str, expected: str) -> None:
 def eligible(bundle: Path, api: GitHub) -> None:
     """Reject any existing target PyPI version before expensive checks."""
     info = json.loads((bundle / "release.json").read_text())
-    require_unpublished(pypi_files(info["version"]))
-    draft_action(api.find_release(info["tag"]), info["commit"])
     live_tag(api)
+    draft_action(api.find_release(info["tag"]), info["commit"])
+    require_unpublished(pypi_files(info["version"]))
     return None
 
 
@@ -346,13 +346,11 @@ def verify_release(bundle: Path, api: GitHub, manifest: dict[str, str]) -> dict:
 def preflight(bundle: Path, api: GitHub) -> None:
     """Recheck approved bytes and identities immediately before the PyPI upload."""
     manifest = verify_bundle(bundle)
-    live_tag(api)
-    release = verify_release(bundle, api, manifest)
-    if not release["draft"]:
-        raise ValueError("Published GitHub release requires owner cleanup")
-    info = json.loads((bundle / "release.json").read_text())
-    # Check PyPI last, after downloading and comparing the draft assets.
-    require_unpublished(pypi_files(info["version"]))
+    verify_release(bundle, api, manifest)
+    # Repeat the same eligibility policy after approval, checking PyPI last.
+    # Early eligibility allows no draft or an obsolete draft; readiness also
+    # requires the exact approved source, metadata and distribution bytes above.
+    eligible(bundle, api)
     return None
 
 
