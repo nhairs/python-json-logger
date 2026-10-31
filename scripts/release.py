@@ -16,8 +16,7 @@ import urllib.error
 import urllib.request
 import zipfile
 
-from packaging.utils import canonicalize_name
-from packaging.version import Version
+# Import packaging only in build/metadata commands; publisher preflight uses the stdlib.
 
 
 def run(*args: str) -> str:
@@ -27,6 +26,8 @@ def run(*args: str) -> str:
 
 def release_info(tag: str, project_version: str, changelog: str) -> tuple[str, str]:
     """Return the normalized version and complete base-version changelog section."""
+    from packaging.version import Version  # pylint: disable=import-outside-toplevel
+
     match = re.fullmatch(
         r"v((?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*))(?:\.(dev|rc|post)(0|[1-9][0-9]*))?",
         tag,
@@ -66,6 +67,8 @@ def validate_post_date(notes: str, original_notes: str) -> None:
 
 def prepare(tag: str, destination: Path) -> None:
     """Validate tag ancestry and write release metadata."""
+    from packaging.version import Version  # pylint: disable=import-outside-toplevel
+
     subprocess.run(["git", "merge-base", "--is-ancestor", "HEAD", "origin/main"], check=True)
     project = tomllib.loads(Path("pyproject.toml").read_text())["project"]
     version, notes = release_info(tag, project["version"], Path("docs/changelog.md").read_text())
@@ -94,6 +97,9 @@ def prepare(tag: str, destination: Path) -> None:
 
 def validate_distributions(directory: Path, version: str) -> None:
     """Check both metadata records and write a manifest for exactly two files."""
+    from packaging.utils import canonicalize_name  # pylint: disable=import-outside-toplevel
+    from packaging.version import Version  # pylint: disable=import-outside-toplevel
+
     wheels = list(directory.glob("*.whl"))
     sdists = list(directory.glob("*.tar.gz"))
     if len(wheels) != 1 or len(sdists) != 1 or len(list(directory.iterdir())) != 2:
@@ -285,6 +291,8 @@ def verify_bundle(bundle: Path) -> dict[str, str]:
     info = json.loads((bundle / "release.json").read_text())
     if info["tag"] != os.environ["GITHUB_REF_NAME"] or info["commit"] != os.environ["GITHUB_SHA"]:
         raise ValueError("Bundle tag or commit mismatch")
+    if info["run_id"] != os.environ["GITHUB_RUN_ID"]:
+        raise ValueError("Bundle belongs to a different workflow run")
     manifest = json.loads((bundle / "SHA256SUMS.json").read_text())
     if len(manifest) != 2 or set(manifest) != {p.name for p in (bundle / "dist").iterdir()}:
         raise ValueError("Unexpected distribution manifest")
@@ -295,19 +303,17 @@ def verify_bundle(bundle: Path) -> dict[str, str]:
         raise ValueError("Expected a wheel and an sdist")
     for name, digest in manifest.items():
         if (
-            Path(name).name != name
+            not re.fullmatch(r"[A-Za-z0-9_.+-]+", name)
+            or not re.fullmatch(r"[a-f0-9]{64}", digest)
             or hashlib.sha256((bundle / "dist" / name).read_bytes()).hexdigest() != digest
         ):
             raise ValueError("Invalid filename or checksum mismatch")
     return manifest
 
 
-def finalize(bundle: Path, api: GitHub) -> None:
-    """Publish only the original draft after verifying every public PyPI hash."""
-    manifest = verify_bundle(bundle)
+def verify_release(bundle: Path, api: GitHub, manifest: dict[str, str]) -> dict:
+    """Verify exact GitHub release source, metadata and assets against the bundle."""
     info = json.loads((bundle / "release.json").read_text())
-    live_tag(api)
-    require_published(manifest, pypi_files(info["version"]))
     release = api.find_release(info["tag"])
     if release is None or release["target_commitish"] != info["commit"]:
         raise ValueError("Missing or changed release draft")
@@ -334,6 +340,29 @@ def finalize(bundle: Path, api: GitHub) -> None:
         release["prerelease"] != info["prerelease"]
     ):
         raise ValueError("Release metadata differs from approved bundle")
+    return release
+
+
+def preflight(bundle: Path, api: GitHub) -> None:
+    """Recheck approved bytes and identities immediately before the PyPI upload."""
+    manifest = verify_bundle(bundle)
+    live_tag(api)
+    release = verify_release(bundle, api, manifest)
+    if not release["draft"]:
+        raise ValueError("Published GitHub release requires owner cleanup")
+    info = json.loads((bundle / "release.json").read_text())
+    # Check PyPI last, after downloading and comparing the draft assets.
+    require_unpublished(pypi_files(info["version"]))
+    return None
+
+
+def finalize(bundle: Path, api: GitHub) -> None:
+    """Publish only the original draft after verifying every public PyPI hash."""
+    manifest = verify_bundle(bundle)
+    live_tag(api)
+    info = json.loads((bundle / "release.json").read_text())
+    require_published(manifest, pypi_files(info["version"]))
+    release = verify_release(bundle, api, manifest)
     if release["draft"]:
         api.request(f'/releases/{release["id"]}', {"draft": False}, method="PATCH")
     return None
@@ -369,6 +398,7 @@ def main() -> None:
             "stage",
             "verify",
             "finalize",
+            "preflight",
             "record-finalization",
         ],
     )
@@ -385,6 +415,8 @@ def main() -> None:
         eligible(args.bundle, GitHub())
     elif args.command == "verify":
         verify_bundle(args.bundle)
+    elif args.command == "preflight":
+        preflight(args.bundle, GitHub())
     elif args.command == "finalize":
         finalize(args.bundle, GitHub())
     else:

@@ -159,13 +159,20 @@ def test_bundle_identity_and_checksums(tmp_path: Path, monkeypatch: pytest.Monke
     (tmp_path / "SHA256SUMS.json").write_text(
         json.dumps({name: hashlib.sha256(content).hexdigest() for name, content in files.items()})
     )
-    (tmp_path / "release.json").write_text(json.dumps({"tag": "v4.3.0", "commit": "abc"}))
+    (tmp_path / "release.json").write_text(
+        json.dumps({"tag": "v4.3.0", "commit": "abc", "run_id": "123"})
+    )
+    monkeypatch.setenv("GITHUB_RUN_ID", "123")
     monkeypatch.setenv("GITHUB_REF_NAME", "v4.3.0")
     monkeypatch.setenv("GITHUB_SHA", "wrong")
     with pytest.raises(ValueError, match="commit mismatch"):
         release.verify_bundle(tmp_path)
     monkeypatch.setenv("GITHUB_SHA", "abc")
     assert set(release.verify_bundle(tmp_path)) == {"package.whl", "package.tar.gz"}
+    monkeypatch.setenv("GITHUB_RUN_ID", "another-run")
+    with pytest.raises(ValueError, match="different workflow run"):
+        release.verify_bundle(tmp_path)
+    monkeypatch.setenv("GITHUB_RUN_ID", "123")
     (directory / "package.whl").write_bytes(b"corrupted")
     with pytest.raises(ValueError, match="checksum mismatch"):
         release.verify_bundle(tmp_path)
@@ -193,7 +200,6 @@ def test_workflow_permissions_and_order() -> None:
             if "uses" in step:
                 assert len(step["uses"].split("@")[1]) == 40
     assert jobs["publish"]["environment"]["name"] == "pypi"
-    assert not any("scripts/" in step.get("run", "") for step in jobs["publish"]["steps"])
     assert jobs["publish"]["needs"] == ["build", "draft"]
     assert jobs["finalize"]["needs"] == ["build", "publish"]
     assert "needs.publish.outputs.uploaded == 'success'" in jobs["finalize"]["if"]
@@ -209,12 +215,17 @@ def test_workflow_permissions_and_order() -> None:
         download = next(s for s in jobs[name]["steps"] if "download-artifact" in s.get("uses", ""))
         assert download["with"]["artifact-ids"] == "${{ needs.build.outputs.bundle-id }}"
     steps = jobs["publish"]["steps"]
-    assert not any("checkout" in step.get("uses", "") for step in steps)
+    checkout = next(s for s in steps if "checkout" in s.get("uses", ""))
+    assert checkout["with"] == {
+        "ref": "${{ github.sha }}",
+        "persist-credentials": "false",
+        "sparse-checkout": "scripts/release.py",
+        "sparse-checkout-cone-mode": "false",
+    }
+    assert not any("pip install" in s.get("run", "") for s in steps)
     assert not any("gh release edit" in step.get("run", "") for step in steps)
     preflight = next(s for s in steps if s.get("id") == "preflight")
-    assert "git/ref/tags" in preflight["run"]
-    assert '"$status" != 404' in preflight["run"]
-    assert "sha256sum --check" in preflight["run"]
+    assert preflight["run"] == "python -I scripts/release.py preflight"
     upload = next(s for s in steps if s.get("id") == "upload")
     assert "pypa/gh-action-pypi-publish@" in upload["uses"]
     assert upload["with"]["packages-dir"] == "bundle/dist/"

@@ -92,54 +92,26 @@ jobs:
       contents: read
       id-token: write
     steps:
+      # Only the reviewed release helper is needed; preflight uses no third-party packages.
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          sparse-checkout: scripts/release.py
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.12'
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           artifact-ids: ${{ needs.build.outputs.bundle-id }}
           merge-multiple: true
           path: bundle
-      # No checkout or repository code in the credential-bearing job.
       - name: Recheck approved source, draft, bytes and PyPI absence
         id: preflight
         env:
           GH_TOKEN: ${{ github.token }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          jq -e --arg tag "$GITHUB_REF_NAME" --arg sha "$GITHUB_SHA" --arg run "$GITHUB_RUN_ID" \
-            '.tag == $tag and .commit == $sha and .run_id == $run' bundle/release.json
-          object=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$GITHUB_REF_NAME" --jq '.object')
-          while [ "$(jq -r .type <<< "$object")" = tag ]; do
-            object=$(gh api "repos/$GITHUB_REPOSITORY/git/tags/$(jq -r .sha <<< "$object")" --jq '.object')
-          done
-          test "$(jq -r .type <<< "$object")" = commit
-          test "$(jq -r .sha <<< "$object")" = "$GITHUB_SHA"
-          jq -e 'length == 2 and ([keys[] | select(endswith(".whl"))] | length) == 1 and
-            ([keys[] | select(endswith(".tar.gz"))] | length) == 1 and
-            all(keys[]; test("^[A-Za-z0-9_.+-]+$")) and
-            all(.[]; test("^[a-f0-9]{64}$"))' bundle/SHA256SUMS.json
-          test "$(find bundle/dist -mindepth 1 -maxdepth 1 | wc -l)" -eq 2
-          jq -r 'to_entries[] | "\(.value)  \(.key)"' bundle/SHA256SUMS.json > "$RUNNER_TEMP/checksums"
-          (cd bundle/dist && sha256sum --check "$RUNNER_TEMP/checksums")
-          draft=$(gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" \
-            --json isDraft,targetCommitish,body,isPrerelease,assets)
-          jq -e --arg sha "$GITHUB_SHA" --rawfile notes bundle/notes.md \
-            --slurpfile info bundle/release.json \
-            '.isDraft and .targetCommitish == $sha and .body == $notes and
-            .isPrerelease == $info[0].prerelease' <<< "$draft"
-          jq -e --slurpfile manifest bundle/SHA256SUMS.json \
-            '([.assets[].name] | sort) == (($manifest[0] | keys) + ["release.json", "SHA256SUMS.json"] | sort)' <<< "$draft"
-          mkdir "$RUNNER_TEMP/draft"
-          gh release download "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --dir "$RUNNER_TEMP/draft"
-          cmp bundle/release.json "$RUNNER_TEMP/draft/release.json"
-          cmp bundle/SHA256SUMS.json "$RUNNER_TEMP/draft/SHA256SUMS.json"
-          for file in bundle/dist/*; do cmp "$file" "$RUNNER_TEMP/draft/$(basename "$file")"; done
-          version=$(jq -r .version bundle/release.json)
-          status=$(curl --silent --show-error --connect-timeout 10 --max-time 30 --output "$RUNNER_TEMP/pypi.json" --write-out '%{http_code}' \
-            "https://pypi.org/pypi/python-json-logger/$version/json")
-          if [ "$status" != 404 ]; then
-            echo "Target PyPI version is not absent (HTTP $status); stop and recover manually."
-            exit 1
-          fi
+        run: python -I scripts/release.py preflight
       - uses: pypa/gh-action-pypi-publish@ed0c53931b1dc9bd32cbe73a98c7f6766f8a527e # v1.13.0
         id: upload
         with:

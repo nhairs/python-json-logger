@@ -41,8 +41,10 @@ happens after checks and build succeed. Public releases are never replaced.
 
 The approved job checks the live tag, source identity, bundle checksums, draft
 assets, and PyPI absence again. It uses OIDC to upload the complete distribution
-set without checking out or running repository scripts. A separate finalization
-job verifies both PyPI filenames and hashes before publishing the original draft.
+set using shared checks in `scripts/release.py`. The approved job checks out only
+that script at the run's commit, without persisting checkout credentials. Preflight
+runs with Python isolation enabled and uses only the standard library. A separate
+finalization job verifies both PyPI filenames and hashes before publishing the original draft.
 Keep the Trusted Publisher repository, workflow filename `release.yml`, and
 `pypi` environment unchanged.
 
