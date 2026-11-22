@@ -16,9 +16,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Preserve an exception's own notes when encoding exception instances, including exception group summaries. Related to [#67](https://github.com/nhairs/python-json-logger/issues/67).
-- Constrain the documentation dependency to `mkdocs<2`. [#80](https://github.com/nhairs/python-json-logger/issues/80)
-- Replaced MyPy with Pyrefly for type checking
-- `merge_record_extra` only reads the values of fields it keeps and checks `str` keys faster, so formatting a record is faster.
+- Performance: `merge_record_extra` only reads the values of fields it keeps and checks `str` keys faster, so formatting a record is ~5-10% faster.
+- Development: Constrain the documentation dependency to `mkdocs<2`. [#80](https://github.com/nhairs/python-json-logger/issues/80)
+- Development: Replaced MyPy with Pyrefly for type checking
 
 ### Fixed
 - `exc_info_as_array=True` now splits cached exception text into lines when a transported log record has no `exc_info` tuple. [#89](https://github.com/nhairs/python-json-logger/issues/89)
