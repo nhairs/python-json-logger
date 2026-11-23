@@ -21,7 +21,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-ProperDocs 1.6.7, mkdocs-material-9.8.0">
+      <meta name="generator" content="mkdocs-ProperDocs 1.6.7, mkdocs-material-9.8.2">
     
     
       
@@ -2428,8 +2428,9 @@ and this project adheres to <a href="https://semver.org/spec/v2.0.0.html">Semant
 <h3 id="changed">Changed<a class="headerlink" href="#changed" title="Permanent link">🔗</a></h3>
 <ul>
 <li>Preserve an exception's own notes when encoding exception instances, including exception group summaries. Related to <a href="https://github.com/nhairs/python-json-logger/issues/67">#67</a>.</li>
-<li>Constrain the documentation dependency to <code>mkdocs&lt;2</code>. <a href="https://github.com/nhairs/python-json-logger/issues/80">#80</a></li>
-<li>Replaced MyPy with Pyrefly for type checking</li>
+<li>Performance: <code>merge_record_extra</code> only reads the values of fields it keeps and checks <code>str</code> keys faster, so formatting a record is ~5-10% faster.</li>
+<li>Development: Constrain the documentation dependency to <code>mkdocs&lt;2</code>. <a href="https://github.com/nhairs/python-json-logger/issues/80">#80</a></li>
+<li>Development: Replaced MyPy with Pyrefly for type checking</li>
 </ul>
 <h3 id="fixed">Fixed<a class="headerlink" href="#fixed" title="Permanent link">🔗</a></h3>
 <ul>
@@ -2440,7 +2441,7 @@ and this project adheres to <a href="https://semver.org/spec/v2.0.0.html">Semant
 <li><code>defaults</code> is copied on construction like <code>rename_fields</code> and <code>static_fields</code>, so DictConfigurator <code>ext://</code> prefixes are converted and mutating the caller's dict cannot change formatter state.</li>
 <li>A string passed as <code>reserved_attrs</code> raises <code>TypeError</code> instead of being iterated as characters; use a list or tuple of field names.</li>
 </ul>
-<p>Thanks @dylanpulver, @Gonghan-Princess, @JackyHsu-X, @00200200, @SAY-5, @AryanRG</p>
+<p>Thanks @dylanpulver, @Gonghan-Princess, @JackyHsu-X, @00200200, @SAY-5, @AryanRG, @g4lb</p>
 <h2 id="420-2026-08-15"><a href="https://github.com/nhairs/python-json-logger/compare/v4.1.0...v4.2.0">4.2.0</a> - 2026-08-15<a class="headerlink" href="#420-2026-08-15" title="Permanent link">🔗</a></h2>
 <h3 id="changed_1">Changed<a class="headerlink" href="#changed_1" title="Permanent link">🔗</a></h3>
 <ul>
@@ -2784,7 +2785,7 @@ and this project adheres to <a href="https://semver.org/spec/v2.0.0.html">Semant
       <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.instant", "navigation.sections", "navigation.indexes", "navigation.expand", "navigation.top", "content.code.annotate", "content.code.copy", "toc.follow"], "search": "../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.c21346df.min.js"></script>
+      <script src="../assets/javascripts/bundle.a5f9d56c.min.js"></script>
       
     
   </body>
