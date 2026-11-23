@@ -98,10 +98,18 @@ def merge_record_extra(
     """
     if rename_fields is None:
         rename_fields = {}
-    for key, value in record.__dict__.items():
+    record_dict = record.__dict__
+    for key in record_dict:
+        if key in reserved:
+            continue
         # this allows to have numeric keys
-        if key not in reserved and not (hasattr(key, "startswith") and key.startswith("_")):
-            target[rename_fields.get(key, key)] = value
+        # an exact str check is faster than hasattr() for the common case
+        if type(key) is str:  # pylint: disable=unidiomatic-typecheck
+            if key.startswith("_"):
+                continue
+        elif hasattr(key, "startswith") and key.startswith("_"):
+            continue
+        target[rename_fields.get(key, key)] = record_dict[key]
     return target
 
 
