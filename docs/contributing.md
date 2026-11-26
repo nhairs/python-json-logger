@@ -88,6 +88,25 @@ pytest
 
 The above commands (`black`, `pylint`, `pyrefly `, `pytest`) should all be run before submitting a pull request.
 
+#### GitHub Actions workflow linting
+
+Pull-request CI checks every workflow in `.github/workflows` with `actionlint`.
+To run the same check locally, download the archive for your platform from the
+[actionlint v1.7.12 release](https://github.com/rhysd/actionlint/releases/tag/v1.7.12).
+Verify its SHA-256 digest against the release's `actionlint_1.7.12_checksums.txt`
+file, then extract the binary and add it to your `PATH`.
+
+Run this command from the repository root.
+
+```shell
+actionlint -shellcheck= -pyflakes=
+```
+
+These flags disable the optional ShellCheck and Pyflakes integrations in both
+local runs and CI.
+
+#### Documentation preview
+
 If making changes to the documentation you can preview the changes locally using `mkdocs`. Changes to the `README.md` can be previewed using a tool like [`grip`](https://github.com/joeyespo/grip) (installable via `pip install grip`).
 
 ```shell

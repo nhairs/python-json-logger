@@ -22,6 +22,31 @@ jobs:
       - name: Lint with tox
         run: uvx tox -e lint
 
+  workflow-lint:
+    name: Lint GitHub Actions workflows
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      - name: Check workflows with actionlint
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          tool_dir="$RUNNER_TEMP/actionlint"
+          archive=actionlint_1.7.12_linux_amd64.tar.gz
+          gh release download v1.7.12 --repo rhysd/actionlint \
+            --pattern "$archive" --dir "$tool_dir"
+          printf '%s  %s\n' \
+            '8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8' \
+            "$tool_dir/$archive" | sha256sum --check
+          tar -xzf "$tool_dir/$archive" -C "$tool_dir"
+          "$tool_dir/actionlint" -shellcheck= -pyflakes=
+
   test:
     name: "Python Test ${{ matrix.os }}"
     needs: [lint]
