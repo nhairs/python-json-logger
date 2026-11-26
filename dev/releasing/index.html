@@ -540,10 +540,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#prepare" class="md-nav__link">
+  <a href="#prepare-the-release" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Prepare
+        Prepare the release
       
     </span>
   </a>
@@ -551,10 +551,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#approve" class="md-nav__link">
+  <a href="#approve-publication" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Approve
+        Approve publication
       
     </span>
   </a>
@@ -562,54 +562,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#recover-before-any-pypi-upload" class="md-nav__link">
+  <a href="#handle-a-failed-release" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Recover before any PyPI upload
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#recover-after-a-pypi-upload" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Recover after a PyPI upload
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#retained-artifacts" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Retained artifacts
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#release-helper-commands" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Release helper commands
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#validate-workflow-changes" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Validate workflow changes
+        Handle a failed release
       
     </span>
   </a>
@@ -1030,10 +986,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#prepare" class="md-nav__link">
+  <a href="#prepare-the-release" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Prepare
+        Prepare the release
       
     </span>
   </a>
@@ -1041,10 +997,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#approve" class="md-nav__link">
+  <a href="#approve-publication" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Approve
+        Approve publication
       
     </span>
   </a>
@@ -1052,54 +1008,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#recover-before-any-pypi-upload" class="md-nav__link">
+  <a href="#handle-a-failed-release" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Recover before any PyPI upload
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#recover-after-a-pypi-upload" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Recover after a PyPI upload
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#retained-artifacts" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Retained artifacts
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#release-helper-commands" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Release helper commands
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#validate-workflow-changes" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Validate workflow changes
+        Handle a failed release
       
     </span>
   </a>
@@ -1127,174 +1039,31 @@
 
 
 <h1 id="release-checklist">Release checklist<a class="headerlink" href="#release-checklist" title="Permanent link">🔗</a></h1>
-<p>The <code>release.yml</code> workflow checks eligibility, runs CI, builds distributions, and
-stages a GitHub draft. After <code>pypi</code> approval, it uploads to PyPI and verifies both
-files before publishing GitHub.</p>
-<h2 id="prepare">Prepare<a class="headerlink" href="#prepare" title="Permanent link">🔗</a></h2>
-<ul>
-<li>[ ] Set <code>project.version</code> in <code>pyproject.toml</code>.</li>
-<li>[ ] Update the base-version section in <code>docs/changelog.md</code>.
-  Set <code>YYYY-MM-DD</code> for RCs and stable releases; only development releases may
-  use <code>UNRELEASED</code>. Post releases must match the date at the base release tag.</li>
-<li>[ ] Merge the release commit into <code>main</code>.</li>
-<li>[ ] Review and push the tag. Use <code>vN.N.N</code> with optional <code>.devN</code>, <code>.rcN</code>, or <code>.postN</code>, without leading zeros.</li>
-</ul>
-<p>For example, <code>v4.3.0.rc1</code> matches project version <code>4.3.0rc1</code> and the <code>4.3.0</code>
-changelog section. Alpha, beta, undotted suffixes, and combined suffixes are rejected.
-Exact validation blocks invalid releases; it does not prevent tag creation.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>git<span class="w"> </span>tag<span class="w"> </span>v4.3.0.rc1
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </span>v4.3.0.rc1
-</code></pre></div>
-<p>Before lint or tests, eligibility rejects any PyPI record for the target version,
-including partial or yanked releases. Only HTTP 404 means absent; service and
-network errors stop the run. A public GitHub release also blocks a new attempt
-and requires owner cleanup. Existing drafts are allowed.</p>
-<h2 id="approve">Approve<a class="headerlink" href="#approve" title="Permanent link">🔗</a></h2>
-<ul>
-<li>[ ] Check lint and the Linux, macOS, and Windows test results.</li>
-<li>[ ] Review the GitHub draft: title, full changelog, and prerelease flag.</li>
-<li>[ ] Check the wheel, sdist, <code>SHA256SUMS.json</code>, and <code>release.json</code> assets.</li>
-<li>[ ] Approve the <code>pypi</code> deployment.</li>
-<li>[ ] Confirm PyPI has both files and GitHub is published.</li>
-</ul>
-<p>Every build attempt creates fresh distributions. Staging replaces all assets on a
-same-commit draft, or deletes and recreates a draft for a different commit. Cleanup
-happens after checks and build succeed. Public releases are never replaced.</p>
-<p>After approval, publication readiness repeats the same version-eligibility policy:
-the live tag must still match, GitHub must remain unpublished, and PyPI must have
-no version record. It also verifies the built bundle's identity and checksums and
-compares every draft asset against that bundle. The early check allows no draft
-or an obsolete draft; readiness requires the exact staged build. PyPI absence is
-checked last, after the asset comparison.</p>
-<p>The approved job uses OIDC to upload the complete distribution set. It checks out
-only <code>scripts/release.py</code> at the run's commit without persisting checkout credentials.
-The shared Python checks run with isolation enabled and use only the standard
-library. A separate finalization job verifies both PyPI filenames and hashes before
-publishing the original draft. The approved job needs <code>contents: write</code> because
-GitHub requires push access to list draft releases and inspect their assets.
-Keep the Trusted Publisher repository, workflow filename <code>release.yml</code>, and
-<code>pypi</code> environment unchanged.</p>
-<h2 id="recover-before-any-pypi-upload">Recover before any PyPI upload<a class="headerlink" href="#recover-before-any-pypi-upload" title="Permanent link">🔗</a></h2>
-<ul>
-<li>[ ] Check PyPI to confirm no file for the version was accepted.</li>
-<li>[ ] Cancel an obsolete run waiting for approval before starting its replacement.</li>
-<li>[ ] Fix and merge the workflow or source change, then retarget the unpublished
-  tag under the repository's protection rules, or rerun the original run for a
-  transient failure with unchanged source.</li>
-<li>[ ] Review the fresh build and draft, then approve the new deployment.</li>
-</ul>
-<p>Runs are serialized per tag without automatic cancellation; different tags run
-independently. The owner cancels stale waiting runs manually. If approved instead,
-a stale run fails its recheck when the tag moved or another run published PyPI.
-Avoid moving tags during an active upload. Rechecks cannot lock a tag against an
-owner changing it after the check.</p>
-<h2 id="recover-after-a-pypi-upload">Recover after a PyPI upload<a class="headerlink" href="#recover-after-a-pypi-upload" title="Permanent link">🔗</a></h2>
-<p>Any accepted file freezes the version's source and distribution bytes. Normal
-attempts stop rather than rebuild, select missing files, or use <code>skip-existing</code>.
-Deleting a PyPI version does not guarantee its filenames can be uploaded again.</p>
-<p>If the PyPI step succeeded but GitHub finalization failed:</p>
+<h2 id="prepare-the-release">Prepare the release<a class="headerlink" href="#prepare-the-release" title="Permanent link">🔗</a></h2>
 <ol>
-<li>Select <strong>Re-run failed jobs</strong> on the original run. This reruns finalization
-   with the original build artifact ID without uploading to PyPI again.</li>
-<li>Confirm finalization verifies the complete PyPI hashes and original draft assets.</li>
-<li>Confirm the GitHub release is published.</li>
+<li>Set <code>project.version</code> in <code>pyproject.toml</code>.</li>
+<li>Update the base-version section in <code>docs/changelog.md</code>. Use <code>UNRELEASED</code> for
+   development and prerelease versions, or <code>YYYY-MM-DD</code> for a final release.</li>
+<li>Merge the release commit into <code>main</code>.</li>
+<li>Tag that commit with <code>v</code> followed by the exact project version, then push the tag.</li>
 </ol>
-<p>Do not select <strong>Re-run all jobs</strong> after publication: eligibility rejects the
-existing version. If PyPI accepted files but the upload step failed, or an upload
-was partial, stop automatic recovery. Recover the original distributions and
-manifest from the draft or retained bundle for an owner-reviewed manual recovery.
-This workflow does not automate partial uploads. If the original bytes cannot be
-recovered, prepare a new version.</p>
-<h2 id="retained-artifacts">Retained artifacts<a class="headerlink" href="#retained-artifacts" title="Permanent link">🔗</a></h2>
-<table>
-<thead>
-<tr>
-<th>Artifact</th>
-<th>Contents</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>release-bundle-N</code></td>
-<td>Original wheel and sdist, <code>SHA256SUMS.json</code>, full notes, and <code>release.json</code> with tag, version, commit, build run, and attempt.</td>
-</tr>
-<tr>
-<td><code>finalization-evidence-N</code></td>
-<td>Original bundle artifact ID and GitHub finalization outcome.</td>
-</tr>
-<tr>
-<td><code>publication-evidence-N</code></td>
-<td>Available <code>.publish.attestation</code> files, manifest, release metadata, bundle artifact ID, publication attempt, and step outcomes.</td>
-</tr>
-</tbody>
-</table>
-<p><code>N</code> is the job's workflow attempt. Artifacts are retained for 90 days and scoped
-to the workflow run. Downstream jobs use the exact build artifact ID, including
-when a failed job reruns with a newer attempt number. The old <code>pypi-upload-N</code>
-subset artifact is no longer needed because normal publication uploads both files.</p>
-<p>Evidence retention runs even after failure. If signing never started, the evidence
-records that no attestations are available. Distributions remain in the referenced
-bundle and GitHub draft. No credentials, OIDC tokens, or private keys are archived.</p>
-<p>Saved attestations bind the CI identity to exact distribution hashes; they are
-not upload credentials. PyPI requires Trusted Publishing authentication to accept
-these attestations. Ordinary local API-token uploads cannot replay that identity.
-The publishing action generates fresh attestations and rejects pre-existing
-attestation files when generation is enabled. Preserve evidence for investigation
-and future recovery rather than assuming it can be submitted by a local upload.</p>
-<h2 id="release-helper-commands">Release helper commands<a class="headerlink" href="#release-helper-commands" title="Permanent link">🔗</a></h2>
-<p>The workflow uses these <code>scripts/release.py</code> commands. Each command performs one
-release operation; job names describe the surrounding pipeline stage.</p>
-<table>
-<thead>
-<tr>
-<th>Command</th>
-<th>Operation</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>prepare-release-metadata</code></td>
-<td>Check tag/version, ancestry, changelog and release date; write metadata and notes.</td>
-</tr>
-<tr>
-<td><code>check-release-version-eligibility</code></td>
-<td>Require PyPI absence and the current source tag; reject public GitHub releases.</td>
-</tr>
-<tr>
-<td><code>validate-distributions</code></td>
-<td>Validate wheel/sdist metadata and write distribution checksums.</td>
-</tr>
-<tr>
-<td><code>verify-release-bundle</code></td>
-<td>Check bundle tag, commit, workflow run, filenames and distribution hashes.</td>
-</tr>
-<tr>
-<td><code>stage-github-draft</code></td>
-<td>Recheck eligibility and stage the complete draft asset set.</td>
-</tr>
-<tr>
-<td><code>check-pypi-publication-readiness</code></td>
-<td>Recheck the approved bundle, live tag, draft assets and PyPI absence.</td>
-</tr>
-<tr>
-<td><code>verify-and-publish-github-release</code></td>
-<td>Verify complete PyPI hashes and original draft assets, then publish GitHub.</td>
-</tr>
-<tr>
-<td><code>record-github-finalization-outcome</code></td>
-<td>Record the finalization result and original bundle reference.</td>
-</tr>
-</tbody>
-</table>
-<h2 id="validate-workflow-changes">Validate workflow changes<a class="headerlink" href="#validate-workflow-changes" title="Permanent link">🔗</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>uv<span class="w"> </span>run<span class="w"> </span>--python<span class="w"> </span><span class="m">3</span>.12<span class="w"> </span>--group<span class="w"> </span>dev<span class="w"> </span>pytest<span class="w"> </span>tests/test_release.py
+<p>For example, version <code>4.3.0rc1</code> uses the <code>4.3.0</code> changelog section and this tag.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>git<span class="w"> </span>tag<span class="w"> </span>v4.3.0rc1
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </span>v4.3.0rc1
 </code></pre></div>
-<ul>
-<li>[ ] Run lint, tests, <code>actionlint</code>, and a local build/install check.</li>
-<li>[ ] Review API-facing changes separately. Unit tests check release policy;
-  they do not prove GitHub or PyPI integration.</li>
-<li>[ ] Obtain separate authorization for live releases, TestPyPI trials, or settings changes.</li>
-</ul>
+<h2 id="approve-publication">Approve publication<a class="headerlink" href="#approve-publication" title="Permanent link">🔗</a></h2>
+<p>When the Release workflow requests approval, review the release notes and
+built distributions in its <code>release-bundle</code> artifact, then approve the <code>pypi</code>
+deployment.</p>
+<h2 id="handle-a-failed-release">Handle a failed release<a class="headerlink" href="#handle-a-failed-release" title="Permanent link">🔗</a></h2>
+<p>Cancel stale runs waiting for approval before starting a replacement.</p>
+<p>If any file reached PyPI, preserve the original bundle and publication evidence
+from the workflow artifacts. Inspect PyPI and GitHub to establish what was
+published before recovering manually. A failed publishing job cannot reuse an
+earlier attempt's bundle through <strong>Re-run failed jobs</strong>. Prepare a new version
+if the original distribution bytes are unavailable.</p>
+<p>See the <a href="https://pypi.org/project/nopt/0.2.0/">nopt documentation</a> for supported
+versions, release policy, and recovery limits.</p>
 
 
 
