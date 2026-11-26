@@ -15,11 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `STYLE_STRING_FORMAT_REGEX`, which is no longer used to find `{` style fields. [#75](https://github.com/nhairs/python-json-logger/pull/75)
 
 ### Changed
-- CI: Use the published `nopt` package to build and publish releases. [#114](https://github.com/nhairs/python-json-logger/pull/114)
 - Preserve an exception's own notes when encoding exception instances, including exception group summaries. Related to [#67](https://github.com/nhairs/python-json-logger/issues/67).
 - Performance: `merge_record_extra` only reads the values of fields it keeps and checks `str` keys faster, so formatting a record is ~5-10% faster.
 - Development: Constrain the documentation dependency to `mkdocs<2`. [#80](https://github.com/nhairs/python-json-logger/issues/80)
 - Development: Replaced MyPy with Pyrefly for type checking
+- CI: Use the published `nopt` package to build and publish releases. [#114](https://github.com/nhairs/python-json-logger/pull/114)
 
 ### Fixed
 - `exc_info_as_array=True` now splits cached exception text into lines when a transported log record has no `exc_info` tuple. [#89](https://github.com/nhairs/python-json-logger/issues/89)
