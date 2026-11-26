@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Performance: `merge_record_extra` only reads the values of fields it keeps and checks `str` keys faster, so formatting a record is ~5-10% faster.
 - Development: Constrain the documentation dependency to `mkdocs<2`. [#80](https://github.com/nhairs/python-json-logger/issues/80)
 - Development: Replaced MyPy with Pyrefly for type checking
+- CI: Use the published `nopt` package to build and publish releases. [#114](https://github.com/nhairs/python-json-logger/pull/114)
 
 ### Fixed
 - `exc_info_as_array=True` now splits cached exception text into lines when a transported log record has no `exc_info` tuple. [#89](https://github.com/nhairs/python-json-logger/issues/89)
